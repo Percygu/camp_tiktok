@@ -1,2 +1,2 @@
 cd ../pkg/proto/
-protoc --go_out=. --go-grpc_out=. ./*.proto
+protoc --go-grpc_out=require_unimplemented_servers=false:.  --go_out=. ./*.proto
