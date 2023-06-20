@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+option go_package = "../pb;pb";
+// protoc --proto_path=. --go_out=. ./*.proto
+// protoc -I . user.proto  --go_out=plugins=grpc:.
+
+service User {
+  rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse); // 获取用户信息
+
+  rpc CheckPassWord(CheckPassWordRequest) returns (CheckPassWordResponse); //检查密码
+  rpc Register(RegisterRequest) returns (RegisterResponse); // 注册
+
+  //  rpc GetUserByMobile(MobileRequest) returns (UserInfoResponse); // 通过mobile查询用户
+  //  rpc GetUserById(IdRequest) returns (UserInfoResponse); // 通过id查询用户
+  //  rpc CreateUser(CreateUserInfo) returns (UserInfoResponse); // 添加用户
+  //  rpc UpdateUser(UpdateUserInfo) returns (google.protobuf.Empty); // 更新用户（更关心接口有没有被调用）
+}
+
+// 用户信息
+message UserInfo {
+  int64 id = 1; // 用户id​
+  string name = 2; // 用户名称​
+  int64 follow_count = 3; // 关注总数
+  int64 follower_count = 4; // 粉丝总数​
+  bool is_follow = 5; // true-已关注，false-未关注
+  string avatar = 6; //头像地址
+  string background_image = 7;//背景图片地址
+  string signature = 8;//个性签名
+  int64 total_favorited = 9;
+  int64 favorite_count = 10;
+}
+
+message GetUserInfoRequest {
+  int64 id = 1;
+}
+
+
+
+message GetUserInfoResponse {
+  int64 id = 1;
+  string name = 2;
+  int64 followCount = 3;
+  int64 followerCount = 4;
+  bool isFollow = 5;
+  string avatar = 6;
+  string backgroundImage = 7;
+  string signature = 8;
+  int64 totalFavorite = 9;
+  int64 favoriteCount = 10;
+}
+
+
+message CheckPassWordRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message CheckPassWordResponse {
+  int64 userId = 2;
+  string  token = 3;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  int64 userID = 1;
+  string token = 2;
+}
+
+
+//message CheckResponse{
+//  bool success = 1;
+//}
+//
+//message PageInfo {
+//  uint32 pn = 1;
+//  uint32 pSize = 2;
+//}
+//
+//message MobileRequest{
+//  string mobile = 1;
+//}
+//
+//message IdRequest {
+//  int32 id = 1;
+//}
+//
+//message CreateUserInfo {
+//  string nickName = 1;
+//  string passWord = 2;
+//  string mobile = 3;
+//}
+//
+//message UpdateUserInfo {
+//  int32 id = 1;
+//  string nickName = 2;
+//  string gender = 3;
+//  uint64 birthDay = 4;
+//}
+//
+//message UserInfoResponse {
+//  int32 id = 1;
+//  string passWord = 2;
+//  string mobile = 3;
+//  string nickName = 4;
+//  uint64 birthDay = 5; // 不使用string类型
+//  string gender = 6;
+//  int32 role = 7;
+//}
+//
+//message UserListResponse {
+//  int32 total = 1;
+//  repeated UserInfoResponse data = 2;
+//}
