@@ -1,17 +1,19 @@
-module commentsvr
+module usersvr
 
-go 1.19
+go 1.20
 
 require (
-	github.com/Percygu/camp_tiktok v0.0.0-20230620031847-5e786d64ff58
+	github.com/Percygu/camp_tiktok v1.0.1
 	github.com/fsnotify/fsnotify v1.6.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/hashicorp/consul/api v1.21.0
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.24.0
+	golang.org/x/crypto v0.10.0
 	golang.org/x/net v0.11.0
-	google.golang.org/grpc v1.56.0
+	google.golang.org/grpc v1.55.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.1

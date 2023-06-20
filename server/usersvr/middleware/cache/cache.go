@@ -1,17 +1,19 @@
 package cache
 
 import (
-	"commentsvr/config"
-	"commentsvr/log"
 	"fmt"
 	redis "github.com/redis/go-redis/v9"
 	"golang.org/x/net/context"
 	"sync"
+	"time"
+	"usersvr/config"
+	"usersvr/log"
 )
 
 var (
-	redisConn *redis.Client
-	redisOnce sync.Once
+	redisConn   *redis.Client
+	redisOnce   sync.Once
+	ValueExpire = time.Hour * 24 * 7
 )
 
 // openDB 连接db
