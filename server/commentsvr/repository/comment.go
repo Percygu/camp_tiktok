@@ -3,16 +3,10 @@ package repository
 import (
 	"commentsvr/log"
 	"commentsvr/middleware/db"
+	"encoding/json"
+	"strconv"
 	"time"
 )
-
-type Comment struct {
-	CommentId int64  `gorm:"column:comment_id; primary_key;"`
-	UserId    int64  `gorm:"column:user_id"`
-	VideoId   int64  `gorm:"column:video_id"`
-	Comment   string `gorm:"column:commentsvr"`
-	Time      string `gorm:"column:time"`
-}
 
 func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
 	db := db.GetDB()
@@ -30,22 +24,24 @@ func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
 		return nil, result.Error
 	}
 	log.Infof("commentsvr:%+v", comment)
-
-	//CacheDelCommentAll(videoId)
+	// 评论缓存起来
+	if err := SetCommentCacheInfo(&comment); err != nil {
+		log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
+	}
 
 	return &comment, nil
 }
 
-func CommentDelete(videoId, comment_id int64) error {
+func CommentDelete(videoId, commentID int64) error {
 	db := db.GetDB()
 	commentTemp := Comment{}
 
-	err := db.Where("comment_id = ?", comment_id).Take(&commentTemp).Error
+	err := db.Model().Where("comment_id = ?", commentID).Take(&commentTemp).Error
 	if err != nil {
 		return err
 	}
 
-	//CacheDelCommentAll(videoId)
+	CacheDelCommentAll(videoId)
 
 	db.Delete(&commentTemp)
 	return nil
@@ -62,7 +58,7 @@ func CommentList(videoId int64) ([]Comment, error) {
 
 	} */
 
-	//comments, _ = CacheGetComment(videoId)
+	comments, _ = CacheGetComment(videoId)
 	log.Infof("comments-------------------------:%+v\n", comments)
 
 	/* if err == nil {
@@ -74,7 +70,7 @@ func CommentList(videoId int64) ([]Comment, error) {
 
 	err = db.Where("video_id = ?", videoId).Order("comment_id DESC").Find(&comments).Error
 
-	//CacheSetComment(videoId, comments)
+	CacheSetComment(videoId, comments)
 	log.Infof("comments:%+v", comments)
 
 	if err != nil {
@@ -106,55 +102,53 @@ func CommentList(videoId int64) ([]Comment, error) {
 
 // }
 
-/* func CacheSetComment(c Comment) {
+func CacheSetComment(c Comment) {
 	vid := strconv.FormatInt(c.VideoId, 10)
 	err := common.CacheHSet("commentsvr", vid, c)
 	if err != nil {
 		log.Errorf("set cache error:%+v", err)
 	}
-} */
+}
 
-//func CacheSetComment(videoId int64, c []Comment) {
-//	// for _, c1 := range c {
-//	// video_id := c1.VideoId
-//
-//	vid := strconv.FormatInt(videoId, 10)
-//	err := common.CacheHSet("commentsvr", vid, c)
-//	if err != nil {
-//		logger.Errorf("set cache error:%+v", err)
-//	}
-//}
-//
-//// }
-//
-//func CacheGetComment(vid int64) ([]Comment, error) {
-//	key := strconv.FormatInt(vid, 10)
-//	data, err := common.CacheHGet("commentsvr", key)
-//
-//	// var comments = make([]map[string]interface{},2)
-//
-//	var comments []Comment
-//	// commentsvr := Comment{}
-//	if err != nil {
-//		return comments, err
-//	}
-//	err = json.Unmarshal(data, &comments)
-//	if err != nil {
-//		return comments, err
-//	}
-//	return comments, nil
-//}
-//
-//func CacheDelCommentAll(videoId int64) {
-//
-//	vid := strconv.FormatInt(videoId, 10)
-//	err := common.CacheDelHash("commentsvr", vid)
-//	if err != nil {
-//		logger.Errorf("set cache error:%+v", err)
-//	}
-//}
+func CacheSetComment(videoId int64, c []Comment) {
+	// for _, c1 := range c {
+	// video_id := c1.VideoId
 
-/* func CacheDelCommentOne(videoId, comment_id int64) {
+	vid := strconv.FormatInt(videoId, 10)
+	err := common.CacheHSet("commentsvr", vid, c)
+	if err != nil {
+		logger.Errorf("set cache error:%+v", err)
+	}
+}
+
+func CacheGetComment(vid int64) ([]Comment, error) {
+	key := strconv.FormatInt(vid, 10)
+	data, err := common.CacheHGet("commentsvr", key)
+
+	// var comments = make([]map[string]interface{},2)
+
+	var comments []Comment
+	// commentsvr := Comment{}
+	if err != nil {
+		return comments, err
+	}
+	err = json.Unmarshal(data, &comments)
+	if err != nil {
+		return comments, err
+	}
+	return comments, nil
+}
+
+func CacheDelCommentAll(videoId int64) {
+
+	vid := strconv.FormatInt(videoId, 10)
+	err := common.CacheDelHash("commentsvr", vid)
+	if err != nil {
+		logger.Errorf("set cache error:%+v", err)
+	}
+}
+
+func CacheDelCommentOne(videoId, comment_id int64) {
 
 	vid := strconv.FormatInt(videoId, 10)
 	cid := strconv.FormatInt(comment_id, 10)
@@ -162,4 +156,4 @@ func CommentList(videoId int64) ([]Comment, error) {
 	if err != nil {
 		log.Errorf("set cache error:%+v", err)
 	}
-} */
+}

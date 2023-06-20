@@ -8,3 +8,10 @@ const (
 const (
 	SuccessMsg = "success"
 )
+
+const (
+	ReqUuid           = "uuid"
+	SessionKeyPrefix  = "session_"
+	CommentInfoPrefix = "comment_info_"
+	VideoInfoPrefix   = "video_info_"
+)

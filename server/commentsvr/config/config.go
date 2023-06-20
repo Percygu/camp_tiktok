@@ -55,6 +55,7 @@ type RedisConfig struct {
 	MinIdleConns int    `mapstructure:"min_idle_conns"`
 	Host         string `mapstructure:"host"`
 	PassWord     string `mapstructure:"password"`
+	Expired      int    `mapstructure:"expired"`
 }
 
 type PathConfig struct {
