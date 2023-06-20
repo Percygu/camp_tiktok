@@ -3,6 +3,7 @@ module commentsvr
 go 1.19
 
 require (
+	github.com/Percygu/camp_tiktok v0.0.0-20230620031847-5e786d64ff58
 	github.com/Percygu/litetiktok_proto v1.0.1
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/hashicorp/consul/api v1.21.0
