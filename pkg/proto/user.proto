@@ -30,6 +30,7 @@ message UserInfo {
   int64 favorite_count = 10;
 }
 
+
 message GetUserInfoRequest {
   int64 id = 1;
 }
