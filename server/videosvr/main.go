@@ -1,12 +1,11 @@
 package main
 
 import (
-	"commentsvr/config"
-	"commentsvr/log"
-	"commentsvr/middleware/consul"
-	"commentsvr/service"
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
+	"log"
+	"videosvr/config"
+
 	// "github.com/Percygu/litetiktok_proto/pb"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"

@@ -1,12 +1,11 @@
 package cache
 
 import (
-	"commentsvr/config"
-	"commentsvr/log"
 	"fmt"
 	redis "github.com/redis/go-redis/v9"
 	"golang.org/x/net/context"
 	"sync"
+	"videosvr/config"
 )
 
 var (

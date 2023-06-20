@@ -1,13 +1,12 @@
 package db
 
 import (
-	"commentsvr/config"
-	"commentsvr/log"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"sync"
 	"time"
+	"videosvr/config"
 )
 
 var (
@@ -33,9 +32,9 @@ func openDB() {
 		panic("fetch db connection err:" + err.Error())
 	}
 
-	sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConn)                                        //设置最大空闲连接
-	sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConn)                                        //设置最大打开的连接
-	sqlDB.SetConnMaxLifetime(time.Duration(dbConfig.MaxIdleTime * int64(time.Second))) //设置空闲时间为(s)
+	sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConn)                                        // 设置最大空闲连接
+	sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConn)                                        // 设置最大打开的连接
+	sqlDB.SetConnMaxLifetime(time.Duration(dbConfig.MaxIdleTime * int64(time.Second))) // 设置空闲时间为(s)
 }
 
 // GetDB 获取数据库连接
