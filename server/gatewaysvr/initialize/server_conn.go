@@ -21,10 +21,12 @@ func InitSrvConn() (err error) {
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
 		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
 	)
+
 	if err != nil {
 		return errors.New("连接用户服务失败")
 	}
 	// global.UserSrvClient = proto.NewUserClient(userConn)
+
 	// global.VideoSrvClient = proto.NewUserClient(userConn)
 	// global.CommentSrvClient = proto.NewUserClient(userConn)
 	// global.FollowSrvClient = proto.NewUserClient(userConn)

@@ -3,7 +3,7 @@ module usersvr
 go 1.20
 
 require (
-	github.com/Percygu/camp_tiktok v1.0.6
+	github.com/Percygu/camp_tiktok v1.0.7
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/hashicorp/consul/api v1.21.0
