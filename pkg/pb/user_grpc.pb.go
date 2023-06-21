@@ -19,198 +19,198 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_GetUserInfo_FullMethodName     = "/User/GetUserInfo"
-	User_CheckPassWord_FullMethodName   = "/User/CheckPassWord"
-	User_Register_FullMethodName        = "/User/Register"
-	User_GetUserInfoList_FullMethodName = "/User/GetUserInfoList"
+	UserService_GetUserInfo_FullMethodName     = "/UserService/GetUserInfo"
+	UserService_CheckPassWord_FullMethodName   = "/UserService/CheckPassWord"
+	UserService_Register_FullMethodName        = "/UserService/Register"
+	UserService_GetUserInfoList_FullMethodName = "/UserService/GetUserInfoList"
 )
 
-// UserClient is the client API for User service.
+// UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UserClient interface {
+type UserServiceClient interface {
 	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
 	CheckPassWord(ctx context.Context, in *CheckPassWordRequest, opts ...grpc.CallOption) (*CheckPassWordResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	GetUserInfoList(ctx context.Context, in *GetUserInfoListRequest, opts ...grpc.CallOption) (*GetUserInfoListResponse, error)
 }
 
-type userClient struct {
+type userServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUserClient(cc grpc.ClientConnInterface) UserClient {
-	return &userClient{cc}
+func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
+	return &userServiceClient{cc}
 }
 
-func (c *userClient) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
+func (c *userServiceClient) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
 	out := new(GetUserInfoResponse)
-	err := c.cc.Invoke(ctx, User_GetUserInfo_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, UserService_GetUserInfo_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) CheckPassWord(ctx context.Context, in *CheckPassWordRequest, opts ...grpc.CallOption) (*CheckPassWordResponse, error) {
+func (c *userServiceClient) CheckPassWord(ctx context.Context, in *CheckPassWordRequest, opts ...grpc.CallOption) (*CheckPassWordResponse, error) {
 	out := new(CheckPassWordResponse)
-	err := c.cc.Invoke(ctx, User_CheckPassWord_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, UserService_CheckPassWord_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
+func (c *userServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
 	out := new(RegisterResponse)
-	err := c.cc.Invoke(ctx, User_Register_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, UserService_Register_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) GetUserInfoList(ctx context.Context, in *GetUserInfoListRequest, opts ...grpc.CallOption) (*GetUserInfoListResponse, error) {
+func (c *userServiceClient) GetUserInfoList(ctx context.Context, in *GetUserInfoListRequest, opts ...grpc.CallOption) (*GetUserInfoListResponse, error) {
 	out := new(GetUserInfoListResponse)
-	err := c.cc.Invoke(ctx, User_GetUserInfoList_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, UserService_GetUserInfoList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// UserServer is the server API for User service.
-// All implementations should embed UnimplementedUserServer
+// UserServiceServer is the server API for UserService service.
+// All implementations should embed UnimplementedUserServiceServer
 // for forward compatibility
-type UserServer interface {
+type UserServiceServer interface {
 	GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error)
 	CheckPassWord(context.Context, *CheckPassWordRequest) (*CheckPassWordResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	GetUserInfoList(context.Context, *GetUserInfoListRequest) (*GetUserInfoListResponse, error)
 }
 
-// UnimplementedUserServer should be embedded to have forward compatible implementations.
-type UnimplementedUserServer struct {
+// UnimplementedUserServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServer) GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error) {
+func (UnimplementedUserServiceServer) GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
 }
-func (UnimplementedUserServer) CheckPassWord(context.Context, *CheckPassWordRequest) (*CheckPassWordResponse, error) {
+func (UnimplementedUserServiceServer) CheckPassWord(context.Context, *CheckPassWordRequest) (*CheckPassWordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPassWord not implemented")
 }
-func (UnimplementedUserServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
+func (UnimplementedUserServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedUserServer) GetUserInfoList(context.Context, *GetUserInfoListRequest) (*GetUserInfoListResponse, error) {
+func (UnimplementedUserServiceServer) GetUserInfoList(context.Context, *GetUserInfoListRequest) (*GetUserInfoListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoList not implemented")
 }
 
-// UnsafeUserServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UserServer will
+// UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UserServiceServer will
 // result in compilation errors.
-type UnsafeUserServer interface {
-	mustEmbedUnimplementedUserServer()
+type UnsafeUserServiceServer interface {
+	mustEmbedUnimplementedUserServiceServer()
 }
 
-func RegisterUserServer(s grpc.ServiceRegistrar, srv UserServer) {
-	s.RegisterService(&User_ServiceDesc, srv)
+func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
+	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
-func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetUserInfo(ctx, in)
+		return srv.(UserServiceServer).GetUserInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetUserInfo_FullMethodName,
+		FullMethod: UserService_GetUserInfo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetUserInfo(ctx, req.(*GetUserInfoRequest))
+		return srv.(UserServiceServer).GetUserInfo(ctx, req.(*GetUserInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_CheckPassWord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_CheckPassWord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckPassWordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).CheckPassWord(ctx, in)
+		return srv.(UserServiceServer).CheckPassWord(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_CheckPassWord_FullMethodName,
+		FullMethod: UserService_CheckPassWord_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).CheckPassWord(ctx, req.(*CheckPassWordRequest))
+		return srv.(UserServiceServer).CheckPassWord(ctx, req.(*CheckPassWordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).Register(ctx, in)
+		return srv.(UserServiceServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_Register_FullMethodName,
+		FullMethod: UserService_Register_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).Register(ctx, req.(*RegisterRequest))
+		return srv.(UserServiceServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetUserInfoList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetUserInfoList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserInfoListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetUserInfoList(ctx, in)
+		return srv.(UserServiceServer).GetUserInfoList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetUserInfoList_FullMethodName,
+		FullMethod: UserService_GetUserInfoList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetUserInfoList(ctx, req.(*GetUserInfoListRequest))
+		return srv.(UserServiceServer).GetUserInfoList(ctx, req.(*GetUserInfoListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// User_ServiceDesc is the grpc.ServiceDesc for User service.
+// UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var User_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "User",
-	HandlerType: (*UserServer)(nil),
+var UserService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "UserService",
+	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetUserInfo",
-			Handler:    _User_GetUserInfo_Handler,
+			Handler:    _UserService_GetUserInfo_Handler,
 		},
 		{
 			MethodName: "CheckPassWord",
-			Handler:    _User_CheckPassWord_Handler,
+			Handler:    _UserService_CheckPassWord_Handler,
 		},
 		{
 			MethodName: "Register",
-			Handler:    _User_Register_Handler,
+			Handler:    _UserService_Register_Handler,
 		},
 		{
 			MethodName: "GetUserInfoList",
-			Handler:    _User_GetUserInfoList_Handler,
+			Handler:    _UserService_GetUserInfoList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

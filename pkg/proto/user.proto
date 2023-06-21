@@ -4,7 +4,7 @@ option go_package = "../pb;pb";
 // protoc --proto_path=. --go_out=. ./*.proto
 // protoc -I . user.proto  --go_out=plugins=grpc:.
 
-service User {
+service UserService {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse); // 获取用户信息
 
   rpc CheckPassWord(CheckPassWordRequest) returns (CheckPassWordResponse); //检查密码

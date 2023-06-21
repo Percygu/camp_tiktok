@@ -82,7 +82,7 @@ func (u UserService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 		return nil, err
 	}
 	registerResponse := &pb.RegisterResponse{
-		UserID: info.Id,
+		UserId: info.Id,
 		Token:  token,
 	}
 
