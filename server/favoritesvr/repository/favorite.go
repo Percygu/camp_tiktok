@@ -61,6 +61,11 @@ func GetFavoriteList(uid int64) ([]*pb.VideoInfo, error) {
 	for _, favorite := range favoriteList {
 		videoIDList = append(videoIDList, favorite.VideoId)
 	}
+	videoSvrClient := NewVideoSvrClient(config.GetGlobalConfig().VideoSvrName)
+	if videoSvrClient == nil {
+		return nil, fmt.Errorf("videoSvrClient is nil")
+	}
+	videoInfoList := videoSvrClient.get
 
 	consulInfo := config.GetGlobalConfig().ConsulConfig
 
@@ -110,12 +115,12 @@ func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func NewVideoSvrClient(svrName string) pb.VideoServiceClient {
+func NewVideoSvrClient(svrName string) pb.VideoClient {
 	conn, err := NewSvrConn(svrName)
 	if err != nil {
 		return nil
 	}
-	return pb.NewVideoServiceClient(conn)
+	return pb.NewVideoClient(conn)
 }
 
 func NewUserSvrClient(svrName string) pb.VideoServiceClient {

@@ -3,7 +3,7 @@ module favoritesvr
 go 1.19
 
 require (
-	github.com/Percygu/camp_tiktok v1.0.12
+	github.com/Percygu/camp_tiktok v1.0.13
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/hashicorp/consul/api v1.21.0
 	github.com/redis/go-redis/v9 v9.0.5
