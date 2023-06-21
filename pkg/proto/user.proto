@@ -9,11 +9,8 @@ service User {
 
   rpc CheckPassWord(CheckPassWordRequest) returns (CheckPassWordResponse); //检查密码
   rpc Register(RegisterRequest) returns (RegisterResponse); // 注册
+  rpc GetUserInfoList(GetUserInfoListRequest) returns (GetUserInfoListResponse); // 获取用户列表信息
 
-  //  rpc GetUserByMobile(MobileRequest) returns (UserInfoResponse); // 通过mobile查询用户
-  //  rpc GetUserById(IdRequest) returns (UserInfoResponse); // 通过id查询用户
-  //  rpc CreateUser(CreateUserInfo) returns (UserInfoResponse); // 添加用户
-  //  rpc UpdateUser(UpdateUserInfo) returns (google.protobuf.Empty); // 更新用户（更关心接口有没有被调用）
 }
 
 // 用户信息
@@ -57,7 +54,7 @@ message CheckPassWordRequest {
 }
 
 message CheckPassWordResponse {
-  int64 userId = 2;
+  int64 user_id = 2;
   string  token = 3;
 }
 
@@ -67,7 +64,15 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-  int64 userID = 1;
+  int64 user_id = 1;
   string token = 2;
+}
+
+message GetUserInfoListRequest {
+  repeated int64 id_list = 1;
+}
+
+message GetUserInfoListResponse {
+  repeated UserInfo user_info_list = 1;
 }
 
