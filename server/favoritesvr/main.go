@@ -37,7 +37,7 @@ func Run() error {
 	// 端口监听启动成功，启动grpc server
 	server := grpc.NewServer()
 	// 注册grpc server
-	pb.RegisterRelationServiceServer(server, &service.RelationService{}) // 注册服务
+	pb.RegisterCommentServiceServer(server, &service.CommentService{}) // 注册服务
 	// 注册服务健康检查
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
