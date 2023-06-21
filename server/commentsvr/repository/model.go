@@ -7,3 +7,7 @@ type Comment struct {
 	Comment   string `gorm:"column:comment"`
 	Time      string `gorm:"column:time"`
 }
+
+func (c *Comment) TableName() string {
+	return "t_comments"
+}
