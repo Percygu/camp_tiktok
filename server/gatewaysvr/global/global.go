@@ -2,16 +2,19 @@ package global
 
 import (
 	"gatewaysvr/config"
-	"gatewaysvr/proto"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"os"
 	"path/filepath"
 )
 
 var (
-	Conf          = new(config.WebConfig) // Conf 全局配置变量
-	UserSrvClient proto.UserClient        // 用户服务客户端
-	// UserSrvClient proto.UserClient
-	// UserSrvClient proto.UserClient
+	Conf             = new(config.WebConfig) // Conf 全局配置变量
+	UserSrvClient    pb.UserServiceClient    // 用户服务客户端
+	CommentSrvClient pb.CommentServiceClient
+
+	UserSrvClient pb.VideoServiceClient
+	UserSrvClient pb.RelationServiceClient
+
 	// UserSrvClient proto.UserClient
 	// UserSrvClient proto.UserClient
 
