@@ -12,12 +12,8 @@ var (
 	UserSrvClient    pb.UserServiceClient    // 用户服务客户端
 	CommentSrvClient pb.CommentServiceClient
 
-	UserSrvClient pb.VideoServiceClient
-	UserSrvClient pb.RelationServiceClient
-
-	// UserSrvClient proto.UserClient
-	// UserSrvClient proto.UserClient
-
+	VideoSrvClient    pb.VideoServiceClient
+	RelationSrvClient pb.RelationServiceClient
 )
 
 // 项目主目录

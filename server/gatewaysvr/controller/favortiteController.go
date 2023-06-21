@@ -1,8 +1,7 @@
 package controller
 
 import (
-	"TikTokLite/response"
-	"TikTokLite/service"
+	"gatewaysvr/response"
 	"go.uber.org/zap"
 	"strconv"
 
@@ -29,14 +28,15 @@ func FavoriteAction(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	tokenUids, _ := ctx.Get("UserId")
-	tokenUid := tokenUids.(int64)
+	tokenUidStr, _ := ctx.Get("UserId")
+	tokenUid := tokenUidStr.(int64)
 
 	if err != nil {
 		zap.L().Error("token error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
+
 	err = service.FavoriteAction(tokenUid, favInfo.VideoId, favInfo.ActionType)
 
 	if err != nil {

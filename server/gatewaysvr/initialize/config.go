@@ -30,15 +30,15 @@ func InitConfig() (err error) {
 		return
 	}
 
-	// 创建文件夹
-	err = util.Mkdir(global.Conf.PathConfig.VideoFile)
-	if err != nil {
-		panic("mkdir videofile error")
-	}
-	err = util.Mkdir(global.Conf.PathConfig.PicFile)
-	if err != nil {
-		panic("mkdir picfile error")
-	}
+	// // 创建文件夹
+	// err = util.Mkdir(global.Conf.PathConfig.VideoFile)
+	// if err != nil {
+	// 	panic("mkdir videofile error")
+	// }
+	// err = util.Mkdir(global.Conf.PathConfig.PicFile)
+	// if err != nil {
+	// 	panic("mkdir picfile error")
+	// }
 
 	viper.WatchConfig() // 实时监控配置文件（热加载）
 	viper.OnConfigChange(func(in fsnotify.Event) {

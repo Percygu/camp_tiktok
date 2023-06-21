@@ -1,15 +1,16 @@
 package controller
 
 import (
-	"TikTokLite/response"
-	"TikTokLite/service"
+	"gatewaysvr/global"
+	"gatewaysvr/response"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-//发布评论
+// 发布评论
 func CommentAction(ctx *gin.Context) {
 	var err error
 
@@ -19,7 +20,7 @@ func CommentAction(ctx *gin.Context) {
 
 	video_id := ctx.Query("video_id")
 	comment_text := ctx.Query("comment_text")
-	actionType := ctx.Query("action_type")
+	actionTypeStr := ctx.Query("action_type")
 	comment_id := ctx.Query("comment_id")
 	commentId := int64(0)
 	if actionType == "2" {
@@ -31,22 +32,30 @@ func CommentAction(ctx *gin.Context) {
 		}
 	}
 	videoId, err := strconv.ParseInt(video_id, 10, 64)
+	actionType, err := strconv.ParseInt(actionTypeStr, 10, 64)
 	if err != nil {
 		zap.L().Error("videoId error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 
-	commentResponse, err := service.CommentAction(commentId, videoId, tokenUid, comment_text, actionType)
+	// TODO: 修正action_type类型
+	commentResponse, err := global.CommentSrvClient.CommentAction(ctx, &pb.CommentActionReq{
+		UserId:      tokenUid,
+		VideoId:     videoId,
+		CommentId:   commentId,
+		CommentText: comment_text,
+		ActionType:  actionType,
+	})
 	if err != nil {
-		logger.Errorf("comment error : %s", err)
+		zap.L().Error("comment error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 	response.Success(ctx, "success", commentResponse)
 }
 
-//获取评论列表
+// 获取评论列表
 func GetCommentList(ctx *gin.Context) {
 	var err error
 	video_id := ctx.Query("video_id")
@@ -63,7 +72,10 @@ func GetCommentList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	listResponse, err := service.CommentList(videoId)
+	listResponse, err := global.CommentSrvClient.GetCommentList(ctx, &pb.GetCommentListReq{
+		VideoId: videoId,
+	})
+
 	if err != nil {
 		zap.L().Error("commentList error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)

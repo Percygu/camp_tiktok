@@ -5,13 +5,8 @@ import (
 	"gatewaysvr/global"
 	"gatewaysvr/initialize"
 	"gatewaysvr/routes"
-	"gatewaysvr/utils/register/consul"
-	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
@@ -40,24 +35,5 @@ func main() {
 		}
 	}()
 	zap.L().Sugar().Infof("listen on %s:%d", global.Conf.Host, global.Conf.Port)
-
-	// 注册中心
-	consulClient := consul.NewRegistryClient(global.Conf.ConsulConfig.Host, global.Conf.ConsulConfig.Port)
-
-	serviceID := fmt.Sprintf("%s", uuid.NewV4())
-
-	if err := consulClient.Register(global.Conf.Host, global.Conf.Port,
-		global.Conf.Name, global.Conf.ConsulConfig.Tags, serviceID); err != nil {
-		zap.L().Fatal("consul.Register error: ", zap.Error(err))
-	}
-
-	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	if err := consulClient.DeRegister(serviceID); err != nil {
-		zap.S().Info("注销失败:", err.Error())
-	} else {
-		zap.S().Info("注销成功:")
-	}
 
 }
