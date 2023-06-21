@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/golang-jwt/jwt/v4"
-	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"usersvr/repository"
 )
@@ -31,8 +30,7 @@ func (u UserService) GetUserInfoList(ctx context.Context, request *pb.GetUserInf
 		if err != nil {
 			return nil, err
 		}
-		// TODO: 没写
-		response.UserInfoList = append(response.UserInfoList, info)
+		response.UserInfoList = append(response.UserInfoList, UserToUserInfo(info))
 	}
 
 	return response, nil
@@ -43,8 +41,11 @@ func (u UserService) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest
 	if err != nil {
 		return nil, err
 	}
+	response := &pb.GetUserInfoResponse{
+		UserInfo: UserToUserInfo(user),
+	}
 
-	return UserInfoToResponse(user), nil
+	return response, nil
 }
 
 func (u UserService) CheckPassWord(ctx context.Context, req *pb.CheckPassWordRequest) (*pb.CheckPassWordResponse, error) {
@@ -89,8 +90,8 @@ func (u UserService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 	return registerResponse, nil
 }
 
-func UserInfoToResponse(info repository.User) *pb.GetUserInfoResponse {
-	return &pb.GetUserInfoResponse{
+func UserToUserInfo(info repository.User) *pb.UserInfo {
+	return &pb.UserInfo{
 		Id:              info.Id,
 		Name:            info.Name,
 		FollowCount:     info.Follow,
@@ -120,33 +121,4 @@ func GenToken(userid int64, userName string) (string, error) {
 		return "", err
 	}
 	return signedToken, nil
-}
-
-// 解析token
-func ParseToken(tokenString string) (*JWTClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (i interface{}, err error) {
-		return Secret, nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if claims, ok := token.Claims.(*JWTClaims); ok && token.Valid {
-		return claims, nil
-	}
-	return nil, errors.New("invalid token")
-}
-
-// 验证token
-func VerifyToken(tokenString string) (int64, error) {
-	zap.L().Debug("tokenString", zap.String("tokenString", tokenString))
-
-	if tokenString == "" {
-		return int64(0), nil
-	}
-	claims, err := ParseToken(tokenString)
-	if err != nil {
-		return int64(0), err
-	}
-
-	return claims.UserId, nil
 }

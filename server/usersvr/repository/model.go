@@ -10,6 +10,6 @@ type User struct {
 	Avatar          string `gorm:"column:avatar"`
 	BackgroundImage string `gorm:"column:background_image"`
 	Signature       string `gorm:"column:signature"`
-	TotalFav        int64  `gorm:"column:total_favorited"`
+	TotalFav        int64  `gorm:"column:total_Favorite"`
 	FavCount        int64  `gorm:"column:favorite_count"`
 }

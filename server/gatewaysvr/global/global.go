@@ -2,13 +2,14 @@ package global
 
 import (
 	"gatewaysvr/config"
+	"gatewaysvr/proto"
 	"os"
 	"path/filepath"
 )
 
 var (
-	Conf = new(config.WebConfig) // Conf 全局配置变量
-	// UserSrvClient proto.UserClient        // 用户服务客户端
+	Conf          = new(config.WebConfig) // Conf 全局配置变量
+	UserSrvClient proto.UserClient        // 用户服务客户端
 	// UserSrvClient proto.UserClient
 	// UserSrvClient proto.UserClient
 	// UserSrvClient proto.UserClient
