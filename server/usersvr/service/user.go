@@ -25,6 +25,19 @@ type UserService struct {
 	pb.UnimplementedCommentServiceServer
 }
 
+func (u UserService) GetUserInfoList(ctx context.Context, request *pb.GetUserInfoListRequest) (response *pb.GetUserInfoListResponse, err error) {
+	for _, user := range request.IdList {
+		info, err := repository.GetUserInfo(user)
+		if err != nil {
+			return nil, err
+		}
+		// TODO: 没写
+		response.UserInfoList = append(response.UserInfoList, info)
+	}
+
+	return response, nil
+}
+
 func (u UserService) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoResponse, error) {
 	user, err := repository.GetUserInfo(req.Id)
 	if err != nil {

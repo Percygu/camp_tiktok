@@ -75,6 +75,7 @@ func GetUserInfo(u interface{}) (User, error) {
 	if err != nil {
 		return user, errors.New("user error")
 	}
+
 	go CacheSetUser(user)
 	zap.L().Info("get user info", zap.Any("user", user))
 	return user, nil
