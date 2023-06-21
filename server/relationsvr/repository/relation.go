@@ -1,74 +1,67 @@
 package repository
 
 import (
+	"fmt"
+	"gorm.io/gorm"
+
 	"relationsvr/log"
 	"relationsvr/middleware/db"
-	"strconv"
-	"time"
 )
 
-func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
+func FollowAction(selfUserId, toUserId int64) error {
 	db := db.GetDB()
-
-	nowtime := time.Now().Format("01-02")
-	comment := Comment{
-		UserId:  userId,
-		VideoId: videoId,
-		Comment: comment_text,
-		Time:    nowtime,
+	relation := Relation{
+		Follow:   selfUserId,
+		Follower: toUserId,
 	}
-	result := db.Create(&comment)
-
-	if result.Error != nil {
-		return nil, result.Error
+	err := db.Where("follow_id = ? and follower_id = ?", selfUserId, toUserId).Find(&Relation{}).Error
+	if err != gorm.ErrRecordNotFound {
+		return fmt.Errorf("you have followed this user")
 	}
-	log.Infof("commentsvr:%+v", comment)
-	// 评论缓存起来
-	if err := SetCommentCacheInfo(&comment); err != nil {
-		log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
-	}
-
-	return &comment, nil
-}
-
-func CommentDelete(videoId, commentID int64) error {
-	db := db.GetDB()
-	commentTemp := Comment{}
-
-	err := db.Model(&Comment{}).Where("comment_id = ?", commentID).Take(&commentTemp).Error
+	err = db.Create(&relation).Error
 	if err != nil {
 		return err
 	}
-	commentIDStr := strconv.FormatInt(commentID, 10)
-	DelCommentCacheInfo([]string{commentIDStr}, videoId)
-	db.Delete(&commentTemp)
+	// 更新缓存中对应用户follower的数量
+	//go CacheChangeUserCount(userId, add, "follow")
+	//go CacheChangeUserCount(toUserId, add, "follower")
 	return nil
 }
 
-func CommentList(videoId int64) ([]*Comment, error) {
-	var comments []*Comment
+func UnFollowAction(selfUserId, toUserId int64) error {
 	db := db.GetDB()
-	var err error
-	comments, err = GetCommentCacheList(videoId)
-	log.Infof("comments-------------------------:%+v\n", comments)
-
-	if len(comments) != 0 {
-		return comments, nil
-	}
-
-	err = db.Where("video_id = ?", videoId).Order("comment_id DESC").Find(&comments).Error
+	err := db.Where("follow_id = ? and follower_id = ?", selfUserId, toUserId).Delete(&Relation{}).Error
 	if err != nil {
-		log.Errorf("get video with %d comment list err:%v", videoId, err)
+		return err
+	}
+	log.Debug("unfollow update user cache")
+	//go CacheChangeUserCount(userId, sub, "follow")
+	//go CacheChangeUserCount(toUserId, sub, "follower")
+	return nil
+}
+
+// GetFollowList 获取被关注者
+func GetFollowList(userId int64) ([]*Relation, error) {
+	db := db.GetDB()
+	relationList := []*Relation{}
+	err := db.Where("follower = ?", userId).Find(&relationList).Error
+	if err == gorm.ErrRecordNotFound {
+		return relationList, nil
+	} else if err != nil {
 		return nil, err
 	}
-	for _, comment := range comments {
-		if err := SetCommentCacheInfo(comment); err != nil {
-			log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
-			DelCacheCommentAll(videoId)
-			return comments, nil
-		}
-	}
-	log.Infof("comments:%+v", comments)
+	return relationList, nil
+}
 
-	return comments, nil
+// GetFollowList 获取关注者
+func GetFollowerList(userId int64) ([]*Relation, error) {
+	db := db.GetDB()
+	relationList := []*Relation{}
+	err := db.Where("follow = ?", userId).Find(&relationList).Error
+	if err == gorm.ErrRecordNotFound {
+		return relationList, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return relationList, nil
 }
