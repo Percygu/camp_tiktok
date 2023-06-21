@@ -9,8 +9,11 @@ import (
 var globalConfig GlobalConfig
 
 type GlobalConfig struct {
-	Name          string           `mapstructure:"name"` // 服务name
-	Host          string           `mapstructure:"host"` // 服务host
+	Name          string           `mapstructure:"name"`           // 服务name
+	UserSvrName   string           `mapstructure:"user_svr_name"`  // 服务user服务name
+	VideoSvrName  string           `mapstructure:"video_svr_name"` // 服务user服务name
+	SvrName       string           `mapstructure:"user_svr_name"`  // 服务user服务name
+	Host          string           `mapstructure:"host"`           // 服务host
 	Port          int              `mapstructure:"port"`
 	Mode          string           `mapstructure:"mode"`
 	RedsyncConfig []*RedsyncConfig `mapstructure:"redsync"`

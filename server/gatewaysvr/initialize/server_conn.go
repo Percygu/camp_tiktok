@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"gatewaysvr/global"
+	"gatewaysvr/proto"
 	"gatewaysvr/utils/otgrpc"
 	_ "github.com/mbobakov/grpc-consul-resolver"
-	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -24,7 +24,7 @@ func InitSrvConn() (err error) {
 	if err != nil {
 		return errors.New("连接用户服务失败")
 	}
-	// global.UserSrvClient = proto.NewUserClient(userConn)
+	global.UserSrvClient = proto.NewUserClient(userConn)
 	// global.VideoSrvClient = proto.NewUserClient(userConn)
 	// global.CommentSrvClient = proto.NewUserClient(userConn)
 	// global.FollowSrvClient = proto.NewUserClient(userConn)

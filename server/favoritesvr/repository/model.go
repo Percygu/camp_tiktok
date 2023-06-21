@@ -1,12 +1,11 @@
 package repository
 
-type Relation struct {
-	// gorm.Model
-	Id       int64 `gorm:"column:relation_id; primary_key;"`
-	Follow   int64 `gorm:"column:follow_id"`
-	Follower int64 `gorm:"column:follower_id"`
+type Favorite struct {
+	Id      int64 `gorm:"column:favorite_id; primary_key;"`
+	UserId  int64 `gorm:"column:user_id"`
+	VideoId int64 `gorm:"column:video_id"`
 }
 
-func (r *Relation) TableName() string {
-	return "relations"
+func (Favorite) TableName() string {
+	return "favorites"
 }
