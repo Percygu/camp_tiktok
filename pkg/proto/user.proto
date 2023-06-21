@@ -30,6 +30,7 @@ message UserInfo {
   int64 favorite_count = 10;
 }
 
+
 message GetUserInfoRequest {
   int64 id = 1;
 }
@@ -70,48 +71,3 @@ message RegisterResponse {
   string token = 2;
 }
 
-
-//message CheckResponse{
-//  bool success = 1;
-//}
-//
-//message PageInfo {
-//  uint32 pn = 1;
-//  uint32 pSize = 2;
-//}
-//
-//message MobileRequest{
-//  string mobile = 1;
-//}
-//
-//message IdRequest {
-//  int32 id = 1;
-//}
-//
-//message CreateUserInfo {
-//  string nickName = 1;
-//  string passWord = 2;
-//  string mobile = 3;
-//}
-//
-//message UpdateUserInfo {
-//  int32 id = 1;
-//  string nickName = 2;
-//  string gender = 3;
-//  uint64 birthDay = 4;
-//}
-//
-//message UserInfoResponse {
-//  int32 id = 1;
-//  string passWord = 2;
-//  string mobile = 3;
-//  string nickName = 4;
-//  uint64 birthDay = 5; // 不使用string类型
-//  string gender = 6;
-//  int32 role = 7;
-//}
-//
-//message UserListResponse {
-//  int32 total = 1;
-//  repeated UserInfoResponse data = 2;
-//}
