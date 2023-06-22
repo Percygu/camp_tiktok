@@ -1,13 +1,12 @@
 package main
 
 import (
+	"favoritesvr/config"
+	"favoritesvr/log"
+	"favoritesvr/middleware/consul"
+	"favoritesvr/service"
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
-	"relationsvr/config"
-	"relationsvr/log"
-	"relationsvr/middleware/consul"
-	"relationsvr/service"
-	// "github.com/Percygu/litetiktok_proto/pb"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -37,7 +36,7 @@ func Run() error {
 	// 端口监听启动成功，启动grpc server
 	server := grpc.NewServer()
 	// 注册grpc server
-	pb.RegisterCommentServiceServer(server, &service.CommentService{}) // 注册服务
+	pb.RegisterFavoriteServiceServer(server, &service.FavoriteService{}) // 注册服务
 	// 注册服务健康检查
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 

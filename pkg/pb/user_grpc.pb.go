@@ -19,10 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_GetUserInfo_FullMethodName     = "/User/GetUserInfo"
-	User_CheckPassWord_FullMethodName   = "/User/CheckPassWord"
-	User_Register_FullMethodName        = "/User/Register"
-	User_GetUserInfoList_FullMethodName = "/User/GetUserInfoList"
+	User_GetUserInfo_FullMethodName          = "/User/GetUserInfo"
+	User_CheckPassWord_FullMethodName        = "/User/CheckPassWord"
+	User_Register_FullMethodName             = "/User/Register"
+	User_GetUserInfoList_FullMethodName      = "/User/GetUserInfoList"
+	User_CacheChangeUserCount_FullMethodName = "/User/CacheChangeUserCount"
+	User_CacheGetAuthor_FullMethodName       = "/User/CacheGetAuthor"
 )
 
 // UserClient is the client API for User service.
@@ -33,6 +35,8 @@ type UserClient interface {
 	CheckPassWord(ctx context.Context, in *CheckPassWordRequest, opts ...grpc.CallOption) (*CheckPassWordResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	GetUserInfoList(ctx context.Context, in *GetUserInfoListRequest, opts ...grpc.CallOption) (*GetUserInfoListResponse, error)
+	CacheChangeUserCount(ctx context.Context, in *CacheChangeUserCountReq, opts ...grpc.CallOption) (*CacheChangeUserCountRsp, error)
+	CacheGetAuthor(ctx context.Context, in *CacheGetAuthorReq, opts ...grpc.CallOption) (*CacheGetAuthorRsp, error)
 }
 
 type userClient struct {
@@ -79,6 +83,24 @@ func (c *userClient) GetUserInfoList(ctx context.Context, in *GetUserInfoListReq
 	return out, nil
 }
 
+func (c *userClient) CacheChangeUserCount(ctx context.Context, in *CacheChangeUserCountReq, opts ...grpc.CallOption) (*CacheChangeUserCountRsp, error) {
+	out := new(CacheChangeUserCountRsp)
+	err := c.cc.Invoke(ctx, User_CacheChangeUserCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) CacheGetAuthor(ctx context.Context, in *CacheGetAuthorReq, opts ...grpc.CallOption) (*CacheGetAuthorRsp, error) {
+	out := new(CacheGetAuthorRsp)
+	err := c.cc.Invoke(ctx, User_CacheGetAuthor_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations should embed UnimplementedUserServer
 // for forward compatibility
@@ -87,6 +109,8 @@ type UserServer interface {
 	CheckPassWord(context.Context, *CheckPassWordRequest) (*CheckPassWordResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	GetUserInfoList(context.Context, *GetUserInfoListRequest) (*GetUserInfoListResponse, error)
+	CacheChangeUserCount(context.Context, *CacheChangeUserCountReq) (*CacheChangeUserCountRsp, error)
+	CacheGetAuthor(context.Context, *CacheGetAuthorReq) (*CacheGetAuthorRsp, error)
 }
 
 // UnimplementedUserServer should be embedded to have forward compatible implementations.
@@ -104,6 +128,12 @@ func (UnimplementedUserServer) Register(context.Context, *RegisterRequest) (*Reg
 }
 func (UnimplementedUserServer) GetUserInfoList(context.Context, *GetUserInfoListRequest) (*GetUserInfoListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoList not implemented")
+}
+func (UnimplementedUserServer) CacheChangeUserCount(context.Context, *CacheChangeUserCountReq) (*CacheChangeUserCountRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheChangeUserCount not implemented")
+}
+func (UnimplementedUserServer) CacheGetAuthor(context.Context, *CacheGetAuthorReq) (*CacheGetAuthorRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CacheGetAuthor not implemented")
 }
 
 // UnsafeUserServer may be embedded to opt out of forward compatibility for this service.
@@ -189,6 +219,42 @@ func _User_GetUserInfoList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_CacheChangeUserCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheChangeUserCountReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).CacheChangeUserCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_CacheChangeUserCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).CacheChangeUserCount(ctx, req.(*CacheChangeUserCountReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_CacheGetAuthor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CacheGetAuthorReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).CacheGetAuthor(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_CacheGetAuthor_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).CacheGetAuthor(ctx, req.(*CacheGetAuthorReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -211,6 +277,14 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserInfoList",
 			Handler:    _User_GetUserInfoList_Handler,
+		},
+		{
+			MethodName: "CacheChangeUserCount",
+			Handler:    _User_CacheChangeUserCount_Handler,
+		},
+		{
+			MethodName: "CacheGetAuthor",
+			Handler:    _User_CacheGetAuthor_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

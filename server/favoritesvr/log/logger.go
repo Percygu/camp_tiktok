@@ -1,8 +1,8 @@
 package log
 
 import (
+	"favoritesvr/config"
 	"os"
-	"relationsvr/config"
 	"time"
 
 	"go.uber.org/zap"
