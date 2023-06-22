@@ -6,7 +6,7 @@ option go_package = "../pb;pb";
 
 import "common.proto";
 
-service User {
+service UserService {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse); // 获取用户信息
 
   rpc CheckPassWord(CheckPassWordRequest) returns (CheckPassWordResponse); //检查密码
