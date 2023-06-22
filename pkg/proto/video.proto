@@ -9,6 +9,7 @@ service VideoService {
   rpc GetPublishVideoList(GetPublishVideoListRequest) returns (GetPublishVideoListResponse);
   rpc PublishVideo(PublishVideoRequest) returns (PublishVideoResponse);
   rpc GetFeedList(GetFeedListRequest) returns (GetFeedListResponse);
+  rpc GetVideoInfoList(GetVideoInfoListReq) returns (GetVideoInfoListRsp);
 }
 
 
@@ -51,4 +52,12 @@ message VideoInfo {
   int64 comment_count = 6; // 视频的评论总数​
   bool is_favorite = 7; // true-已点赞，false-未点赞​
   string title = 8; //视频标题
+}
+
+message GetVideoInfoListReq {
+  repeated int64 video_id = 1;
+}
+
+message GetVideoInfoListRsp {
+  repeated VideoInfo video_info_list = 2;
 }

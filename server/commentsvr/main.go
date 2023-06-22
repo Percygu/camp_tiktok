@@ -80,4 +80,5 @@ func main() {
 	if err := Run(); err != nil {
 		log.Errorf("commentsvr run err:%v", err)
 	}
+
 }
