@@ -23,7 +23,7 @@ func CommentAction(ctx *gin.Context) {
 	actionTypeStr := ctx.Query("action_type")
 	comment_id := ctx.Query("comment_id")
 	commentId := int64(0)
-	if actionType == "2" {
+	if actionTypeStr == "2" {
 		commentId, err = strconv.ParseInt(comment_id, 10, 64)
 		if err != nil {
 			zap.L().Error("commentId error", zap.Error(err))
@@ -39,7 +39,6 @@ func CommentAction(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: 修正action_type类型
 	commentResponse, err := global.CommentSrvClient.CommentAction(ctx, &pb.CommentActionReq{
 		UserId:      tokenUid,
 		VideoId:     videoId,

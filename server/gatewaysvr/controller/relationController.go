@@ -47,8 +47,8 @@ func GetFollowList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	} */
-	tokens, _ := ctx.Get("UserId")
-	tokenUserId := tokens.(int64)
+	// tokens, _ := ctx.Get("UserId")
+	// tokenUserId := tokens.(int64)
 
 	UserId := ctx.Query("user_id")
 	uid, err := strconv.ParseInt(UserId, 10, 64)
@@ -57,10 +57,9 @@ func GetFollowList(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: 少了一个tokenUserId，需要修改远程调用
+	// TODO: 暂时不确定需不需要 tokenUserId
 	resp, err := global.RelationSrvClient.GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
 		UserId: uid,
-		// TokenUserId: tokenUserId,
 	})
 
 	if err != nil {
@@ -78,8 +77,8 @@ func GetFollowerList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	} */
-	tokens, _ := ctx.Get("UserId")
-	tokenUserId := tokens.(int64)
+	// tokens, _ := ctx.Get("UserId")
+	// tokenUserId := tokens.(int64)
 
 	UserId := ctx.Query("user_id")
 	uid, err := strconv.ParseInt(UserId, 10, 64)
@@ -88,10 +87,9 @@ func GetFollowerList(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: 少了一个tokenUserId，需要修改远程调用
+	// TODO: 暂时不确定需不需要 tokenUserId
 	resp, err := global.RelationSrvClient.GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
 		UserId: uid,
-		// TokenUserId: tokenUserId,
 	})
 
 	if err != nil {
