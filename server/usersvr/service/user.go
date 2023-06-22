@@ -2,10 +2,14 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
+	"strconv"
+	"usersvr/log"
+	"usersvr/middleware/lock"
 	"usersvr/repository"
 )
 
@@ -22,6 +26,48 @@ type JWTClaims struct {
 
 type UserService struct {
 	pb.UnimplementedCommentServiceServer
+}
+
+func (u UserService) CacheChangeUserCount(ctx context.Context, req *pb.CacheChangeUserCountReq) (*pb.CacheChangeUserCountRsp, error) {
+	uid := strconv.FormatInt(req.UserId, 10)
+	mutex := lock.GetLock("user_" + uid)
+	defer lock.UnLock(mutex)
+	user, err := repository.CacheGetUser(req.UserId)
+	if err != nil {
+		log.Infof("CacheChangeUserCount err", req.UserId)
+		return nil, err
+	}
+
+	switch req.CountType {
+	case "follow":
+		user.Follow += req.Op
+	case "follower":
+		user.Follower += req.Op
+	case "like":
+		user.FavCount += req.Op
+	case "liked":
+		user.TotalFav += req.Op
+	}
+	repository.CacheSetUser(user)
+
+	return &pb.CacheChangeUserCountRsp{}, nil
+}
+
+func (u UserService) CacheGetAuthor(ctx context.Context, req *pb.CacheGetAuthorReq) (*pb.CacheGetAuthorRsp, error) {
+	key := strconv.FormatInt(req.VideoId, 10)
+	data, err := repository.CacheHGet("video", key)
+	if err != nil {
+		log.Errorf("CacheGetAuthor err", req.VideoId)
+		return nil, err
+	}
+
+	uid := int64(0)
+	err = json.Unmarshal(data, &uid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.CacheGetAuthorRsp{UserId: uid}, nil
 }
 
 func (u UserService) GetUserInfoList(ctx context.Context, request *pb.GetUserInfoListRequest) (response *pb.GetUserInfoListResponse, err error) {

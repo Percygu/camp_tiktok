@@ -5,7 +5,9 @@ import (
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"usersvr/config"
 	"usersvr/log"
+	"usersvr/middleware/cache"
 	"usersvr/middleware/consul"
+	"usersvr/middleware/lock"
 	"usersvr/service"
 
 	uuid "github.com/satori/go.uuid"
@@ -37,7 +39,7 @@ func Run() error {
 	// 端口监听启动成功，启动grpc server
 	server := grpc.NewServer()
 	// 注册grpc server
-	pb.RegisterUserServer(server, &service.UserService{}) // 注册服务
+	pb.RegisterUserServiceServer(server, &service.UserService{}) // 注册服务
 	// 注册服务健康检查
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
@@ -77,6 +79,8 @@ func Run() error {
 func main() {
 	Init()
 	defer log.Sync()
+	defer lock.CloseLock()
+	defer cache.CloseRedis()
 	if err := Run(); err != nil {
 		log.Errorf("userSvr run err:%v", err)
 	}

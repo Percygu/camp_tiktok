@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"favoritesvr/repository"
 	"gatewaysvr/global"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
@@ -15,7 +16,7 @@ type VideoService struct {
 	pb.UnimplementedCommentServiceServer
 }
 
-func (v VideoServer) GetPublishVideoList(ctx context.Context, req *proto.GetPublishVideoListRequest) (*proto.GetPublishVideoListResponse, error) {
+func (v VideoService) GetPublishVideoList(ctx context.Context, req *proto.GetPublishVideoListRequest) (*proto.GetPublishVideoListResponse, error) {
 	videos, err := repository.GetVideoList(req.UserID)
 	if err != nil {
 		return nil, err
@@ -26,7 +27,7 @@ func (v VideoServer) GetPublishVideoList(ctx context.Context, req *proto.GetPubl
 
 	return list, nil
 }
-func (v VideoServer) PublishVideo(ctx context.Context, req *proto.PublishVideoRequest) (*proto.PublishVideoResponse, error) {
+func (v VideoService) PublishVideo(ctx context.Context, req *proto.PublishVideoRequest) (*proto.PublishVideoResponse, error) {
 	client := minioStore.GetMinio()
 	videoUrl, err := client.UploadFile("video", req.SaveFile, strconv.FormatInt(req.UserId, 10))
 	if err != nil {
@@ -52,7 +53,7 @@ func (v VideoServer) PublishVideo(ctx context.Context, req *proto.PublishVideoRe
 	}
 	return &proto.PublishVideoResponse{}, nil
 }
-func (v VideoServer) GetFeedList(ctx context.Context, req *proto.GetFeedListRequest) (*proto.GetFeedListResponse, error) {
+func (v VideoService) GetFeedList(ctx context.Context, req *proto.GetFeedListRequest) (*proto.GetFeedListResponse, error) {
 	videoList, err := repository.GetVideoListByFeed(req.CurrentTime)
 	if err != nil {
 		return nil, err
@@ -131,7 +132,7 @@ func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
 	return m, nil
 }
 
-func messageUserInfo(info repository.User) *proto.UserInfo {
+func messageUserInfo(info repository.User) *pb.UserInfo {
 	return &proto.UserInfo{
 		Id:              info.Id,
 		Name:            info.Name,

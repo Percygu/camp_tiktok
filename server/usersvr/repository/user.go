@@ -107,3 +107,19 @@ func CacheGetUser(uid int64) (User, error) {
 	}
 	return user, nil
 }
+
+func CacheGetAuthor(videoId int64) (int64, error) {
+
+}
+
+func CacheHGet(key, mkey string) ([]byte, error) {
+
+	data, err := cache.GetRedisCli().HGet(context.Background(), key, mkey).Bytes()
+	if err != nil {
+		return []byte{}, err
+	}
+	if len(data) == 0 {
+		return []byte{}, errors.New("data is empty")
+	}
+	return data, nil
+}
