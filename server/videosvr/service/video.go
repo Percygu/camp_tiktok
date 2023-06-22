@@ -2,21 +2,20 @@ package service
 
 import (
 	"context"
-	"favoritesvr/repository"
-	"gatewaysvr/global"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"videosvr/repository"
 )
 
 type VideoService struct {
 	pb.UnimplementedCommentServiceServer
 }
 
-func (v VideoService) GetPublishVideoList(ctx context.Context, req *proto.GetPublishVideoListRequest) (*proto.GetPublishVideoListResponse, error) {
+func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublishVideoListRequest) (*pb.GetPublishVideoListResponse, error) {
 	videos, err := repository.GetVideoList(req.UserID)
 	if err != nil {
 		return nil, err

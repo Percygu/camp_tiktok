@@ -25,7 +25,7 @@ func InitConfig() (err error) {
 	}
 
 	// 把读取到的信息反序列化到 Conf 变量中
-	if err = viper.Unmarshal(global.C); err != nil {
+	if err = viper.Unmarshal(global.Conf); err != nil {
 		fmt.Printf("viper.Unmarshal failed: %v\n", err)
 		return
 	}

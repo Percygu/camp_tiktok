@@ -146,7 +146,7 @@ func UserToUserInfo(info repository.User) *pb.UserInfo {
 		Avatar:          info.Avatar,
 		BackgroundImage: info.BackgroundImage,
 		Signature:       info.Signature,
-		TotalFavorite:   info.TotalFav,
+		TotalFavorited:  info.TotalFav,
 		FavoriteCount:   info.FavCount,
 	}
 }
