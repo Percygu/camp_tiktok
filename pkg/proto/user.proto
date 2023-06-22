@@ -4,26 +4,29 @@ option go_package = "../pb;pb";
 // protoc --proto_path=. --go_out=. ./*.proto
 // protoc -I . user.proto  --go_out=plugins=grpc:.
 
-service UserService {
+import "common.proto";
+
+service User {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse); // 获取用户信息
 
   rpc CheckPassWord(CheckPassWordRequest) returns (CheckPassWordResponse); //检查密码
   rpc Register(RegisterRequest) returns (RegisterResponse); // 注册
   rpc GetUserInfoList(GetUserInfoListRequest) returns (GetUserInfoListResponse); // 获取用户列表信息
-
+  rpc CacheChangeUserCount(CacheChangeUserCountReq) returns (CacheChangeUserCountRsp);
+  rpc CacheGetAuthor (CacheGetAuthorReq) returns (CacheGetAuthorRsp);
 }
 
 // 用户信息
 message UserInfo {
-  int64 id = 1;
-  string name = 2;
-  int64 follow_count = 3;
-  int64 follower_count = 4;
-  bool is_follow = 5;
-  string avatar = 6;
-  string background_image = 7;
-  string signature = 8;
-  int64 total_favorite = 9;
+  int64 id = 1; // 用户id​
+  string name = 2; // 用户名称​
+  int64 follow_count = 3; // 关注总数
+  int64 follower_count = 4; // 粉丝总数​
+  bool is_follow = 5; // true-已关注，false-未关注
+  string avatar = 6; //头像地址
+  string background_image = 7;//背景图片地址
+  string signature = 8;//个性签名
+  int64 total_favorited = 9;
   int64 favorite_count = 10;
 }
 
@@ -35,7 +38,16 @@ message GetUserInfoRequest {
 
 
 message GetUserInfoResponse {
-    UserInfo user_info = 1;
+  int64 id = 1;
+  string name = 2;
+  int64 followCount = 3;
+  int64 followerCount = 4;
+  bool isFollow = 5;
+  string avatar = 6;
+  string backgroundImage = 7;
+  string signature = 8;
+  int64 totalFavorite = 9;
+  int64 favoriteCount = 10;
 }
 
 
@@ -65,5 +77,23 @@ message GetUserInfoListRequest {
 
 message GetUserInfoListResponse {
   repeated UserInfo user_info_list = 1;
+}
+
+message CacheChangeUserCountReq {
+  int64 user_id = 1;
+  int64 op = 2;
+  string count_type = 3;
+}
+
+message CacheChangeUserCountRsp {
+  CommonResponse common_rsp = 1;
+}
+
+message CacheGetAuthorReq {
+  int64 video_id = 1;
+}
+
+message CacheGetAuthorRsp {
+  int64 user_id = 1;
 }
 

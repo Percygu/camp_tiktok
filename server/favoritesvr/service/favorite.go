@@ -1,39 +1,47 @@
 package service
 
 import (
+	"context"
+	"favoritesvr/constant"
 	"favoritesvr/log"
 	"favoritesvr/repository"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 )
 
-func FavoriteAction(uid, vid int64, actionType int64) error {
-	if actionType == 1 {
-		log.Infof("like action uid:%v,vid:%v", uid, vid)
-		err := repository.LikeAction(uid, vid)
-		if err != nil {
-			return err
-		}
-	} else {
-		logger.Infof("unlike action uid:%v,vid:%v", uid, vid)
-		err := repository.UnLikeAction(uid, vid)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+type FavoriteService struct {
+	pb.UnimplementedFavoriteServiceServer
 }
 
-func FavoriteList(tokenUid, uid int64) (*message.DouyinFavoriteListResponse, error) {
-	favList, err := repository.GetFavoriteList(uid)
+func FavoriteAction(ctx context.Context, req *pb.FavoriteActionReq) (*pb.FavoriteActionRsp, error) {
+	if req.ActionType == 1 {
+		log.Infof("like action uid:%v,vid:%v", req.UserId, req.VideoId)
+		err := repository.LikeAction(req.UserId, req.VideoId)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		log.Infof("unlike action uid:%v,vid:%v", req.UserId, req.VideoId)
+		err := repository.UnLikeAction(req.UserId, req.VideoId)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &pb.FavoriteActionRsp{
+		CommonRsp: &pb.CommonResponse{
+			Code: constant.SuccessCode,
+			Msg:  constant.SuccessMsg,
+		},
+	}, nil
+}
+
+func (f *FavoriteService) GetFavoriteVideoList(ctx context.Context, req *pb.GetFavoriteVideoListReq) (*pb.GetFavoriteVideoListRsp, error) {
+	videoList, err := repository.GetFavoriteList(req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	// log.Infof("user:%v, followList:%+v", uid, favList)
-
-	favListResponse := message.DouyinFavoriteListResponse{
-		VideoList: VideoList(favList, tokenUid),
-	}
-
-	return &favListResponse, nil
+	return &pb.GetFavoriteVideoListRsp{
+		VideoInfoList: videoList,
+	}, nil
 }
 
 func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {

@@ -23,8 +23,7 @@ message GetRelationFollowListReq {
 }
 
 message GetRelationFollowListRsp {
-  CommonResponse common_rsp = 1;
-  repeated UserInfo user_info = 2; // 关注z者用户信息列表
+  repeated UserInfo user_info_list = 1; // 关注z者用户信息列表
 }
 
 message GetRelationFollowerListReq {
@@ -32,8 +31,7 @@ message GetRelationFollowerListReq {
 }
 
 message GetRelationFollowerListRsp {
-  CommonResponse common_rsp = 1;
-  repeated UserInfo user_info = 2; // 被关注者用户信息列表
+  repeated UserInfo user_info_list = 1; // 被关注者用户信息列表
 }
 
 
