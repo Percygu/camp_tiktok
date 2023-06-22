@@ -1,14 +1,12 @@
 package repository
 
 import (
+	"context"
 	"favoritesvr/config"
-	"favoritesvr/log"
 	db "favoritesvr/middleware/db"
+	"favoritesvr/utils"
 	"fmt"
-	"gatewaysvr/utils/otgrpc"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
 )
 
@@ -48,12 +46,11 @@ func UnLikeAction(uid, vid int64) error {
 }
 
 func GetFavoriteList(uid int64) ([]*pb.VideoInfo, error) {
-	var videos []*pb.VideoInfo
 	db := db.GetDB()
 	var favoriteList []*Favorite
 	err := db.Model(&Favorite{}).Where("user_id= ?", uid).Find(&favoriteList).Error
 	if err == gorm.ErrRecordNotFound {
-		return videos, nil
+		return []*pb.VideoInfo{}, nil
 	} else if err != nil {
 		return nil, err
 	}
@@ -61,72 +58,14 @@ func GetFavoriteList(uid int64) ([]*pb.VideoInfo, error) {
 	for _, favorite := range favoriteList {
 		videoIDList = append(videoIDList, favorite.VideoId)
 	}
-	videoSvrClient := NewVideoSvrClient(config.GetGlobalConfig().VideoSvrName)
+	videoSvrClient := utils.NewVideoSvrClient(config.GetGlobalConfig().VideoSvrName)
 	if videoSvrClient == nil {
 		return nil, fmt.Errorf("videoSvrClient is nil")
 	}
-	videoInfoList := videoSvrClient.get
-
-	consulInfo := config.GetGlobalConfig().ConsulConfig
-
-	userConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port,
-			config.GetGlobalConfig().VideoSvrName),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("连接用户服务失败")
+	getVideoInfoListReq := &pb.GetVideoInfoListReq{VideoId: videoIDList}
+	videoInfoListRsp, err := videoSvrClient.GetVideoInfoList(context.Background(), getVideoInfoListReq)
+	if videoInfoListRsp == nil {
+		return nil, fmt.Errorf("videoInfoList is nil")
 	}
-
-	err := db.Joins("left join favorites on videos.video_id = favorites.video_id").
-		Where("favorites.user_id = ?", uid).Find(&videos).Error
-	if err == gorm.ErrRecordNotFound {
-		return videos, nil
-	} else if err != nil {
-		return nil, err
-	}
-
-	// global.UserSrvClient = proto.NewUserClient(userConn)
-
-	for i, v := range videos {
-		author, err := GetUserInfo(v.AuthorId)
-		if err != nil {
-			return videos, err
-		}
-		videos[i].Author = author
-	}
-	return videos, nil
-}
-
-func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
-	consulInfo := config.GetGlobalConfig().ConsulConfig
-	conn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, svrName),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
-	)
-	if err != nil {
-		log.Errorf("NewSvrConn with svrname %s err:%v", svrName, err)
-		return nil, err
-	}
-	return conn, nil
-}
-
-func NewVideoSvrClient(svrName string) pb.VideoClient {
-	conn, err := NewSvrConn(svrName)
-	if err != nil {
-		return nil
-	}
-	return pb.NewVideoClient(conn)
-}
-
-func NewUserSvrClient(svrName string) pb.VideoServiceClient {
-	conn, err := NewSvrConn(svrName)
-	if err != nil {
-		return nil
-	}
-	return pb.NewVideoServiceClient(conn)
+	return videoInfoListRsp.VideoInfoList, nil
 }

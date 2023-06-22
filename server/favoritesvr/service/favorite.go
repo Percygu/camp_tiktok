@@ -3,6 +3,8 @@ package service
 import (
 	"favoritesvr/log"
 	"favoritesvr/repository"
+
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 )
 
 func FavoriteAction(uid, vid int64, actionType int64) error {
@@ -13,7 +15,7 @@ func FavoriteAction(uid, vid int64, actionType int64) error {
 			return err
 		}
 	} else {
-		logger.Infof("unlike action uid:%v,vid:%v", uid, vid)
+		log.Infof("unlike action uid:%v,vid:%v", uid, vid)
 		err := repository.UnLikeAction(uid, vid)
 		if err != nil {
 			return err
@@ -22,7 +24,7 @@ func FavoriteAction(uid, vid int64, actionType int64) error {
 	return nil
 }
 
-func FavoriteList(tokenUid, uid int64) (*message.DouyinFavoriteListResponse, error) {
+func GetFavoriteVideoList(tokenUid, uid int64) (*pb.GetFavoriteListRsp, error) {
 	favList, err := repository.GetFavoriteList(uid)
 	if err != nil {
 		return nil, err

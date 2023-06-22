@@ -33,8 +33,7 @@ message GetCommentListReq {
 
 
 message GetCommentListRsp {
-  CommonResponse common_rsp = 1;
-  repeated Comment comment_list = 3; // 评论列表​
+  repeated Comment comment_list = 1; // 评论列表​
 }
 
 
