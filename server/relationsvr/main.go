@@ -29,7 +29,8 @@ func Init() {
 }
 
 func Run() error {
-	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.GetGlobalConfig().Host, config.GetGlobalConfig().Port))
+	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.GetGlobalConfig().
+		SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port))
 	if err != nil {
 		log.Fatalf("listen: error %v", err)
 		return fmt.Errorf("listen: error %v", err)
@@ -44,7 +45,7 @@ func Run() error {
 	// 注册服务到consul中
 	consulClient := consul.NewRegistryClient(config.GetGlobalConfig().ConsulConfig.Host, config.GetGlobalConfig().ConsulConfig.Port)
 	serviceID := fmt.Sprintf("%s", uuid.NewV4())
-	if err := consulClient.Register(config.GetGlobalConfig().Host, config.GetGlobalConfig().Port,
+	if err := consulClient.Register(config.GetGlobalConfig().SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port,
 		config.GetGlobalConfig().Name, config.GetGlobalConfig().ConsulConfig.Tags, serviceID); err != nil {
 		log.Fatal("consul.Register error: ", zap.Error(err))
 		return fmt.Errorf("consul.Register error: ", zap.Error(err))
@@ -52,7 +53,8 @@ func Run() error {
 	log.Info("Init Consul Register success")
 
 	// 启动
-	log.Infof("TikTokLite.comment_svr listening on %s:%d", config.GetGlobalConfig().Host, config.GetGlobalConfig().Port)
+	log.Infof("TikTokLite.relation_svr listening on %s:%d", config.GetGlobalConfig().
+		SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port)
 	go func() {
 		err = server.Serve(listen)
 		if err != nil {
@@ -78,6 +80,6 @@ func main() {
 	Init()
 	defer log.Sync()
 	if err := Run(); err != nil {
-		log.Errorf("commentsvr run err:%v", err)
+		log.Errorf("relationsvr run err:%v", err)
 	}
 }

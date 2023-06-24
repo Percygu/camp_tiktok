@@ -36,7 +36,7 @@ func InitLog() {
 	})
 	currentTime := time.Now()
 	now := currentTime.Format("200601021504")
-	path := config.GetGlobalConfig().PathConfig.LogFile
+	path := config.GetGlobalConfig().LogConfig.LogPath
 	//info文件writeSyncer
 	logConfig := config.GetGlobalConfig().LogConfig
 	infoFileWriteSyncer := zapcore.AddSync(&lumberjack.Logger{
