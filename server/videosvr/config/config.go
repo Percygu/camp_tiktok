@@ -13,6 +13,9 @@ type GlobalConfig struct {
 	Host              string           `mapstructure:"host"` // 服务host
 	Port              int              `mapstructure:"port"`
 	Mode              string           `mapstructure:"mode"`
+	UserSvrName       string           `mapstructure:"user_svr_name"` // 服务user服务name
+	RelationSvrName   string           `mapstructure:"relation_svr_name"`
+	FavoriteSvrName   string           `mapstructure:"favorite_svr_name"`
 	RedsyncConfig     []*RedsyncConfig `mapstructure:"redsync"`
 	*UserServerConfig `mapstructure:"user_srv" json:"user_srv" yaml:"user_srv"`
 	*ConsulConfig     `mapstructure:"consul"`

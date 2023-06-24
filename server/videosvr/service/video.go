@@ -8,7 +8,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
+	"videosvr/config"
+	"videosvr/middleware/minioStore"
 	"videosvr/repository"
+	"videosvr/utils"
 )
 
 type VideoService struct {
@@ -20,13 +24,13 @@ func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublis
 	if err != nil {
 		return nil, err
 	}
-	list := &proto.GetPublishVideoListResponse{
+	list := &pb.GetPublishVideoListResponse{
 		VideoList: VideoInfo(videos, req.TokenUserId),
 	}
 
 	return list, nil
 }
-func (v VideoService) PublishVideo(ctx context.Context, req *proto.PublishVideoRequest) (*proto.PublishVideoResponse, error) {
+func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequest) (*pb.PublishVideoResponse, error) {
 	client := minioStore.GetMinio()
 	videoUrl, err := client.UploadFile("video", req.SaveFile, strconv.FormatInt(req.UserId, 10))
 	if err != nil {
@@ -50,19 +54,19 @@ func (v VideoService) PublishVideo(ctx context.Context, req *proto.PublishVideoR
 	if err != nil {
 		return nil, err
 	}
-	return &proto.PublishVideoResponse{}, nil
+	return &pb.PublishVideoResponse{}, nil
 }
-func (v VideoService) GetFeedList(ctx context.Context, req *proto.GetFeedListRequest) (*proto.GetFeedListResponse, error) {
+func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListRequest) (*pb.GetFeedListResponse, error) {
 	videoList, err := repository.GetVideoListByFeed(req.CurrentTime)
 	if err != nil {
 		return nil, err
 	}
 
-	feed := &proto.GetFeedListResponse{
+	feed := &pb.GetFeedListResponse{
 		VideoList: VideoInfo(videoList, req.TokenUserId),
 	}
 
-	nextTime := util.GetCurrentTime()
+	nextTime := time.Now().UnixNano() / 1e6
 	if len(videoList) == 20 {
 		nextTime = videoList[len(videoList)-1].PublishTime
 	}
@@ -70,7 +74,7 @@ func (v VideoService) GetFeedList(ctx context.Context, req *proto.GetFeedListReq
 	return feed, nil
 }
 
-func VideoInfo(videoList []repository.Video, userId int64) []*proto.VideoInfo {
+func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
 	var err error
 	FollowList := make(map[int64]struct{})
 	favList := make(map[int64]struct{})
@@ -84,9 +88,9 @@ func VideoInfo(videoList []repository.Video, userId int64) []*proto.VideoInfo {
 			return nil
 		}
 	}
-	lists := make([]*proto.VideoInfo, len(videoList))
+	lists := make([]*pb.VideoInfo, len(videoList))
 	for i, video := range videoList {
-		v := &proto.VideoInfo{
+		v := &pb.VideoInfo{
 			Id:            video.Id,
 			PlayUrl:       video.PlayUrl,
 			CoverUrl:      video.CoverUrl,
@@ -109,10 +113,13 @@ func VideoInfo(videoList []repository.Video, userId int64) []*proto.VideoInfo {
 
 func tokenFollowList(userId int64) (map[int64]struct{}, error) {
 	m := make(map[int64]struct{})
-	list, err := repository.GetFollowList(userId, "follow")
+	reply, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationSvrName).GetRelationFollowList(context.Background(), &pb.GetRelationFollowListReq{
+		UserId: userId,
+	})
 	if err != nil {
 		return nil, err
 	}
+	list := reply.UserInfoList
 	for _, u := range list {
 		m[u.Id] = struct{}{}
 	}
@@ -121,10 +128,15 @@ func tokenFollowList(userId int64) (map[int64]struct{}, error) {
 
 func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
 	m := make(map[int64]struct{})
-	list, err := repository.GetFavoriteList(tokenUserId)
+
+	reply, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().FavoriteSvrName).GetFavoriteVideoList(context.Background(), &pb.GetFavoriteVideoListReq{
+		UserId: tokenUserId,
+	})
 	if err != nil {
 		return nil, err
 	}
+
+	list := reply.VideoInfoList
 	for _, v := range list {
 		m[v.Id] = struct{}{}
 	}
@@ -132,7 +144,7 @@ func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
 }
 
 func messageUserInfo(info repository.User) *pb.UserInfo {
-	return &proto.UserInfo{
+	return &pb.UserInfo{
 		Id:              info.Id,
 		Name:            info.Name,
 		FollowCount:     info.Follow,
@@ -151,7 +163,7 @@ func GetImageFile(videoPath string) (string, error) {
 	videoName := temp[len(temp)-1]
 	b := []byte(videoName)
 	videoName = string(b[:len(b)-3]) + "jpg"
-	picPath := global.Conf.PathConfig.PicFile
+	picPath := config.GetGlobalConfig().PathConfig.PicFile
 	picName := filepath.Join(picPath, videoName)
 	cmd := exec.Command("ffmpeg", "-i", videoPath, "-ss", "1", "-f", "image2", "-t", "0.01", "-y", picName)
 	err := cmd.Run()
