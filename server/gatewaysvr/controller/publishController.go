@@ -2,12 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"gatewaysvr/global"
+	"gatewaysvr/config"
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
-	"github.com/goccy/go-json"
-	"go.uber.org/zap"
-	"gorm.io/gorm/logger"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"path/filepath"
 	"strconv"
 
@@ -29,25 +28,28 @@ func PublishAction(ctx *gin.Context) {
 	filename := filepath.Base(data.Filename)
 
 	finalName := fmt.Sprintf("%s_%s", utils.RandomString(), filename)
-	videoPath := global.Conf.VideoServerConfig.Videofile
+	videoPath := config.GetGlobalConfig().VideoPath
 	saveFile := filepath.Join(videoPath, finalName)
 
-	zap.L().Info("videoPath:", zap.String("videoPath", videoPath))
-	// 将data序列化成json 字符串
-	dataJson, err := json.Marshal(data)
+	log.Infof("videoPath:%v", videoPath)
 
 	if err := ctx.SaveUploadedFile(data, saveFile); err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 
-	publish, err := service.PublishVideo(userId.(int64), saveFile, title)
-	// publish, err := service.PublishVideo(userId, saveFile)
+	publish, err := utils.NewVideoSvrClient(config.GetGlobalConfig().VideoServerConfig.Name).PublishVideo(ctx, &pb.PublishVideoRequest{
+		UserId:   userId.(int64),
+		Title:    title,
+		SaveFile: saveFile,
+	})
+
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	logger.Infof("publish:%v", publish)
+
+	log.Infof("publish:%v", err)
 	response.Success(ctx, "success", publish)
 
 }
@@ -60,10 +62,14 @@ func GetPublishList(ctx *gin.Context) {
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 	}
-	list, err := service.PublishList(tokenUserId.(int64), userId)
+
+	resp, err := utils.NewVideoSvrClient(config.GetGlobalConfig().VideoServerConfig.Name).GetPublishVideoList(ctx, &pb.GetPublishVideoListRequest{
+		TokenUserId: tokenUserId.(int64),
+		UserID:      userId,
+	})
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", list)
+	response.Success(ctx, "success", resp)
 }

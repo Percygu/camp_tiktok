@@ -1,11 +1,12 @@
 package controller
 
 import (
+	"gatewaysvr/config"
 	"gatewaysvr/response"
-	"go.uber.org/zap"
-	"strconv"
-
+	"gatewaysvr/utils"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type FavActionParams struct {
@@ -37,31 +38,30 @@ func FavoriteAction(ctx *gin.Context) {
 		return
 	}
 
-	err = service.FavoriteAction(tokenUid, favInfo.VideoId, favInfo.ActionType)
+	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().FavoriteServerConfig.Name).FavoriteAction(ctx, &pb.FavoriteActionReq{
+		UserId:     tokenUid,
+		VideoId:    favInfo.VideoId,
+		ActionType: int64(favInfo.ActionType),
+	})
 
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", nil)
+	response.Success(ctx, "success", resp)
 }
 
 // 获取点赞列表
 func GetFavoriteList(ctx *gin.Context) {
 
-	UserId := ctx.Query("user_id")
-	tokenUids, _ := ctx.Get("UserId")
-	tokenUid := tokenUids.(int64)
-	uid, err := strconv.ParseInt(UserId, 10, 64)
-	if err != nil {
-		zap.L().Error("userid error", zap.Error(err))
-		response.Fail(ctx, err.Error(), nil)
-		return
-	}
-	favList, err := service.FavoriteList(tokenUid, uid)
+	tokenUidStr, _ := ctx.Get("UserId")
+	tokenUid := tokenUidStr.(int64)
+	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().FavoriteServerConfig.Name).GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
+		UserId: tokenUid,
+	})
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", favList)
+	response.Success(ctx, "success", resp)
 }

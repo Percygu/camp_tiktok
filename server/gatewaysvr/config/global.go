@@ -1,23 +1,16 @@
-package global
+package config
 
 import (
-	"gatewaysvr/config"
-	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"os"
 	"path/filepath"
 )
 
-var (
-	Conf             = new(config.WebConfig) // Conf 全局配置变量
-	UserSrvClient    pb.UserServiceClient    // 用户服务客户端
-	CommentSrvClient pb.CommentServiceClient
-
-	VideoSrvClient    pb.VideoServiceClient
-	RelationSrvClient pb.RelationServiceClient
-)
-
 // 项目主目录
-var RootDir string
+var rootDir string
+
+func GetRootDir() string {
+	return rootDir
+}
 
 func init() {
 	inferRootDir()
@@ -42,7 +35,7 @@ func inferRootDir() {
 		return infer(parent)
 	}
 
-	RootDir = infer(pwd)
+	rootDir = infer(pwd)
 }
 
 func exists(dir string) bool {

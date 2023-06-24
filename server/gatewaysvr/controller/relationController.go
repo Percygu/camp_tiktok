@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"gatewaysvr/global"
+	"gatewaysvr/config"
 	"gatewaysvr/response"
+	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"strconv"
 
@@ -27,11 +28,13 @@ func RelationAction(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	resp, err := global.RelationSrvClient.RelationAction(ctx, &pb.RelationActionReq{
+
+	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationServerConfig.Name).RelationAction(ctx, &pb.RelationActionReq{
 		ToUserId:   toUid,
 		SelfUserId: tokenUserId,
 		ActionType: actionType,
 	})
+
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
@@ -57,8 +60,7 @@ func GetFollowList(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: 暂时不确定需不需要 tokenUserId
-	resp, err := global.RelationSrvClient.GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
+	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationServerConfig.Name).GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
 		UserId: uid,
 	})
 
@@ -66,7 +68,7 @@ func GetFollowList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp.UserInfo)
+	response.Success(ctx, "success", resp)
 }
 
 // 获取关注者列表
@@ -87,8 +89,7 @@ func GetFollowerList(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: 暂时不确定需不需要 tokenUserId
-	resp, err := global.RelationSrvClient.GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
+	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationServerConfig.Name).GetRelationFollowerList(ctx, &pb.GetRelationFollowerListReq{
 		UserId: uid,
 	})
 
@@ -96,5 +97,5 @@ func GetFollowerList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp.UserInfo)
+	response.Success(ctx, "success", resp)
 }

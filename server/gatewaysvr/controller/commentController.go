@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"gatewaysvr/global"
+	"gatewaysvr/config"
 	"gatewaysvr/response"
+	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
 	"strconv"
@@ -39,19 +40,20 @@ func CommentAction(ctx *gin.Context) {
 		return
 	}
 
-	commentResponse, err := global.CommentSrvClient.CommentAction(ctx, &pb.CommentActionReq{
+	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().CommentServerConfig.Name).CommentAction(ctx, &pb.CommentActionReq{
 		UserId:      tokenUid,
 		VideoId:     videoId,
 		CommentId:   commentId,
 		CommentText: comment_text,
 		ActionType:  actionType,
 	})
+
 	if err != nil {
 		zap.L().Error("comment error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", commentResponse)
+	response.Success(ctx, "success", resp)
 }
 
 // 获取评论列表
@@ -71,7 +73,8 @@ func GetCommentList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	listResponse, err := global.CommentSrvClient.GetCommentList(ctx, &pb.GetCommentListReq{
+
+	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().CommentServerConfig.Name).GetCommentList(ctx, &pb.GetCommentListReq{
 		VideoId: videoId,
 	})
 
@@ -80,5 +83,5 @@ func GetCommentList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", listResponse)
+	response.Success(ctx, "success", resp)
 }
