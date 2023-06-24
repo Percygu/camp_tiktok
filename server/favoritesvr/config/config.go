@@ -18,11 +18,12 @@ type GlobalConfig struct {
 }
 
 type SvrConfig struct {
-	Name        string `mapstructure:"name"` // 服务name
-	Host        string `mapstructure:"host"` // 服务host
-	Port        int    `mapstructure:"port"`
-	Mode        string `mapstructure:"mode"`
-	UserSvrName string `mapstructure:"user_svr_name"` // 用户服务name
+	Name         string `mapstructure:"name"` // 服务name
+	Host         string `mapstructure:"host"` // 服务host
+	Port         int    `mapstructure:"port"`
+	Mode         string `mapstructure:"mode"`
+	UserSvrName  string `mapstructure:"user_svr_name"`  // 用户服务name
+	VideoSvrName string `mapstructure:"video_svr_name"` // 视频服务name
 }
 
 type ConsulConfig struct {

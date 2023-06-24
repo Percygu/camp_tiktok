@@ -1,5 +1,5 @@
 svr_config:
-  name: "commentsvr"
+  name: "relationsvr"
   host: 121.43.102.177
   port: 8081
   mode: release
@@ -30,7 +30,7 @@ redis:
 log:
   level: "info"
   file_name: ".log"
-  log_path: "../log/commentsvr/"
+  log_path: "../log/relationsvr/"
   max_size: 50
   max_age: 20
   MaxBackups: 10
@@ -39,5 +39,5 @@ consul:
   host: 121.43.102.177
   port: 8090
   tags:
-    - "commentsvr"
+    - "relationsvr"
 
