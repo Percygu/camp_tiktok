@@ -12,10 +12,6 @@ import (
 	"usersvr/middleware/db"
 )
 
-func (User) TableName() string {
-	return "users"
-}
-
 // 检查该用户名是否已经存在
 func UserNameIsExist(userName string) error {
 	db := db.GetDB()

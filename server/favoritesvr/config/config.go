@@ -9,20 +9,20 @@ import (
 var globalConfig GlobalConfig
 
 type GlobalConfig struct {
-	Name          string           `mapstructure:"name"`           // 服务name
-	UserSvrName   string           `mapstructure:"user_svr_name"`  // 服务user服务name
-	VideoSvrName  string           `mapstructure:"video_svr_name"` // 服务user服务name
-	SvrName       string           `mapstructure:"user_svr_name"`  // 服务user服务name
-	Host          string           `mapstructure:"host"`           // 服务host
-	Port          int              `mapstructure:"port"`
-	Mode          string           `mapstructure:"mode"`
-	RedsyncConfig []*RedsyncConfig `mapstructure:"redsync"`
+	*SvrConfig    `mapstructure:"svr_config"`
 	*ConsulConfig `mapstructure:"consul"`
 	*DbConfig     `mapstructure:"mysql"`
 	*MinioConfig  `mapstructure:"minio"`
 	*RedisConfig  `mapstructure:"redis"`
-	*PathConfig   `mapstructure:"path"`
 	*LogConfig    `mapstructure:"log"`
+}
+
+type SvrConfig struct {
+	Name        string `mapstructure:"name"` // 服务name
+	Host        string `mapstructure:"host"` // 服务host
+	Port        int    `mapstructure:"port"`
+	Mode        string `mapstructure:"mode"`
+	UserSvrName string `mapstructure:"user_svr_name"` // 用户服务name
 }
 
 type ConsulConfig struct {
@@ -61,15 +61,10 @@ type RedisConfig struct {
 	Expired      int    `mapstructure:"expired"`
 }
 
-type PathConfig struct {
-	VideoFile string `mapstructure:"videofile"`
-	LogFile   string `mapstructure:"logfile"`
-	PicFile   string `mapstructure:"picfile"`
-}
-
 type LogConfig struct {
 	Level      string `mapstructure:"level"`
-	Filename   string `mapstructure:"filename"`
+	Filename   string `mapstructure:"file_name"`
+	LogPath    string `mapstructure:"log_path"`
 	MaxSize    int    `mapstructure:"max_size"`
 	MaxAge     int    `mapstructure:"max_age"`
 	MaxBackups int    `mapstructure:"max_backups"`
@@ -84,14 +79,10 @@ type RedsyncConfig struct {
 }
 
 func Init() (err error) {
-	// 自动推导项目根目录
-	configFile := GetRootDir() + "/config/config.yaml"
-	viper.SetConfigFile(configFile)
-	// viper.SetConfigFile("./config.yaml") //指定配置文件（带后缀，可写绝对路径和相对路径两种）
-	// viper.SetConfigName("config") //指定配置文件的名字（不带后缀）
-	// 基本上是配合远程配置中心使用的，告诉viper当前的数据使用什么格式去解析
+	viper.SetConfigName("config")
 	viper.SetConfigType("yaml") // 远程配置文件传输 确定配置文件的格式
 	viper.AddConfigPath(".")    // 指定配置文件的一个寻找路径
+	viper.AddConfigPath("../")  // 指定配置文件的一个寻找路径
 	err = viper.ReadInConfig()  // 读取配置信息
 
 	if err != nil {
@@ -101,7 +92,7 @@ func Init() (err error) {
 	}
 
 	// 把读取到的信息反序列化到 Conf 变量中
-	if err = viper.Unmarshal(globalConfig); err != nil {
+	if err = viper.Unmarshal(&globalConfig); err != nil {
 		fmt.Printf("viper.Unmarshal failed: %v\n", err)
 		return fmt.Errorf("viper.Unmarshal failed: %v\n", err)
 	}
@@ -110,7 +101,7 @@ func Init() (err error) {
 	viper.OnConfigChange(func(in fsnotify.Event) {
 		fmt.Println("配置文件修改...")
 		// 当配置文件信息发生变化 就修改 Conf 变量
-		if err := viper.Unmarshal(globalConfig); err != nil {
+		if err := viper.Unmarshal(&globalConfig); err != nil {
 			fmt.Printf("viper.Unmarshal failed: %v\n", err)
 		}
 	})

@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"favoritesvr/config"
-	"favoritesvr/log"
-	"favoritesvr/utils/otgrpc"
+	"commentsvr/config"
+	"commentsvr/log"
+	"commentsvr/utils/otgrpc"
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/opentracing/opentracing-go"
@@ -26,10 +26,10 @@ func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func NewVideoSvrClient(svrName string) pb.VideoServiceClient {
+func NewUserSvrClient(svrName string) pb.UserServiceClient {
 	conn, err := NewSvrConn(svrName)
 	if err != nil {
 		return nil
 	}
-	return pb.NewVideoServiceClient(conn)
+	return pb.NewUserServiceClient(conn)
 }

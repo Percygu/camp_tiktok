@@ -1,9 +1,13 @@
 package service
 
 import (
+	"commentsvr/config"
 	"commentsvr/constant"
+	"commentsvr/log"
 	"commentsvr/repository"
+	"commentsvr/utils"
 	"context"
+	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 )
 
@@ -40,6 +44,48 @@ func (c CommentService) CommentAction(ctx context.Context, req *pb.CommentAction
 }
 
 func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentListReq) (*pb.GetCommentListRsp, error) {
-	//TODO implement me
-	panic("implement me")
+	comments, err := repository.CommentList(req.VideoId)
+	if err != nil {
+		return nil, err
+	}
+	log.Infof("comments:%v\n", comments)
+
+	userIDList := make([]int64, len(comments))
+	for _, comment := range comments {
+		userIDList = append(userIDList, comment.UserId)
+	}
+
+	userSvrClient := utils.NewUserSvrClient(config.GetGlobalConfig().UserSvrName)
+	if userSvrClient == nil {
+		return nil, fmt.Errorf("userSvrClient is nil")
+	}
+	userInfoListReq := &pb.GetUserInfoListRequest{
+		IdList: userIDList,
+	}
+	userInfoListRsp, err := userSvrClient.GetUserInfoList(context.Background(), userInfoListReq)
+	if err != nil {
+		log.Errorf("GetCommentList|GetUserInfoList err:%v", err)
+		return nil, err
+	}
+	uerMap := make(map[int64]*pb.UserInfo)
+	for _, userInfo := range userInfoListRsp.UserInfoList {
+		uerMap[userInfo.Id] = userInfo
+	}
+
+	list := &pb.GetCommentListRsp{
+		CommentList: make([]*pb.Comment, len(comments)),
+	}
+
+	for i, comment := range comments {
+		// 为了找到video_id所对应的user_id，在通过user_id找到user_name.传递给前端
+		userInfo := uerMap[comment.UserId]
+		v := &pb.Comment{
+			Id:         comment.CommentId,
+			UserInfo:   userInfo,
+			Content:    comment.Comment,
+			CreateDate: comment.Time,
+		}
+		list.CommentList[i] = v
+	}
+	return list, nil
 }

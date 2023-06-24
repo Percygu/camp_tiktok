@@ -1,13 +1,13 @@
 package repository
 
 import (
-	"commentsvr/config"
-	"commentsvr/constant"
-	"commentsvr/middleware/cache"
 	"context"
 	"encoding/json"
 	"strconv"
 	"time"
+	"videosvr/config"
+	"videosvr/constant"
+	"videosvr/middleware/cache"
 )
 
 // SetCommentCacheInfo 给某一个video添加评论，评论以hash 形式存储

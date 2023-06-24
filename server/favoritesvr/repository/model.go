@@ -7,5 +7,5 @@ type Favorite struct {
 }
 
 func (Favorite) TableName() string {
-	return "favorites"
+	return "t_favorites"
 }

@@ -13,3 +13,7 @@ type User struct {
 	TotalFav        int64  `gorm:"column:total_favorited"`
 	FavCount        int64  `gorm:"column:favorite_count"`
 }
+
+func (r *User) TableName() string {
+	return "t_users"
+}

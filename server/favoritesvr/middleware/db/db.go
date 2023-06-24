@@ -1,11 +1,11 @@
 package db
 
 import (
+	"favoritesvr/config"
+	"favoritesvr/log"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"relationsvr/config"
-	"relationsvr/log"
 	"sync"
 	"time"
 )
