@@ -7,6 +7,8 @@ FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 CREATE DATABASE camps_tiktok;
 
+USE camps_tiktok;
+
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE `t_comments`
 (
