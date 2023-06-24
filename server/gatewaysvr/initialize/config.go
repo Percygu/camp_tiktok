@@ -25,20 +25,20 @@ func InitConfig() (err error) {
 	}
 
 	// 把读取到的信息反序列化到 Conf 变量中
-	if err = viper.Unmarshal(global.C); err != nil {
+	if err = viper.Unmarshal(global.Conf); err != nil {
 		fmt.Printf("viper.Unmarshal failed: %v\n", err)
 		return
 	}
 
-	// 创建文件夹
-	err = util.Mkdir(global.Conf.PathConfig.VideoFile)
-	if err != nil {
-		panic("mkdir videofile error")
-	}
-	err = util.Mkdir(global.Conf.PathConfig.PicFile)
-	if err != nil {
-		panic("mkdir picfile error")
-	}
+	// // 创建文件夹
+	// err = util.Mkdir(global.Conf.PathConfig.VideoFile)
+	// if err != nil {
+	// 	panic("mkdir videofile error")
+	// }
+	// err = util.Mkdir(global.Conf.PathConfig.PicFile)
+	// if err != nil {
+	// 	panic("mkdir picfile error")
+	// }
 
 	viper.WatchConfig() // 实时监控配置文件（热加载）
 	viper.OnConfigChange(func(in fsnotify.Event) {

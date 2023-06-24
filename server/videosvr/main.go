@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
-	"log"
 	"videosvr/config"
+	"videosvr/log"
+	"videosvr/middleware/consul"
+	"videosvr/service"
 
 	// "github.com/Percygu/litetiktok_proto/pb"
 	uuid "github.com/satori/go.uuid"
@@ -36,7 +38,7 @@ func Run() error {
 	// 端口监听启动成功，启动grpc server
 	server := grpc.NewServer()
 	// 注册grpc server
-	pb.RegisterCommentServiceServer(server, &service.CommentService{}) // 注册服务
+	pb.RegisterCommentServiceServer(server, &service.VideoService{}) // 注册服务
 	// 注册服务健康检查
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
@@ -46,7 +48,7 @@ func Run() error {
 	if err := consulClient.Register(config.GetGlobalConfig().Host, config.GetGlobalConfig().Port,
 		config.GetGlobalConfig().Name, config.GetGlobalConfig().ConsulConfig.Tags, serviceID); err != nil {
 		log.Fatal("consul.Register error: ", zap.Error(err))
-		return fmt.Errorf("consul.Register error: ", zap.Error(err))
+		return fmt.Errorf("consul.Register error: %v", zap.Error(err))
 	}
 	log.Info("Init Consul Register success")
 
@@ -77,6 +79,6 @@ func main() {
 	Init()
 	defer log.Sync()
 	if err := Run(); err != nil {
-		log.Errorf("commentsvr run err:%v", err)
+		log.Errorf("videoSvr run err:%v", err)
 	}
 }

@@ -1,13 +1,13 @@
 package repository
 
 import (
+	"videosvr/config"
+	"videosvr/constant"
+	"videosvr/middleware/cache"
 	"context"
 	"encoding/json"
 	"strconv"
 	"time"
-	"videosvr/config"
-	"videosvr/constant"
-	"videosvr/middleware/cache"
 )
 
 // SetCommentCacheInfo 给某一个video添加评论，评论以hash 形式存储
@@ -37,4 +37,12 @@ func GetCommentCacheInfo(comment *Comment) error {
 	expired := time.Second * time.Duration(config.GetGlobalConfig().RedisConfig.Expired)
 	_, err = cache.GetRedisCli().Set(context.Background(), redisKey, val, expired*time.Second).Result()
 	return err
+}
+
+func CacheSetAuthor(videoId, authorId int64) error {
+	err := cache.GetRedisCli().HSet(context.Background(), "video", strconv.FormatInt(videoId, 10), authorId).Err()
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"gatewaysvr/global"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"

@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"TikTokLite/response"
-	"TikTokLite/service"
-	"TikTokLite/web/global"
-	"TikTokLite/web/proto"
+	"gatewaysvr/global"
+	"gatewaysvr/response"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"strconv"
@@ -20,7 +19,7 @@ func UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := global.UserSrvClient.CheckPassWord(ctx, &proto.CheckPassWordRequest{
+	resp, err := global.UserSrvClient.CheckPassWord(ctx, &pb.CheckPassWordRequest{
 		Username: userName,
 		Password: password,
 	})
@@ -40,7 +39,10 @@ func UserRegister(ctx *gin.Context) {
 		response.Fail(ctx, "username or password invalid", nil)
 		return
 	}
-	registerResponse, err := service.UserRegister(userName, password)
+	registerResponse, err := global.UserSrvClient.Register(ctx, &pb.RegisterRequest{
+		Username: userName,
+		Password: password,
+	})
 	if err != nil {
 		zap.L().Error("register error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
@@ -68,7 +70,9 @@ func GetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	userinfo, err := service.UserInfo(uid)
+	userinfo, err := global.UserSrvClient.GetUserInfo(ctx, &pb.GetUserInfoRequest{
+		Id: uid,
+	})
 	if err != nil {
 		zap.L().Error("get userinfo error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)

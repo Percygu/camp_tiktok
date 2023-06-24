@@ -2,10 +2,11 @@ package controller
 
 import (
 	"fmt"
+	"gatewaysvr/global"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/goccy/go-json"
-	"github.com/mgechev/revive/config"
+	"go.uber.org/zap"
 	"gorm.io/gorm/logger"
 	"path/filepath"
 	"strconv"
@@ -28,10 +29,10 @@ func PublishAction(ctx *gin.Context) {
 	filename := filepath.Base(data.Filename)
 
 	finalName := fmt.Sprintf("%s_%s", utils.RandomString(), filename)
-	videoPath := config.GetConfig().Path.Videofile
+	videoPath := global.Conf.VideoServerConfig.Videofile
 	saveFile := filepath.Join(videoPath, finalName)
 
-	logger.Info("saveFile:", saveFile)
+	zap.L().Info("videoPath:", zap.String("videoPath", videoPath))
 	// 将data序列化成json 字符串
 	dataJson, err := json.Marshal(data)
 

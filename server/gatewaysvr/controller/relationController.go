@@ -1,49 +1,54 @@
 package controller
 
 import (
-	"TikTokLite/response"
-	"TikTokLite/service"
+	"gatewaysvr/global"
+	"gatewaysvr/response"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-//关注操作
+// 关注操作
 func RelationAction(ctx *gin.Context) {
-	//token := ctx.Query("token")
-	//tokenUserId, err := common.VerifyToken(token)
-	/* if err != nil {
-		response.Fail(ctx, err.Error(), nil)
-		return
-	} */
 	tokens, _ := ctx.Get("UserId")
 	tokenUserId := tokens.(int64)
 
 	toUserId := ctx.Query("to_user_id")
-	touid, err := strconv.ParseInt(toUserId, 10, 64)
+	toUid, err := strconv.ParseInt(toUserId, 10, 64)
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	action := ctx.Query("action_type")
-	err = service.RelationAction(touid, tokenUserId, action)
+	actionStr := ctx.Query("action_type")
+
+	actionType, err := strconv.ParseInt(actionStr, 10, 64)
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", nil)
+	resp, err := global.RelationSrvClient.RelationAction(ctx, &pb.RelationActionReq{
+		ToUserId:   toUid,
+		SelfUserId: tokenUserId,
+		ActionType: actionType,
+	})
+	if err != nil {
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+	response.Success(ctx, "success", resp.CommonRsp)
 }
 
-//获取关注列表
+// 获取关注列表
 func GetFollowList(ctx *gin.Context) {
-	//token := ctx.Query("token")
-	//tokenUserId, err := common.VerifyToken(token)
+	// token := ctx.Query("token")
+	// tokenUserId, err := common.VerifyToken(token)
 	/* if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	} */
-	tokens, _ := ctx.Get("UserId")
-	tokenUserId := tokens.(int64)
+	// tokens, _ := ctx.Get("UserId")
+	// tokenUserId := tokens.(int64)
 
 	UserId := ctx.Query("user_id")
 	uid, err := strconv.ParseInt(UserId, 10, 64)
@@ -51,15 +56,20 @@ func GetFollowList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	followList, err := service.RelationFollowList(uid, tokenUserId)
+
+	// TODO: 暂时不确定需不需要 tokenUserId
+	resp, err := global.RelationSrvClient.GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
+		UserId: uid,
+	})
+
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", followList)
+	response.Success(ctx, "success", resp.UserInfo)
 }
 
-//获取关注者列表
+// 获取关注者列表
 func GetFollowerList(ctx *gin.Context) {
 	/* token := ctx.Query("token")
 	tokenUserId, err := common.VerifyToken(token)
@@ -67,8 +77,8 @@ func GetFollowerList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	} */
-	tokens, _ := ctx.Get("UserId")
-	tokenUserId := tokens.(int64)
+	// tokens, _ := ctx.Get("UserId")
+	// tokenUserId := tokens.(int64)
 
 	UserId := ctx.Query("user_id")
 	uid, err := strconv.ParseInt(UserId, 10, 64)
@@ -76,10 +86,15 @@ func GetFollowerList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	followerList, err := service.RelationFollowerList(uid, tokenUserId)
+
+	// TODO: 暂时不确定需不需要 tokenUserId
+	resp, err := global.RelationSrvClient.GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
+		UserId: uid,
+	})
+
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", followerList)
+	response.Success(ctx, "success", resp.UserInfo)
 }
