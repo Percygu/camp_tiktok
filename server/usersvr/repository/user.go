@@ -75,6 +75,7 @@ func GetUserInfo(u interface{}) (User, error) {
 	if err != nil {
 		return user, errors.New("user error")
 	}
+
 	go CacheSetUser(user)
 	zap.L().Info("get user info", zap.Any("user", user))
 	return user, nil
@@ -105,4 +106,16 @@ func CacheGetUser(uid int64) (User, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+func CacheHGet(key, mKey string) ([]byte, error) {
+
+	data, err := cache.GetRedisCli().HGet(context.Background(), key, mKey).Bytes()
+	if err != nil {
+		return []byte{}, err
+	}
+	if len(data) == 0 {
+		return []byte{}, errors.New("data is empty")
+	}
+	return data, nil
 }

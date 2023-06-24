@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"gatewaysvr/global"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
+	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -10,24 +12,29 @@ import (
 
 // 视频流
 func Feed(ctx *gin.Context) {
-	var userId int64
+	var tokenId int64
 	currentTime, err := strconv.ParseInt(ctx.Query("latest_time"), 10, 64)
 	if err != nil || currentTime == int64(0) {
 		currentTime = utils.GetCurrentTime()
 	}
 	// token := ctx.Query("token")
 	// userId, err = common.VerifyToken(token)
-	userIds, _ := ctx.Get("UserId")
-	userId = userIds.(int64)
+	userId, _ := ctx.Get("UserId")
+	tokenId = userId.(int64)
 
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	// TODO: 改成远程调用
-	// feedList, err := service.GetFeedList(currentTime, userId)
+
+	resp, err := global.VideoSrvClient.GetFeedList(ctx, &pb.GetFeedListRequest{
+		CurrentTime: currentTime,
+		TokenUserId: tokenId,
+	})
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
+		return
 	}
-	response.Success(ctx, "success", feedList)
+
+	response.Success(ctx, "success", resp.VideoList)
 }

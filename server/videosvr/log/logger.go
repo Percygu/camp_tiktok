@@ -3,6 +3,7 @@ package log
 import (
 	"os"
 	"time"
+	"videosvr/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

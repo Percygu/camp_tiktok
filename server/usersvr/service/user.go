@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/golang-jwt/jwt/v4"
-	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
+	"strconv"
+	"usersvr/log"
+	"usersvr/middleware/lock"
 	"usersvr/repository"
 )
 
@@ -25,13 +28,70 @@ type UserService struct {
 	pb.UnimplementedCommentServiceServer
 }
 
+func (u UserService) CacheChangeUserCount(ctx context.Context, req *pb.CacheChangeUserCountReq) (*pb.CacheChangeUserCountRsp, error) {
+	uid := strconv.FormatInt(req.UserId, 10)
+	mutex := lock.GetLock("user_" + uid)
+	defer lock.UnLock(mutex)
+	user, err := repository.CacheGetUser(req.UserId)
+	if err != nil {
+		log.Infof("CacheChangeUserCount err", req.UserId)
+		return nil, err
+	}
+
+	switch req.CountType {
+	case "follow":
+		user.Follow += req.Op
+	case "follower":
+		user.Follower += req.Op
+	case "like":
+		user.FavCount += req.Op
+	case "liked":
+		user.TotalFav += req.Op
+	}
+	repository.CacheSetUser(user)
+
+	return &pb.CacheChangeUserCountRsp{}, nil
+}
+
+func (u UserService) CacheGetAuthor(ctx context.Context, req *pb.CacheGetAuthorReq) (*pb.CacheGetAuthorRsp, error) {
+	key := strconv.FormatInt(req.VideoId, 10)
+	data, err := repository.CacheHGet("video", key)
+	if err != nil {
+		log.Errorf("CacheGetAuthor err", req.VideoId)
+		return nil, err
+	}
+
+	uid := int64(0)
+	err = json.Unmarshal(data, &uid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.CacheGetAuthorRsp{UserId: uid}, nil
+}
+
+func (u UserService) GetUserInfoList(ctx context.Context, request *pb.GetUserInfoListRequest) (response *pb.GetUserInfoListResponse, err error) {
+	for _, user := range request.IdList {
+		info, err := repository.GetUserInfo(user)
+		if err != nil {
+			return nil, err
+		}
+		response.UserInfoList = append(response.UserInfoList, UserToUserInfo(info))
+	}
+
+	return response, nil
+}
+
 func (u UserService) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoResponse, error) {
 	user, err := repository.GetUserInfo(req.Id)
 	if err != nil {
 		return nil, err
 	}
+	response := &pb.GetUserInfoResponse{
+		UserInfo: UserToUserInfo(user),
+	}
 
-	return UserInfoToResponse(user), nil
+	return response, nil
 }
 
 func (u UserService) CheckPassWord(ctx context.Context, req *pb.CheckPassWordRequest) (*pb.CheckPassWordResponse, error) {
@@ -69,15 +129,15 @@ func (u UserService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 		return nil, err
 	}
 	registerResponse := &pb.RegisterResponse{
-		UserID: info.Id,
+		UserId: info.Id,
 		Token:  token,
 	}
 
 	return registerResponse, nil
 }
 
-func UserInfoToResponse(info repository.User) *pb.GetUserInfoResponse {
-	return &pb.GetUserInfoResponse{
+func UserToUserInfo(info repository.User) *pb.UserInfo {
+	return &pb.UserInfo{
 		Id:              info.Id,
 		Name:            info.Name,
 		FollowCount:     info.Follow,
@@ -86,7 +146,7 @@ func UserInfoToResponse(info repository.User) *pb.GetUserInfoResponse {
 		Avatar:          info.Avatar,
 		BackgroundImage: info.BackgroundImage,
 		Signature:       info.Signature,
-		TotalFavorite:   info.TotalFav,
+		TotalFavorited:  info.TotalFav,
 		FavoriteCount:   info.FavCount,
 	}
 }
@@ -107,33 +167,4 @@ func GenToken(userid int64, userName string) (string, error) {
 		return "", err
 	}
 	return signedToken, nil
-}
-
-// 解析token
-func ParseToken(tokenString string) (*JWTClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (i interface{}, err error) {
-		return Secret, nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if claims, ok := token.Claims.(*JWTClaims); ok && token.Valid {
-		return claims, nil
-	}
-	return nil, errors.New("invalid token")
-}
-
-// 验证token
-func VerifyToken(tokenString string) (int64, error) {
-	zap.L().Debug("tokenString", zap.String("tokenString", tokenString))
-
-	if tokenString == "" {
-		return int64(0), nil
-	}
-	claims, err := ParseToken(tokenString)
-	if err != nil {
-		return int64(0), err
-	}
-
-	return claims.UserId, nil
 }

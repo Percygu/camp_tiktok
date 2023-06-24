@@ -48,3 +48,7 @@ func GetRedisCli() *redis.Client {
 
 	return redisConn
 }
+
+func CacheGetUser(key string) (string, error) {
+
+}
