@@ -1,9 +1,9 @@
 package log
 
 import (
-	"commentsvr/config"
 	"os"
 	"time"
+	"usersvr/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

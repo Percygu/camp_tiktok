@@ -6,6 +6,7 @@ import (
 	"golang.org/x/net/context"
 	"sync"
 	"videosvr/config"
+	"videosvr/log"
 )
 
 var (

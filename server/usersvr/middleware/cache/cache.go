@@ -50,5 +50,5 @@ func GetRedisCli() *redis.Client {
 }
 
 func CacheGetUser(key string) (string, error) {
-
+	return "", nil
 }
