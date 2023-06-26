@@ -5,7 +5,9 @@ import (
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"relationsvr/config"
 	"relationsvr/log"
+	"relationsvr/middleware/cache"
 	"relationsvr/middleware/consul"
+	"relationsvr/middleware/db"
 	"relationsvr/service"
 	// "github.com/Percygu/litetiktok_proto/pb"
 	uuid "github.com/satori/go.uuid"
@@ -29,8 +31,7 @@ func Init() {
 }
 
 func Run() error {
-	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.GetGlobalConfig().
-		SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port))
+	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", "", config.GetGlobalConfig().SvrConfig.Port))
 	if err != nil {
 		log.Fatalf("listen: error %v", err)
 		return fmt.Errorf("listen: error %v", err)
@@ -79,6 +80,8 @@ func Run() error {
 func main() {
 	Init()
 	defer log.Sync()
+	defer cache.CloseRedis()
+	defer db.CloseDB()
 	if err := Run(); err != nil {
 		log.Errorf("relationsvr run err:%v", err)
 	}

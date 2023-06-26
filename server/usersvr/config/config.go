@@ -6,20 +6,21 @@ import (
 	"github.com/spf13/viper"
 )
 
-var globalConfig GlobalConfig
+var globalConfig = new(GlobalConfig)
 
 type GlobalConfig struct {
-	Name          string           `mapstructure:"name"` // 服务name
-	Host          string           `mapstructure:"host"` // 服务host
-	Port          int              `mapstructure:"port"`
-	Mode          string           `mapstructure:"mode"`
-	RedsyncConfig []*RedsyncConfig `mapstructure:"redsync"`
+	*SvrConfig    `mapstructure:"svr_config"`
 	*ConsulConfig `mapstructure:"consul"`
 	*DbConfig     `mapstructure:"mysql"`
-	*MinioConfig  `mapstructure:"minio"`
 	*RedisConfig  `mapstructure:"redis"`
-	*PathConfig   `mapstructure:"path"`
 	*LogConfig    `mapstructure:"log"`
+	RedsyncConfig []*RedsyncConfig `mapstructure:"redsync"`
+}
+
+type SvrConfig struct {
+	Name string `mapstructure:"name"` // 服务name
+	Host string `mapstructure:"host"` // 服务host
+	Port int    `mapstructure:"port"`
 }
 
 type ConsulConfig struct {
@@ -39,29 +40,14 @@ type DbConfig struct {
 	MaxIdleTime int64  ` mapstructure:"max_idle_time"` // 连接最大空闲时间
 }
 
-type MinioConfig struct {
-	Host            string `mapstructure:"host"`
-	Port            string `mapstructure:"port"`
-	AccessKeyID     string `mapstructure:"access_key_id"`
-	SecretAccessKey string `mapstructure:"secret_access_key"`
-	VideoBuckets    string `mapstructure:"videobuckets"`
-	PicBuckets      string `mapstructure:"picbuckets"`
-}
-
 type RedisConfig struct {
-	DB           int    `mapstructure:"db"`
-	Port         int    `mapstructure:"port"`
-	PoolSize     int    `mapstructure:"pool_size"`
-	MinIdleConns int    `mapstructure:"min_idle_conns"`
-	Host         string `mapstructure:"host"`
-	PassWord     string `mapstructure:"password"`
-	Expired      int    `mapstructure:"expired"`
-}
-
-type PathConfig struct {
-	VideoFile string `mapstructure:"videofile"`
-	LogFile   string `mapstructure:"logfile"`
-	PicFile   string `mapstructure:"picfile"`
+	DB       int `mapstructure:"db"`
+	Port     int `mapstructure:"port"`
+	PoolSize int `mapstructure:"pool_size"`
+	// Expired      int    `mapstructure:"expired"`
+	// MinIdleConns int    `mapstructure:"min_idle_conns"`
+	Host     string `mapstructure:"host"`
+	PassWord string `mapstructure:"password"`
 }
 
 type LogConfig struct {
@@ -73,11 +59,11 @@ type LogConfig struct {
 }
 
 type RedsyncConfig struct {
-	Host       string `mapstructure:"host" json:"host" yaml:"host"`
 	Port       int    `mapstructure:"port" json:"port" yaml:"port"`
-	Password   string `mapstructure:"password" json:"password" yaml:"password"`
 	LockExpire int    `mapstructure:"expire" json:"expire" yaml:"expire"` // 锁过期时间
 	PoolSize   int    `mapstructure:"pool_size" json:"pool_size" yaml:"pool_size"`
+	Host       string `mapstructure:"host" json:"host" yaml:"host"`
+	Password   string `mapstructure:"password" json:"password" yaml:"password"`
 }
 
 func Init() (err error) {
@@ -115,5 +101,5 @@ func Init() (err error) {
 }
 
 func GetGlobalConfig() *GlobalConfig {
-	return &globalConfig
+	return globalConfig
 }

@@ -6,30 +6,24 @@ import (
 	"github.com/spf13/viper"
 )
 
-var globalConfig GlobalConfig
+var globalConfig = new(GlobalConfig)
 
 type GlobalConfig struct {
-	Name              string           `mapstructure:"name"` // 服务name
-	Host              string           `mapstructure:"host"` // 服务host
-	Port              int              `mapstructure:"port"`
-	Mode              string           `mapstructure:"mode"`
-	UserSvrName       string           `mapstructure:"user_svr_name"` // 服务user服务name
-	RelationSvrName   string           `mapstructure:"relation_svr_name"`
-	FavoriteSvrName   string           `mapstructure:"favorite_svr_name"`
-	RedsyncConfig     []*RedsyncConfig `mapstructure:"redsync"`
-	*UserServerConfig `mapstructure:"user_srv" json:"user_srv" yaml:"user_srv"`
-	*ConsulConfig     `mapstructure:"consul"`
-	*DbConfig         `mapstructure:"mysql"`
-	*MinioConfig      `mapstructure:"minio"`
-	*RedisConfig      `mapstructure:"redis"`
-	*PathConfig       `mapstructure:"path"`
-	*LogConfig        `mapstructure:"log"`
+	*SvrConfig    `mapstructure:"svr_config"`
+	*ConsulConfig `mapstructure:"consul"`
+	*DbConfig     `mapstructure:"mysql"`
+	*MinioConfig  `mapstructure:"minio"`
+	*RedisConfig  `mapstructure:"redis"`
+	*LogConfig    `mapstructure:"log"`
 }
 
-type UserServerConfig struct {
-	Host string `mapstructure:"host" json:"host" yaml:"host"`
-	Port int    `mapstructure:"port" json:"port" yaml:"port"`
-	Name string `mapstructure:"name" json:"name" yaml:"name"`
+type SvrConfig struct {
+	Name string `mapstructure:"name"` // 服务name
+	Host string `mapstructure:"host"` // 服务host
+	Port int    `mapstructure:"port"`
+	// UserSvrName     string `mapstructure:"user_svr_name"` // 用户服务name
+	RelationSvrName string `mapstructure:"relation_svr_name"`
+	FavoriteSvrName string `mapstructure:"favorite_svr_name"`
 }
 
 type ConsulConfig struct {
@@ -56,6 +50,9 @@ type MinioConfig struct {
 	SecretAccessKey string `mapstructure:"secret_access_key"`
 	VideoBuckets    string `mapstructure:"videobuckets"`
 	PicBuckets      string `mapstructure:"picbuckets"`
+	VideoPath       string `mapstructure:"videopath"`
+	// LogFile   string `mapstructure:"logfile"`
+	PicPath string `mapstructure:"picpath"`
 }
 
 type RedisConfig struct {
@@ -66,12 +63,6 @@ type RedisConfig struct {
 	Host         string `mapstructure:"host"`
 	PassWord     string `mapstructure:"password"`
 	Expired      int    `mapstructure:"expired"`
-}
-
-type PathConfig struct {
-	VideoFile string `mapstructure:"videofile"`
-	LogFile   string `mapstructure:"logfile"`
-	PicFile   string `mapstructure:"picfile"`
 }
 
 type LogConfig struct {
@@ -125,5 +116,5 @@ func Init() (err error) {
 }
 
 func GetGlobalConfig() *GlobalConfig {
-	return &globalConfig
+	return globalConfig
 }

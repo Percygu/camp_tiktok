@@ -37,7 +37,9 @@ func initRedis() {
 }
 
 func CloseRedis() {
-	redisConn.Close()
+	if redisConn != nil {
+		redisConn.Close()
+	}
 }
 
 // GetRedisCli 获取数据库连接

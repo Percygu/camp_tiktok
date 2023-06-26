@@ -29,7 +29,7 @@ func RelationAction(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationServerConfig.Name).RelationAction(ctx, &pb.RelationActionReq{
+	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().SvrConfig.RelationSvrName).RelationAction(ctx, &pb.RelationActionReq{
 		ToUserId:   toUid,
 		SelfUserId: tokenUserId,
 		ActionType: actionType,
@@ -60,7 +60,7 @@ func GetFollowList(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationServerConfig.Name).GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
+	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().SvrConfig.RelationSvrName).GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
 		UserId: uid,
 	})
 
@@ -89,7 +89,7 @@ func GetFollowerList(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationServerConfig.Name).GetRelationFollowerList(ctx, &pb.GetRelationFollowerListReq{
+	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().SvrConfig.RelationSvrName).GetRelationFollowerList(ctx, &pb.GetRelationFollowerListReq{
 		UserId: uid,
 	})
 

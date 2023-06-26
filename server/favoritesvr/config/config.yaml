@@ -1,44 +1,35 @@
 svr_config:
   name: "favoritesvr"
-  host: 121.43.102.177
-  port: 8081
-  mode: release
+  host: "43.139.192.217"
+  port: "8004"
   user_svr_name: "usersvr"
   video_svr_name: "videosvr"
 
-mysql:
-  host: 121.43.102.177
-  port: 8086
-  database: camps_tiktok
-  username: root
-  password: 123456
-
-minio:
-  #minio服务主机ip，需要填具体ip
-  host: 121.43.102.177
-  port: 9000
-  accessKeyID: minioadmin
-  secretAccessKey: minioadmin
-  videobuckets: video
-  picbuckets: pic
 
 redis:
-  address: 192.168.1.12
-  network: tcp
+  host: "43.139.192.217"
+  password: "123456"
+  db: 0
   port: 6379
-  auth: 123
+  PoolSize: 10
+
+mysql:
+  host: "121.43.102.177"
+  port: "8086"
+  database: "camps_tiktok"
+  username: "root"
+  password: "123456"
 
 log:
-  level: "info"
-  file_name: ".log"
-  log_path: "../log/favoritesvr/"
-  max_size: 50
-  max_age: 20
-  MaxBackups: 10
+  level: "debug"
+  filename: "favorite.log"
+  max_size: 200
+  max_age: 30
+  max_backups: 7
 
 consul:
-  host: 121.43.102.177
-  port: 8090
+  host: "43.139.192.217"
+  port: 8500
   tags:
     - "favoritesvr"
 

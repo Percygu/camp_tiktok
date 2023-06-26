@@ -1,6 +1,7 @@
 package response
 
 import (
+	"gatewaysvr/log"
 	"github.com/gin-gonic/gin"
 	"reflect"
 )
@@ -45,12 +46,12 @@ func setResponse(ctx *gin.Context, StatusCode int64, StatusMsg string, v interfa
 	if field.CanSet() {
 		field.SetString(StatusMsg)
 	} else {
-		logger.Debug("cant set msg")
+		log.Debug("cant set StatusMsg")
 	}
 	fieldCode := getValue.Elem().FieldByName("StatusCode")
 	if fieldCode.CanSet() {
 		fieldCode.SetInt(StatusCode)
 	} else {
-		logger.Debug("cant set StatusCode")
+		log.Debug("cant set StatusMsg")
 	}
 }

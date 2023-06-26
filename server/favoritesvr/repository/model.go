@@ -1,9 +1,9 @@
 package repository
 
 type Favorite struct {
-	Id      int64 `gorm:"column:favorite_id; primary_key;"`
-	UserId  int64 `gorm:"column:user_id"`
-	VideoId int64 `gorm:"column:video_id"`
+	Id      int64 `gorm:"column:favorite_id; primary_key;"` // favorite_id
+	UserId  int64 `gorm:"column:user_id"`                   // user_id 谁点的赞
+	VideoId int64 `gorm:"column:video_id"`                  // video_id 被点赞的视频
 }
 
 func (Favorite) TableName() string {
