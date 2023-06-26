@@ -12,10 +12,10 @@ func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
 
 	nowtime := time.Now().Format("01-02")
 	comment := Comment{
-		UserId:  userId,
-		VideoId: videoId,
-		Comment: comment_text,
-		Time:    nowtime,
+		UserId:      userId,
+		VideoId:     videoId,
+		CommentText: comment_text,
+		CreateTime:  nowtime,
 	}
 	result := db.Create(&comment)
 

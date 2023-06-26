@@ -45,7 +45,7 @@ func DelCommentCacheInfo(keyList []string, VideoID int64) error {
 
 // GetCommentCacheInfo 获取某个video的评论列表
 func GetCommentCacheInfo(comment *Comment) error {
-	redisKey := constant.CommentInfoPrefix + strconv.FormatInt(comment.CommentId, 10)
+	redisKey := constant.CommentInfoPrefix + strconv.FormatInt(comment.Id, 10)
 
 	val, err := json.Marshal(comment)
 	if err != nil {

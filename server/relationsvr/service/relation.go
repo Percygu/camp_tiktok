@@ -46,11 +46,7 @@ func GetRelationFollowList(ctx context.Context, userId int64) (*pb.GetRelationFo
 		return nil, err
 	}
 	return &pb.GetRelationFollowListRsp{
-		CommonRsp: &pb.CommonResponse{
-			Code: constant.SuccessCode,
-			Msg:  constant.SuccessMsg,
-		},
-		UserInfo: userInfoList,
+		UserInfoList: userInfoList,
 	}, nil
 }
 
@@ -61,11 +57,7 @@ func GetRelationFollowerList(userId int64, tokenUserId int64) (*pb.GetRelationFo
 		return nil, err
 	}
 	return &pb.GetRelationFollowerListRsp{
-		CommonRsp: &pb.CommonResponse{
-			Code: constant.SuccessCode,
-			Msg:  constant.SuccessMsg,
-		},
-		UserInfo: userInfoList,
+		UserInfoList: userInfoList,
 	}, nil
 }
 

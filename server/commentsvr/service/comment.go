@@ -80,10 +80,10 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 		// 为了找到video_id所对应的user_id，在通过user_id找到user_name.传递给前端
 		userInfo := uerMap[comment.UserId]
 		v := &pb.Comment{
-			Id:         comment.CommentId,
+			Id:         comment.Id,
 			UserInfo:   userInfo,
-			Content:    comment.Comment,
-			CreateDate: comment.Time,
+			Content:    comment.CommentText,
+			CreateDate: comment.CreateTime,
 		}
 		list.CommentList[i] = v
 	}

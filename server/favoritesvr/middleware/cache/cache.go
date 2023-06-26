@@ -1,11 +1,11 @@
 package cache
 
 import (
+	"favoritesvr/config"
+	"favoritesvr/log"
 	"fmt"
 	redis "github.com/redis/go-redis/v9"
 	"golang.org/x/net/context"
-	"relationsvr/config"
-	"relationsvr/log"
 	"sync"
 )
 
