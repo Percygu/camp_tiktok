@@ -8,23 +8,24 @@ import (
 	"go.uber.org/zap"
 )
 
-func main() {
-	// 1.加载配置
-	config.Init()
-	// 2.初始化日志
+func Init() {
+	if err := config.Init(); err != nil {
+		log.Fatalf("init config failed, err:%v\n", err)
+	}
 	log.InitLog()
+	log.Info("log init success...")
+}
 
-	defer zap.L().Sync() // 把缓存区的日志追加到文件中
-	zap.L().Info("init config success...")
-	zap.L().Info("init logger success...")
-
+func main() {
+	Init()
+	defer log.Sync()
 	// 3.初始化路由
 	r := routes.SetRoute()
 	go func() {
-		if err := r.Run(fmt.Sprintf(":%d", config.GetGlobalConfig().Port)); err != nil {
+		if err := r.Run(fmt.Sprintf(":%d", config.GetGlobalConfig().SvrConfig.Port)); err != nil {
 			zap.L().Panic("Router.Run error: ", zap.Error(err))
 		}
 	}()
-	zap.L().Sugar().Infof("listen on %s:%d", config.GetGlobalConfig().Host, config.GetGlobalConfig().Port)
+	zap.L().Sugar().Infof("listen on %s:%d", config.GetGlobalConfig().SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port)
 
 }

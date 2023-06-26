@@ -27,7 +27,7 @@ func InitLog() {
 		return lev >= zap.ErrorLevel
 	})
 	lowPriority := zap.LevelEnablerFunc(func(lev zapcore.Level) bool { // info和debug级别,debug级别是最低的
-		if config.GetGlobalConfig().Level == "debug" {
+		if config.GetGlobalConfig().LogConfig.Level == "debug" {
 			return lev < zap.ErrorLevel && lev >= zap.DebugLevel
 		} else {
 			return lev < zap.ErrorLevel && lev >= zap.InfoLevel

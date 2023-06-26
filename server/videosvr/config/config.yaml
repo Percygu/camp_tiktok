@@ -1,38 +1,44 @@
-mysql:  
-  host: 192.168.1.12
-  port: 3306
-  database: TikTokLite
-  username: user
-  password: 123
+svr_config:
+    name: "videosvr"
+    host: "43.139.192.217"
+    port: 8001
+    relation_svr_name: "relationsvr"
+    favorite_svr_name: "favoritesvr"
+
+redis:
+  host: "43.139.192.217"
+  password: "123456"
+  db: 0
+  port: 6379
+  PoolSize: 10
+
+mysql:
+  host: "121.43.102.177"
+  port: "8086"
+  database: "camps_tiktok"
+  username: "root"
+  password: "123456"
+
+log:
+  level: "debug"
+  filename: "video.log"
+  max_size: 200
+  max_age: 30
+  max_backups: 7
+
+consul:
+  host: "43.139.192.217"
+  port: 8500
+  tags:
+    - "usersvr"
+
 minio:
-  #minio服务主机ip，需要填具体ip
-  host: 192.168.1.12
-  port: 9000
-  accessKeyID: minioadmin
-  secretAccessKey: minioadmin
+  host: "43.139.192.217"
+  port: "9000"
+  accessKeyID: "admin"
+  secretAccessKey: "admin"
   videobuckets: video
   picbuckets: pic
-redis:
-  address: 192.168.1.12
-  network: tcp
-  port: 6379
-  auth: 123
-videofile: /tmp/file/video/
-logfile: /tmp/file/log/
-picfile: /tmp/file/picture/
-level: info
+  videopath: "/root/tiktok/store/video"
+  picpath: "/root/tiktok/store/pic"
 
-
-//    Addr:               "localhost:6379",
-                            Password:           "", // no password set
-                            DB:                 0,  // use default DB
-                            MaxRetries:         3,  // set maximum number of retries
-                            DialTimeout:        5 * time.Second, // set dial timeout
-                            ReadTimeout:        3 * time.Second, // set read timeout
-                            WriteTimeout:       3 * time.Second, // set write timeout
-                            PoolSize:           10, // set connection pool size
-                            MinIdleConns:       5,  // set minimum idle connections
-                            IdleTimeout:        240 * time.Second, // set idle timeout
-                            MaxConnAge:         300 * time.Second, // set maximum connection age
-                            PoolTimeout:        5 * time.Second,   // set pool timeout
-                            IdleCheckFrequency: 60 * time.Second,  // set idle c

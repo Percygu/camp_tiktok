@@ -27,7 +27,7 @@ func Feed(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewVideoSvrClient(config.GetGlobalConfig().VideoServerConfig.Name).GetFeedList(ctx, &pb.GetFeedListRequest{
+	resp, err := utils.NewVideoSvrClient(config.GetGlobalConfig().SvrConfig.VideoSvrName).GetFeedList(ctx, &pb.GetFeedListRequest{
 		CurrentTime: currentTime,
 		TokenUserId: tokenId,
 	})

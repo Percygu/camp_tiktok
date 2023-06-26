@@ -9,15 +9,18 @@ import (
 var globalConfig = new(GlobalConfig)
 
 type GlobalConfig struct {
-	Name          string           `mapstructure:"name"` // 服务name
-	Host          string           `mapstructure:"host"` // 服务host
-	Port          int              `mapstructure:"port"`
-	RedsyncConfig []*RedsyncConfig `mapstructure:"redsync"`
+	*SvrConfig    `mapstructure:"svr_config"`
 	*ConsulConfig `mapstructure:"consul"`
 	*DbConfig     `mapstructure:"mysql"`
 	*RedisConfig  `mapstructure:"redis"`
-	*PathConfig   `mapstructure:"path"`
 	*LogConfig    `mapstructure:"log"`
+	RedsyncConfig []*RedsyncConfig `mapstructure:"redsync"`
+}
+
+type SvrConfig struct {
+	Name string `mapstructure:"name"` // 服务name
+	Host string `mapstructure:"host"` // 服务host
+	Port int    `mapstructure:"port"`
 }
 
 type ConsulConfig struct {
@@ -45,12 +48,6 @@ type RedisConfig struct {
 	// MinIdleConns int    `mapstructure:"min_idle_conns"`
 	Host     string `mapstructure:"host"`
 	PassWord string `mapstructure:"password"`
-}
-
-type PathConfig struct {
-	VideoFile string `mapstructure:"videofile"`
-	LogFile   string `mapstructure:"logfile"`
-	PicFile   string `mapstructure:"picfile"`
 }
 
 type LogConfig struct {

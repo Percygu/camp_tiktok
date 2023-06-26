@@ -14,7 +14,7 @@ type RelationService struct {
 	pb.UnimplementedRelationServiceServer
 }
 
-func (c RelationService) CommentAction(ctx context.Context, req *pb.RelationActionReq) (*pb.RelationActionRsp, error) {
+func (c RelationService) RelationAction(ctx context.Context, req *pb.RelationActionReq) (*pb.RelationActionRsp, error) {
 	if req.SelfUserId == req.ToUserId {
 		return nil, fmt.Errorf("you can't follow yourself")
 	}
@@ -40,8 +40,8 @@ func (c RelationService) CommentAction(ctx context.Context, req *pb.RelationActi
 }
 
 // GetRelationFollowList 获取被关注者列表
-func GetRelationFollowList(ctx context.Context, userId int64) (*pb.GetRelationFollowListRsp, error) {
-	userInfoList, err := RelationFollowList(userId, 1)
+func (c RelationService) GetRelationFollowList(ctx context.Context, req *pb.GetRelationFollowListReq) (*pb.GetRelationFollowListRsp, error) {
+	userInfoList, err := RelationFollowList(req.UserId, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +51,8 @@ func GetRelationFollowList(ctx context.Context, userId int64) (*pb.GetRelationFo
 }
 
 // GetRelationFollowerList 获取关注者列表
-func GetRelationFollowerList(userId int64, tokenUserId int64) (*pb.GetRelationFollowerListRsp, error) {
-	userInfoList, err := RelationFollowList(userId, 2)
+func (c RelationService) GetRelationFollowerList(ctx context.Context, req *pb.GetRelationFollowerListReq) (*pb.GetRelationFollowerListRsp, error) {
+	userInfoList, err := RelationFollowList(req.UserId, 2)
 	if err != nil {
 		return nil, err
 	}

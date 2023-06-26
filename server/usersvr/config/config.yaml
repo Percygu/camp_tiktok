@@ -1,7 +1,8 @@
-name: "usersvr"
-host: ""
-port: 8000
-mode: "dev"
+svr_config:
+  name: "usersvr"
+  host: "43.139.192.217"
+  port: "8000"
+
 
 redis:
   host: "43.139.192.217"

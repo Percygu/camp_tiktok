@@ -3,10 +3,13 @@ package main
 import (
 	"commentsvr/config"
 	"commentsvr/log"
+	"commentsvr/middleware/cache"
 	"commentsvr/middleware/consul"
+	"commentsvr/middleware/db"
 	"commentsvr/service"
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
+
 	// "github.com/Percygu/litetiktok_proto/pb"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
@@ -29,8 +32,7 @@ func Init() {
 }
 
 func Run() error {
-	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.GetGlobalConfig().
-		SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port))
+	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", "", config.GetGlobalConfig().SvrConfig.Port))
 	if err != nil {
 		log.Fatalf("listen: error %v", err)
 		return fmt.Errorf("listen: error %v", err)
@@ -79,6 +81,8 @@ func Run() error {
 func main() {
 	Init()
 	defer log.Sync()
+	defer cache.CloseRedis()
+	defer db.CloseDB()
 	if err := Run(); err != nil {
 		log.Errorf("commentsvr run err:%v", err)
 	}

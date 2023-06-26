@@ -57,6 +57,7 @@ func GetCommentCacheInfo(comment *Comment) error {
 }
 
 func GetCommentCacheList(vid int64) ([]*Comment, error) {
+	// key名 video:1 value: comment1 comment2 comment3
 	redisKey := constant.VideoInfoPrefix + strconv.FormatInt(vid, 10)
 	redisCli := cache.GetRedisCli()
 	resultList, err := redisCli.HGetAll(context.Background(), redisKey).Result()

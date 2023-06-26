@@ -16,18 +16,24 @@ func LikeAction(uid, vid int64) error {
 		UserId:  uid,
 		VideoId: vid,
 	}
+	// 这个video 是否有被当前userid 点赞过
 	err := db.Where("user_id = ? and video_id = ?", uid, vid).Find(&Favorite{}).Error
 	if err != gorm.ErrRecordNotFound {
 		return fmt.Errorf("you have liked this video")
 	}
 	err = db.Create(&favorite).Error
+
 	if err != nil {
 		return err
 	}
-	//authorid, _ := CacheGetAuthor(vid) // todo videosvr
+
+	// TODO: update user TotalFav
+	// 得这个video的作者id
+
+	// authorid, _ := CacheGetAuthor(vid) // todo videosvr
 	// todo usercountcache change usersvr
-	//go CacheChangeUserCount(uid, add, "like")
-	//go CacheChangeUserCount(authorid, add, "liked")
+	// go CacheChangeUserCount(uid, add, "like")
+	// go CacheChangeUserCount(authorid, add, "liked")
 	return nil
 }
 
@@ -37,10 +43,10 @@ func UnLikeAction(uid, vid int64) error {
 	if err != nil {
 		return err
 	}
-	//authorid, _ := CacheGetAuthor(vid)
+	// authorid, _ := CacheGetAuthor(vid)
 	// go func() {
-	//go CacheChangeUserCount(uid, sub, "like")
-	//go CacheChangeUserCount(authorid, sub, "liked")
+	// go CacheChangeUserCount(uid, sub, "like")
+	// go CacheChangeUserCount(authorid, sub, "liked")
 	// }()
 	return nil
 }
