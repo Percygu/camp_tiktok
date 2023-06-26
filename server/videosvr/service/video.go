@@ -56,6 +56,7 @@ func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequ
 	}
 	return &pb.PublishVideoResponse{}, nil
 }
+
 func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListRequest) (*pb.GetFeedListResponse, error) {
 	videoList, err := repository.GetVideoListByFeed(req.CurrentTime)
 	if err != nil {
@@ -97,8 +98,8 @@ func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
 			FavoriteCount: video.FavoriteCount,
 			CommentCount:  video.CommentCount,
 			IsFavorite:    false,
-			Author:        messageUserInfo(video.Author),
-			Title:         video.Title,
+			// Author:        messageUserInfo(video.Author),
+			Title: video.Title,
 		}
 		if _, ok := FollowList[video.AuthorId]; ok {
 			v.Author.IsFollow = true
@@ -113,7 +114,7 @@ func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
 
 func tokenFollowList(userId int64) (map[int64]struct{}, error) {
 	m := make(map[int64]struct{})
-	reply, err := utils.NewRelationSvrClient(config.GetGlobalConfig().RelationSvrName).GetRelationFollowList(context.Background(), &pb.GetRelationFollowListReq{
+	reply, err := utils.NewRelationSvrClient(config.GetGlobalConfig().SvrConfig.RelationSvrName).GetRelationFollowList(context.Background(), &pb.GetRelationFollowListReq{
 		UserId: userId,
 	})
 	if err != nil {
@@ -129,7 +130,7 @@ func tokenFollowList(userId int64) (map[int64]struct{}, error) {
 func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
 	m := make(map[int64]struct{})
 
-	reply, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().FavoriteSvrName).GetFavoriteVideoList(context.Background(), &pb.GetFavoriteVideoListReq{
+	reply, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName).GetFavoriteVideoList(context.Background(), &pb.GetFavoriteVideoListReq{
 		UserId: tokenUserId,
 	})
 	if err != nil {
@@ -143,27 +144,27 @@ func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
 	return m, nil
 }
 
-func messageUserInfo(info repository.User) *pb.UserInfo {
-	return &pb.UserInfo{
-		Id:              info.Id,
-		Name:            info.Name,
-		FollowCount:     info.Follow,
-		FollowerCount:   info.Follower,
-		IsFollow:        false,
-		Avatar:          info.Avatar,
-		BackgroundImage: info.BackgroundImage,
-		Signature:       info.Signature,
-		TotalFavorited:  info.TotalFav,
-		FavoriteCount:   info.FavCount,
-	}
-}
+// func messageUserInfo(info repository.User) *pb.UserInfo {
+// 	return &pb.UserInfo{
+// 		Id:              info.Id,
+// 		Name:            info.Name,
+// 		FollowCount:     info.Follow,
+// 		FollowerCount:   info.Follower,
+// 		IsFollow:        false,
+// 		Avatar:          info.Avatar,
+// 		BackgroundImage: info.BackgroundImage,
+// 		Signature:       info.Signature,
+// 		TotalFavorited:  info.TotalFav,
+// 		FavoriteCount:   info.FavCount,
+// 	}
+// }
 
 func GetImageFile(videoPath string) (string, error) {
 	temp := strings.Split(videoPath, "/")
 	videoName := temp[len(temp)-1]
 	b := []byte(videoName)
 	videoName = string(b[:len(b)-3]) + "jpg"
-	picPath := config.GetGlobalConfig().PathConfig.PicFile
+	picPath := config.GetGlobalConfig().MinioConfig.PicPath
 	picName := filepath.Join(picPath, videoName)
 	cmd := exec.Command("ffmpeg", "-i", videoPath, "-ss", "1", "-f", "image2", "-t", "0.01", "-y", picName)
 	err := cmd.Run()

@@ -38,7 +38,7 @@ func FavoriteAction(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().FavoriteServerConfig.Name).FavoriteAction(ctx, &pb.FavoriteActionReq{
+	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName).FavoriteAction(ctx, &pb.FavoriteActionReq{
 		UserId:     tokenUid,
 		VideoId:    favInfo.VideoId,
 		ActionType: int64(favInfo.ActionType),
@@ -56,7 +56,7 @@ func GetFavoriteList(ctx *gin.Context) {
 
 	tokenUidStr, _ := ctx.Get("UserId")
 	tokenUid := tokenUidStr.(int64)
-	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().FavoriteServerConfig.Name).GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
+	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName).GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
 		UserId: tokenUid,
 	})
 	if err != nil {

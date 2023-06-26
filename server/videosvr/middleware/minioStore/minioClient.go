@@ -29,10 +29,10 @@ func GetMinio() Minio {
 }
 
 func initMinio() {
-	conf := config.GetGlobalConfig()
+	conf := config.GetGlobalConfig().MinioConfig
 
 	endpoint := conf.Host
-	port := strconv.Itoa(conf.Port)
+	port := conf.Port
 	endpoint = endpoint + ":" + port
 	accessKeyID := conf.AccessKeyID
 	secretAccessKey := conf.SecretAccessKey

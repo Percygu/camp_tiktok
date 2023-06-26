@@ -20,7 +20,7 @@ func UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().UserServerConfig.Name).CheckPassWord(ctx, &pb.CheckPassWordRequest{
+	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).CheckPassWord(ctx, &pb.CheckPassWordRequest{
 		Username: userName,
 		Password: password,
 	})
@@ -41,7 +41,7 @@ func UserRegister(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().UserServerConfig.Name).Register(ctx, &pb.RegisterRequest{
+	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).Register(ctx, &pb.RegisterRequest{
 		Username: userName,
 		Password: password,
 	})
@@ -72,7 +72,7 @@ func GetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	userInfo, err := utils.NewUserSvrClient(config.GetGlobalConfig().UserServerConfig.Name).GetUserInfo(ctx, &pb.GetUserInfoRequest{
+	userInfo, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).GetUserInfo(ctx, &pb.GetUserInfoRequest{
 		Id: uid,
 	})
 	if err != nil {

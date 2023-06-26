@@ -1,11 +1,11 @@
 package repository
 
 type Comment struct {
-	Id          int64  `gorm:"column:id; primary_key;"`
-	UserId      int64  `gorm:"column:user_id"`
-	VideoId     int64  `gorm:"column:video_id"`
-	CommentText string `gorm:"column:comment_text"`
-	CreateTime  string `gorm:"column:create_time"`
+	Id          int64  `gorm:"column:id; primary_key;"` // ID = commentID
+	UserId      int64  `gorm:"column:user_id"`          // 是谁评论的
+	VideoId     int64  `gorm:"column:video_id"`         // 评论哪个视频
+	CommentText string `gorm:"column:comment_text"`     // 评论内容
+	CreateTime  string `gorm:"column:create_time"`      // 评论时间
 }
 
 func (c *Comment) TableName() string {

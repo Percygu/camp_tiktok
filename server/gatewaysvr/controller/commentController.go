@@ -40,7 +40,7 @@ func CommentAction(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().CommentServerConfig.Name).CommentAction(ctx, &pb.CommentActionReq{
+	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().SvrConfig.CommentSvrName).CommentAction(ctx, &pb.CommentActionReq{
 		UserId:      tokenUid,
 		VideoId:     videoId,
 		CommentId:   commentId,
@@ -74,7 +74,7 @@ func GetCommentList(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().CommentServerConfig.Name).GetCommentList(ctx, &pb.GetCommentListReq{
+	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().SvrConfig.CommentSvrName).GetCommentList(ctx, &pb.GetCommentListReq{
 		VideoId: videoId,
 	})
 

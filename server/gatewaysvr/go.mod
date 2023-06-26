@@ -1,6 +1,6 @@
 module gatewaysvr
 
-go 1.20
+go 1.19
 
 require (
 	github.com/Percygu/camp_tiktok v1.0.19

@@ -43,3 +43,13 @@ func GetDB() *gorm.DB {
 	dbOnce.Do(openDB)
 	return db
 }
+
+func CloseDB() {
+	if db != nil {
+		sqlDB, err := db.DB()
+		if err != nil {
+			log.Errorf("close db err:%v", err)
+		}
+		sqlDB.Close()
+	}
+}
