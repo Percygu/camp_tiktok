@@ -30,7 +30,7 @@ func initRedis() {
 	if redisConn == nil {
 		panic("failed to call redis.NewClient")
 	}
-	res, err := redisConn.Set(context.Background(), "abc", 100, 60).Result()
+	res, err := redisConn.Set(context.Background(), "abc", 100, 1000).Result()
 	log.Infof("res=======%v,err======%v", res, err)
 	_, err = redisConn.Ping(context.Background()).Result()
 	if err != nil {
@@ -39,7 +39,9 @@ func initRedis() {
 }
 
 func CloseRedis() {
-	redisConn.Close()
+	if redisConn != nil {
+		redisConn.Close()
+	}
 }
 
 // GetRedisCli 获取数据库连接
@@ -47,8 +49,4 @@ func GetRedisCli() *redis.Client {
 	redisOnce.Do(initRedis)
 
 	return redisConn
-}
-
-func CacheGetUser(key string) (string, error) {
-
 }
