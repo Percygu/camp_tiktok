@@ -7,9 +7,10 @@ import (
 	"usersvr/log"
 	"usersvr/middleware/cache"
 	"usersvr/middleware/consul"
-	"usersvr/middleware/lock"
+	"usersvr/middleware/db"
 	"usersvr/service"
 
+	// "github.com/Percygu/litetiktok_proto/pb"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -49,12 +50,13 @@ func Run() error {
 	if err := consulClient.Register(config.GetGlobalConfig().SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port,
 		config.GetGlobalConfig().Name, config.GetGlobalConfig().ConsulConfig.Tags, serviceID); err != nil {
 		log.Fatal("consul.Register error: ", zap.Error(err))
-		return fmt.Errorf("consul.Register error: %v", zap.Error(err))
+		return fmt.Errorf("consul.Register error: ", zap.Error(err))
 	}
 	log.Info("Init Consul Register success")
 
 	// 启动
-	log.Infof("TikTokLite.comment_svr listening on %s:%d", config.GetGlobalConfig().SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port)
+	log.Infof("TikTokLite.relation_svr listening on %s:%d", config.GetGlobalConfig().
+		SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port)
 	go func() {
 		err = server.Serve(listen)
 		if err != nil {
@@ -79,9 +81,9 @@ func Run() error {
 func main() {
 	Init()
 	defer log.Sync()
-	defer lock.CloseLock()
 	defer cache.CloseRedis()
+	defer db.CloseDB()
 	if err := Run(); err != nil {
-		log.Errorf("userSvr run err:%v", err)
+		log.Errorf("UserSvr run err:%v", err)
 	}
 }

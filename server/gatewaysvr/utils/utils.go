@@ -6,6 +6,8 @@ import (
 	"gatewaysvr/log"
 	"gatewaysvr/utils/otgrpc"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
+	// 必须要导入这个包，否则grpc会报错
+	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -23,6 +25,7 @@ func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
 		log.Errorf("NewSvrConn with svrname %s err:%v", svrName, err)
 		return nil, err
 	}
+	log.Info("NewSvrConn success")
 	return conn, nil
 }
 

@@ -32,7 +32,7 @@ func openDB() {
 	if err != nil {
 		panic("fetch db connection err:" + err.Error())
 	}
-
+	// _ = db.AutoMigrate(&repository.User{})
 	sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConn)                                        // 设置最大空闲连接
 	sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConn)                                        // 设置最大打开的连接
 	sqlDB.SetConnMaxLifetime(time.Duration(dbConfig.MaxIdleTime * int64(time.Second))) // 设置空闲时间为(s)
@@ -42,4 +42,15 @@ func openDB() {
 func GetDB() *gorm.DB {
 	dbOnce.Do(openDB)
 	return db
+}
+
+// CloseDB 关闭数据库连接
+func CloseDB() {
+	if db != nil {
+		sqlDB, err := db.DB()
+		if err != nil {
+			panic("fetch db connection err:" + err.Error())
+		}
+		sqlDB.Close()
+	}
 }
