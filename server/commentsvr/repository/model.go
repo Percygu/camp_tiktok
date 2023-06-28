@@ -9,5 +9,5 @@ type Comment struct {
 }
 
 func (c *Comment) TableName() string {
-	return "t_comments"
+	return "t_comment"
 }
