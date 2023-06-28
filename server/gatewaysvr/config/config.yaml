@@ -12,7 +12,7 @@ svr_config:
 
 log:
   level: "debug"
-  filename: "video.log"
+  file_name: "gateway.log"
   max_size: 200
   max_age: 30
   max_backups: 7

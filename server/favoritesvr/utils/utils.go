@@ -8,6 +8,8 @@ import (
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
+	// 必须要导入这个包，否则grpc会报错
+	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"google.golang.org/grpc/credentials/insecure"
 )
 

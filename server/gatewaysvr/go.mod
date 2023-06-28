@@ -6,7 +6,6 @@ require (
 	github.com/Percygu/camp_tiktok v1.0.19
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/gin-gonic/gin v1.8.0
-	github.com/goccy/go-json v0.9.7
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645
@@ -20,7 +19,6 @@ require (
 	golang.org/x/net v0.10.0
 	google.golang.org/grpc v1.56.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	gorm.io/gorm v1.25.1
 )
 
 require (
@@ -75,6 +73,7 @@ require (
 	github.com/go-toolsmith/typep v1.1.0 // indirect
 	github.com/go-xmlfmt/xmlfmt v1.1.2 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
+	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/golangci/check v0.0.0-20180506172741-cfe4005ccda2 // indirect
 	github.com/golangci/dupl v0.0.0-20180902072040-3e9179ac440a // indirect
