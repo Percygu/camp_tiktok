@@ -34,11 +34,21 @@ message GetRelationFollowerListRsp {
   repeated UserInfo user_info_list = 1; // 被关注者用户信息列表
 }
 
+message IsFollowedReq {
+  int64 self_user_id = 1; // 自己的id
+  int64 to_user_id = 2;   // 对方的id
+}
+
+message IsFollowedRsp {
+  bool is_followed = 1; // 是否关注
+}
+
 
 service RelationService {
   rpc RelationAction(RelationActionReq) returns (RelationActionRsp); // 关联关系方法
   rpc GetRelationFollowList(GetRelationFollowListReq) returns (GetRelationFollowListRsp); // 获取被关注者列表
   rpc GetRelationFollowerList(GetRelationFollowerListReq) returns (GetRelationFollowerListRsp); // 获取关注者列表
+  rpc IsFollowed(IsFollowedReq) returns (IsFollowedRsp); // 获取是否关注
 }
 
 

@@ -62,33 +62,65 @@ func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequ
 }
 
 func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListRequest) (*pb.GetFeedListResponse, error) {
+	// 拿出一批视频
 	videoList, err := repository.GetVideoListByFeed(req.CurrentTime)
 	if err != nil {
 		return nil, err
 	}
-
-	feed := &pb.GetFeedListResponse{
-		VideoList: VideoInfo(videoList, req.TokenUserId),
-	}
+	//
+	// feed := &pb.GetFeedListResponse{
+	// 	VideoList: VideoInfo(videoList, req.TokenUserId),
+	// }
 
 	nextTime := time.Now().UnixNano() / 1e6
 	if len(videoList) == 20 {
 		nextTime = videoList[len(videoList)-1].PublishTime
 	}
-	feed.NextTime = nextTime
-	return feed, nil
+
+	var VideoInfoList []*pb.VideoInfo
+	for _, video := range videoList {
+		VideoInfoList = append(VideoInfoList, &pb.VideoInfo{
+			Id:            video.Id,
+			AuthorId:      video.AuthorId,
+			PlayUrl:       video.PlayUrl,
+			CoverUrl:      video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			IsFavorite:    false, // 是否喜欢，在gateway处理
+			Title:         video.Title,
+		})
+	}
+	resp := &pb.GetFeedListResponse{
+		NextTime:  nextTime,
+		VideoList: VideoInfoList,
+	}
+	return resp, nil
 }
 
 func (v VideoService) GetFavoriteVideoList(ctx context.Context, req *pb.GetFavoriteVideoListReq) (*pb.GetFavoriteVideoListRsp, error) {
 	resp, err := utils.GetFavoriteSvrClient().GetFavoriteVideoIdList(ctx, &pb.GetFavoriteVideoIdListReq{
 		UserId: req.UserId,
 	})
+	if err != nil {
+		log.Errorf("GetFavoriteVideoIdList err: %v", err)
+		return nil, err
+	}
 
-	videoInfoListRsp, err := v.GetVideoInfoList()
+	videoInfoListRsp, err := v.GetVideoInfoList(ctx, &pb.GetVideoInfoListReq{
+		VideoId: resp.VideoIdList,
+	})
+	if err != nil {
+		log.Errorf("GetVideoInfoList err: %v", err)
+		return nil, err
+	}
+
 	if videoInfoListRsp == nil {
 		return nil, fmt.Errorf("videoInfoList is nil")
 	}
-	return videoInfoListRsp.VideoInfoList, nil
+
+	return &pb.GetFavoriteVideoListRsp{
+		VideoList: videoInfoListRsp.VideoInfoList,
+	}, nil
 }
 
 func (v VideoService) GetVideoInfoList(ctx context.Context, req *pb.GetVideoInfoListReq) (*pb.GetVideoInfoListRsp, error) {
@@ -97,8 +129,21 @@ func (v VideoService) GetVideoInfoList(ctx context.Context, req *pb.GetVideoInfo
 		return nil, err
 	}
 
+	videoInfoList := make([]*pb.VideoInfo, len(videoList))
+	for i, video := range videoList {
+		videoInfoList[i] = &pb.VideoInfo{
+			Id:            video.Id,
+			AuthorId:      video.AuthorId,
+			PlayUrl:       video.PlayUrl,
+			CoverUrl:      video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			IsFavorite:    false,
+			Title:         video.Title,
+		}
+	}
 	return &pb.GetVideoInfoListRsp{
-		VideoInfoList: videoList,
+		VideoInfoList: videoInfoList,
 	}, nil
 }
 
@@ -116,6 +161,7 @@ func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
 			return nil
 		}
 	}
+
 	lists := make([]*pb.VideoInfo, len(videoList))
 	for i, video := range videoList {
 		v := &pb.VideoInfo{
@@ -128,12 +174,14 @@ func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
 			// Author:        messageUserInfo(video.Author),
 			Title: video.Title,
 		}
+
 		if _, ok := FollowList[video.AuthorId]; ok {
 			v.Author.IsFollow = true
 		}
 		if _, ok := favList[video.Id]; ok {
 			v.IsFavorite = true
 		}
+
 		lists[i] = v
 	}
 	return lists
@@ -141,7 +189,7 @@ func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
 
 func tokenFollowList(userId int64) (map[int64]struct{}, error) {
 	m := make(map[int64]struct{})
-	reply, err := utils.NewRelationSvrClient(config.GetGlobalConfig().SvrConfig.RelationSvrName).GetRelationFollowList(context.Background(), &pb.GetRelationFollowListReq{
+	reply, err := utils.GetRelationSvrClient().GetRelationFollowList(context.Background(), &pb.GetRelationFollowListReq{
 		UserId: userId,
 	})
 	if err != nil {

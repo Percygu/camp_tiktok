@@ -22,6 +22,7 @@ const (
 	RelationService_RelationAction_FullMethodName          = "/RelationService/RelationAction"
 	RelationService_GetRelationFollowList_FullMethodName   = "/RelationService/GetRelationFollowList"
 	RelationService_GetRelationFollowerList_FullMethodName = "/RelationService/GetRelationFollowerList"
+	RelationService_IsFollowed_FullMethodName              = "/RelationService/IsFollowed"
 )
 
 // RelationServiceClient is the client API for RelationService service.
@@ -31,6 +32,7 @@ type RelationServiceClient interface {
 	RelationAction(ctx context.Context, in *RelationActionReq, opts ...grpc.CallOption) (*RelationActionRsp, error)
 	GetRelationFollowList(ctx context.Context, in *GetRelationFollowListReq, opts ...grpc.CallOption) (*GetRelationFollowListRsp, error)
 	GetRelationFollowerList(ctx context.Context, in *GetRelationFollowerListReq, opts ...grpc.CallOption) (*GetRelationFollowerListRsp, error)
+	IsFollowed(ctx context.Context, in *IsFollowedReq, opts ...grpc.CallOption) (*IsFollowedRsp, error)
 }
 
 type relationServiceClient struct {
@@ -68,6 +70,15 @@ func (c *relationServiceClient) GetRelationFollowerList(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *relationServiceClient) IsFollowed(ctx context.Context, in *IsFollowedReq, opts ...grpc.CallOption) (*IsFollowedRsp, error) {
+	out := new(IsFollowedRsp)
+	err := c.cc.Invoke(ctx, RelationService_IsFollowed_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RelationServiceServer is the server API for RelationService service.
 // All implementations should embed UnimplementedRelationServiceServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type RelationServiceServer interface {
 	RelationAction(context.Context, *RelationActionReq) (*RelationActionRsp, error)
 	GetRelationFollowList(context.Context, *GetRelationFollowListReq) (*GetRelationFollowListRsp, error)
 	GetRelationFollowerList(context.Context, *GetRelationFollowerListReq) (*GetRelationFollowerListRsp, error)
+	IsFollowed(context.Context, *IsFollowedReq) (*IsFollowedRsp, error)
 }
 
 // UnimplementedRelationServiceServer should be embedded to have forward compatible implementations.
@@ -89,6 +101,9 @@ func (UnimplementedRelationServiceServer) GetRelationFollowList(context.Context,
 }
 func (UnimplementedRelationServiceServer) GetRelationFollowerList(context.Context, *GetRelationFollowerListReq) (*GetRelationFollowerListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRelationFollowerList not implemented")
+}
+func (UnimplementedRelationServiceServer) IsFollowed(context.Context, *IsFollowedReq) (*IsFollowedRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsFollowed not implemented")
 }
 
 // UnsafeRelationServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -156,6 +171,24 @@ func _RelationService_GetRelationFollowerList_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RelationService_IsFollowed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsFollowedReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RelationServiceServer).IsFollowed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RelationService_IsFollowed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RelationServiceServer).IsFollowed(ctx, req.(*IsFollowedReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RelationService_ServiceDesc is the grpc.ServiceDesc for RelationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -174,6 +207,10 @@ var RelationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRelationFollowerList",
 			Handler:    _RelationService_GetRelationFollowerList_Handler,
+		},
+		{
+			MethodName: "IsFollowed",
+			Handler:    _RelationService_IsFollowed_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
