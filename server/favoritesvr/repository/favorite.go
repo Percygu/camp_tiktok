@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Favorite 点赞
 func LikeAction(uid, vid int64) error {
 	db := db.GetDB()
 	favorite := Favorite{
@@ -33,6 +34,7 @@ func LikeAction(uid, vid int64) error {
 	return nil
 }
 
+// UnFavorite 取消点赞
 func UnLikeAction(uid, vid int64) error {
 	db := db.GetDB()
 	err := db.Where("user_id = ? and video_id = ?", uid, vid).Delete(&Favorite{}).Error
@@ -47,6 +49,7 @@ func UnLikeAction(uid, vid int64) error {
 	return nil
 }
 
+// GetFavoriteList 获取我点赞的视频
 func GetFavoriteIdList(uid int64) ([]int64, error) {
 	db := db.GetDB()
 	var favoriteList []*Favorite
@@ -74,4 +77,16 @@ func GetFavoriteIdList(uid int64) ([]int64, error) {
 	// 	return nil, fmt.Errorf("videoInfoList is nil")
 	// }
 	// return videoInfoListRsp.VideoInfoList, nil
+}
+
+// IsFavoriteVideo 判断是否点赞这个视频
+func IsFavoriteVideo(uid, vid int64) (bool, error) {
+	db := db.GetDB()
+	err := db.Where("user_id = ? and video_id = ?", uid, vid).Find(&Favorite{}).Error
+	if err == gorm.ErrRecordNotFound {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	return true, nil
 }

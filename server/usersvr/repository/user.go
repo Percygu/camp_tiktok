@@ -13,6 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// 使用userIdList
+
 // 检查该用户名是否已经存在, 存在返回错误
 func UserNameIsExist(userName string) (bool, error) {
 	db := db.GetDB()
@@ -51,6 +53,16 @@ func InsertUser(userName, password string) (*User, error) {
 	zap.L().Info("create user", zap.Any("user", user))
 	go CacheSetUser(user)
 	return &user, nil
+}
+
+func GetUserList(userIdList []int64) ([]*User, error) {
+	db := db.GetDB()
+	var users []*User
+	err := db.Where("user_id in ?", userIdList).Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 // 获取用户信息
