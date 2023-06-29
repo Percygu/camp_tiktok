@@ -55,7 +55,9 @@ func GetFavoriteList(ctx *gin.Context) {
 
 	tokenUidStr, _ := ctx.Get("UserId")
 	tokenUid := tokenUidStr.(int64)
-	resp, err := utils.GetFavoriteSvrClient().GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
+
+	// 拿videoID List
+	resp, err := utils.GetVideoSvrClient().GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
 		UserId: tokenUid,
 	})
 

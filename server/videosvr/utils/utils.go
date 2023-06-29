@@ -12,6 +12,11 @@ import (
 	"videosvr/utils/otgrpc"
 )
 
+var (
+	FavoriteSvrClient pb.FavoriteServiceClient
+	RelationSvrClient pb.RelationServiceClient
+)
+
 func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
 	consulInfo := config.GetGlobalConfig().ConsulConfig
 	conn, err := grpc.Dial(
@@ -27,13 +32,13 @@ func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func NewUserSvrClient(svrName string) pb.UserServiceClient {
-	conn, err := NewSvrConn(svrName)
-	if err != nil {
-		return nil
-	}
-	return pb.NewUserServiceClient(conn)
-}
+// func NewUserSvrClient(svrName string) pb.UserServiceClient {
+// 	conn, err := NewSvrConn(svrName)
+// 	if err != nil {
+// 		return nil
+// 	}
+// 	return pb.NewUserServiceClient(conn)
+// }
 
 func NewRelationSvrClient(svrName string) pb.RelationServiceClient {
 	conn, err := NewSvrConn(svrName)
@@ -49,4 +54,17 @@ func NewFavoriteSvrClient(svrName string) pb.FavoriteServiceClient {
 		return nil
 	}
 	return pb.NewFavoriteServiceClient(conn)
+}
+
+func GetRelationSvrClient() pb.RelationServiceClient {
+	return RelationSvrClient
+}
+
+func GetFavoriteSvrClient() pb.FavoriteServiceClient {
+	return FavoriteSvrClient
+}
+
+func InitSvrConn() {
+	RelationSvrClient = NewRelationSvrClient(config.GetGlobalConfig().SvrConfig.RelationSvrName)
+	FavoriteSvrClient = NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName)
 }

@@ -1,11 +1,8 @@
 package repository
 
 import (
-	"context"
 	db "favoritesvr/middleware/db"
-	"favoritesvr/utils"
 	"fmt"
-	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"gorm.io/gorm"
 )
 
@@ -50,27 +47,31 @@ func UnLikeAction(uid, vid int64) error {
 	return nil
 }
 
-func GetFavoriteList(uid int64) ([]*pb.VideoInfo, error) {
+func GetFavoriteIdList(uid int64) ([]int64, error) {
 	db := db.GetDB()
 	var favoriteList []*Favorite
 	err := db.Model(&Favorite{}).Where("user_id= ?", uid).Find(&favoriteList).Error
+
 	if err == gorm.ErrRecordNotFound {
-		return []*pb.VideoInfo{}, nil
+		return []int64{}, nil
 	} else if err != nil {
 		return nil, err
 	}
+
 	var videoIDList []int64
 	for _, favorite := range favoriteList {
 		videoIDList = append(videoIDList, favorite.VideoId)
 	}
-	videoSvrClient := utils.GetVideoSvrClient()
-	if videoSvrClient == nil {
-		return nil, fmt.Errorf("videoSvrClient is nil")
-	}
-	getVideoInfoListReq := &pb.GetVideoInfoListReq{VideoId: videoIDList}
-	videoInfoListRsp, err := videoSvrClient.GetVideoInfoList(context.Background(), getVideoInfoListReq)
-	if videoInfoListRsp == nil {
-		return nil, fmt.Errorf("videoInfoList is nil")
-	}
-	return videoInfoListRsp.VideoInfoList, nil
+
+	return videoIDList, nil
+	// videoSvrClient := utils.GetVideoSvrClient()
+	// if videoSvrClient == nil {
+	// 	return nil, fmt.Errorf("videoSvrClient is nil")
+	// }
+	// getVideoInfoListReq := &pb.GetVideoInfoListReq{VideoId: videoIDList}
+	// videoInfoListRsp, err := videoSvrClient.GetVideoInfoList(context.Background(), getVideoInfoListReq)
+	// if videoInfoListRsp == nil {
+	// 	return nil, fmt.Errorf("videoInfoList is nil")
+	// }
+	// return videoInfoListRsp.VideoInfoList, nil
 }

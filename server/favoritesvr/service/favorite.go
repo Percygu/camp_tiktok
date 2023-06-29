@@ -34,13 +34,15 @@ func (f *FavoriteService) FavoriteAction(ctx context.Context, req *pb.FavoriteAc
 	}, nil
 }
 
-func (f *FavoriteService) GetFavoriteVideoList(ctx context.Context, req *pb.GetFavoriteVideoListReq) (*pb.GetFavoriteVideoListRsp, error) {
-	videoList, err := repository.GetFavoriteList(req.UserId)
+func (f *FavoriteService) GetFavoriteVideoIdList(ctx context.Context, req *pb.GetFavoriteVideoIdListReq) (*pb.GetFavoriteVideoIdListRsp, error) {
+	videoIdList, err := repository.GetFavoriteIdList(req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.GetFavoriteVideoListRsp{
-		VideoInfoList: videoList,
+	log.Infof("get favorite video id list success", videoIdList)
+
+	return &pb.GetFavoriteVideoIdListRsp{
+		VideoIdList: videoIdList,
 	}, nil
 }
 

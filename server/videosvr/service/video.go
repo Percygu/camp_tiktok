@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
 	"os/exec"
@@ -21,7 +22,7 @@ type VideoService struct {
 }
 
 func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublishVideoListRequest) (*pb.GetPublishVideoListResponse, error) {
-	videos, err := repository.GetVideoList(req.UserID)
+	videos, err := repository.GetVideoListByAuthorId(req.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +77,29 @@ func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListReques
 	}
 	feed.NextTime = nextTime
 	return feed, nil
+}
+
+func (v VideoService) GetFavoriteVideoList(ctx context.Context, req *pb.GetFavoriteVideoListReq) (*pb.GetFavoriteVideoListRsp, error) {
+	resp, err := utils.GetFavoriteSvrClient().GetFavoriteVideoIdList(ctx, &pb.GetFavoriteVideoIdListReq{
+		UserId: req.UserId,
+	})
+
+	videoInfoListRsp, err := v.GetVideoInfoList()
+	if videoInfoListRsp == nil {
+		return nil, fmt.Errorf("videoInfoList is nil")
+	}
+	return videoInfoListRsp.VideoInfoList, nil
+}
+
+func (v VideoService) GetVideoInfoList(ctx context.Context, req *pb.GetVideoInfoListReq) (*pb.GetVideoInfoListRsp, error) {
+	videoList, err := repository.GetVideoListByVideoIdList(req.VideoId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetVideoInfoListRsp{
+		VideoInfoList: videoList,
+	}, nil
 }
 
 func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
