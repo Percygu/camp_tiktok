@@ -7,7 +7,7 @@ import (
 	"videosvr/middleware/db"
 )
 
-func GetVideoList(AuthorId int64) ([]Video, error) {
+func GetVideoListByAuthorId(AuthorId int64) ([]Video, error) {
 	var videos []Video
 	// userSvrClient := utils.NewUserSvrClient(config.GetGlobalConfig().UserSvrName)
 	// reply, err := userSvrClient.GetUserInfo(context.Background(), &pb.GetUserInfoRequest{Id: AuthorId})
@@ -81,5 +81,15 @@ func GetVideoListByFeed(currentTime int64) ([]Video, error) {
 	// 		FavCount:        author.UserInfo.FavoriteCount,
 	// 	}
 	// }
+	return videos, nil
+}
+
+func GetVideoListByVideoIdList(videoIdList []int64) ([]Video, error) {
+	var videos []Video
+	db := db.GetDB()
+	err := db.Where("id in ?", videoIdList).Find(&videos).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return videos, err
+	}
 	return videos, nil
 }

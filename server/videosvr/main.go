@@ -9,6 +9,7 @@ import (
 	"videosvr/middleware/consul"
 	"videosvr/middleware/db"
 	"videosvr/service"
+	"videosvr/utils"
 
 	// "github.com/Percygu/litetiktok_proto/pb"
 	uuid "github.com/satori/go.uuid"
@@ -29,6 +30,8 @@ func Init() {
 	}
 	log.InitLog()
 	log.Info("log init success...")
+	utils.InitSvrConn()
+	log.Info("InitSvrConn init success...")
 }
 
 func Run() error {
