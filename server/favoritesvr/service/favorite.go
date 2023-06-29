@@ -6,10 +6,25 @@ import (
 	"favoritesvr/log"
 	"favoritesvr/repository"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
+	"strconv"
 )
 
 type FavoriteService struct {
 	pb.UnimplementedFavoriteServiceServer
+}
+
+func (f *FavoriteService) IsFavoriteVideoDict(ctx context.Context, req *pb.IsFavoriteVideoDictReq) (*pb.IsFavoriteVideoDictRsp, error) {
+	isFavoriteDict := make(map[string]bool)
+	for _, unit := range req.FavoriteUnitList {
+		isFavorite, err := repository.IsFavoriteVideo(unit.UserId, unit.VideoId)
+		if err != nil {
+			log.Errorf("IsFavoriteVideoDict err", unit.UserId, unit.VideoId)
+			return nil, err
+		}
+		isFavoriteKey := strconv.FormatInt(unit.UserId, 10) + "_" + strconv.FormatInt(unit.VideoId, 10)
+		isFavoriteDict[isFavoriteKey] = isFavorite
+	}
+	return &pb.IsFavoriteVideoDictRsp{IsFavoriteDict: isFavoriteDict}, nil
 }
 
 func (f *FavoriteService) FavoriteAction(ctx context.Context, req *pb.FavoriteActionReq) (*pb.FavoriteActionRsp, error) {

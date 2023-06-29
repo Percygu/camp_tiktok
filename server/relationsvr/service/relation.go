@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"relationsvr/constant"
 	"relationsvr/repository"
+	"strconv"
 
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"relationsvr/log"
@@ -12,6 +13,23 @@ import (
 
 type RelationService struct {
 	pb.UnimplementedRelationServiceServer
+}
+
+func (c RelationService) IsFollowDict(ctx context.Context, req *pb.IsFollowDictReq) (*pb.IsFollowDictRsp, error) {
+	var isFollowDict = make(map[string]bool)
+
+	for _, unit := range req.FollowUintList {
+		// TODO: UserIdList 可能是我关注的人
+		isFollow, err := repository.IsFollow(unit.SelfUserId, unit.UserIdList)
+		if err != nil {
+			log.Errorf("IsFollowDict err", unit.SelfUserId, unit.UserIdList)
+			return nil, err
+		}
+		isFollowKey := strconv.FormatInt(unit.SelfUserId, 10) + "_" + strconv.FormatInt(unit.UserIdList, 10)
+		isFollowDict[isFollowKey] = isFollow
+	}
+
+	return &pb.IsFollowDictRsp{IsFollowDict: isFollowDict}, nil
 }
 
 func (c RelationService) RelationAction(ctx context.Context, req *pb.RelationActionReq) (*pb.RelationActionRsp, error) {

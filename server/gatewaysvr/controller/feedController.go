@@ -22,13 +22,6 @@ func Feed(ctx *gin.Context) {
 	// userId, err = common.VerifyToken(token)
 	userId, _ := ctx.Get("UserId")
 	tokenId = userId.(int64)
-
-	// log.Info("currentTime:", currentTime, "tokenId:", tokenId)
-	// if err != nil {
-	// 	response.Fail(ctx, err.Error(), nil)
-	// 	return
-	// }
-
 	// 这里还需要知道用户是否关注这个视频 作者 以及是否点赞
 	feedListResponse, err := utils.GetVideoSvrClient().GetFeedList(ctx, &pb.GetFeedListRequest{
 		CurrentTime: currentTime,
@@ -36,6 +29,50 @@ func Feed(ctx *gin.Context) {
 	})
 
 	var resp = &DouyinFeedResponse{VideoList: make([]*Video, 0), NextTime: feedListResponse.NextTime}
+
+	// 调用远程方法获取视频作者信息（一次性）
+	var userIdList = make([]int64, 0)
+	var followUintList = make([]*pb.FollowUint, 0)
+	var favoriteUnitList = make([]*pb.FavoriteUnit, 0)
+	for _, video := range feedListResponse.VideoList {
+		userIdList = append(userIdList, video.AuthorId)
+		followUintList = append(followUintList, &pb.FollowUint{
+			SelfUserId: tokenId,
+			// TODO: 命名不规范，应该是 toUserId
+			UserIdList: video.AuthorId,
+		})
+		favoriteUnitList = append(favoriteUnitList, &pb.FavoriteUnit{
+			UserId:  tokenId,
+			VideoId: video.Id,
+		})
+
+	}
+	getUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfoDict(ctx, &pb.GetUserInfoDictRequest{
+		UserIdList: userIdList,
+	})
+	if err != nil {
+		log.Errorf("GetUserSvrClient GetUserInfoDict err %v", err.Error())
+		response.Fail(ctx, fmt.Sprintf("GetUserSvrClient GetUserInfoDict err %v", err.Error()), nil)
+		return
+	}
+
+	isFollowedRsp, err := utils.GetRelationSvrClient().IsFollowDict(ctx, &pb.IsFollowDictReq{
+		FollowUintList: followUintList,
+	})
+	if err != nil {
+		log.Errorf("GetRelationSvrClient IsFollowDict err %v", err.Error())
+		response.Fail(ctx, fmt.Sprintf("GetRelationSvrClient IsFollowDict err %v", err.Error()), nil)
+		return
+	}
+
+	isFavoriteVideoRsp, err := utils.GetFavoriteSvrClient().IsFavoriteVideoDict(ctx, &pb.IsFavoriteVideoDictReq{
+		FavoriteUnitList: favoriteUnitList,
+	})
+	if err != nil {
+		log.Errorf("GetFavoriteSvrClient IsFavoriteVideoDict err %v", err.Error())
+		response.Fail(ctx, fmt.Sprintf("GetFavoriteSvrClient IsFavoriteVideoDict err %v", err.Error()), nil)
+		return
+	}
 
 	for _, video := range feedListResponse.VideoList {
 		videoRsp := &Video{
@@ -47,43 +84,16 @@ func Feed(ctx *gin.Context) {
 			IsFavorite:    video.IsFavorite,
 			Title:         video.Title,
 		}
-		// 调用远程方法获取视频作者信息
-		GetUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
-			Id: video.AuthorId,
-		})
-		if err != nil {
-			log.Errorf("GetUserSvrClient GetUserInfo err %v", err.Error())
-			response.Fail(ctx, fmt.Sprintf("GetUserSvrClient GetUserInfo err %v", err.Error()), nil)
-			return
-		}
-		// 调用远程方法获取 我是否关注了这个视频的作者
-		isFollowedRsp, err := utils.GetRelationSvrClient().IsFollowed(ctx, &pb.IsFollowedReq{
-			SelfUserId: tokenId,
-			ToUserId:   video.AuthorId,
-		})
-		if err != nil {
-			log.Errorf("GetRelationSvrClient IsFollowed err %v", err.Error())
-			response.Fail(ctx, fmt.Sprintf("GetRelationSvrClient IsFollowed err %v", err.Error()), nil)
-			return
-		}
-		// 调用远程方法获取 我是否点赞了这个视频
-		IsFavoriteVideoRsp, err := utils.GetFavoriteSvrClient().IsFavoriteVideo(ctx, &pb.IsFavoriteVideoReq{
-			UserId:  tokenId,
-			VideoId: video.Id,
-		})
-		if err != nil {
-			log.Errorf("GetFavoriteSvrClient IsFavoriteVideo err %v", err.Error())
-			response.Fail(ctx, fmt.Sprintf("GetFavoriteSvrClient IsFavoriteVideo err %v", err.Error()), nil)
-			return
-		}
-
-		videoRsp.Author = GetUserInfoRsp.UserInfo
-		videoRsp.Author.IsFollow = isFollowedRsp.IsFollowed
-		videoRsp.IsFavorite = IsFavoriteVideoRsp.IsFavorite
-
+		// 获取视频作者信息
+		videoRsp.Author = getUserInfoRsp.UserInfoDict[video.AuthorId]
+		var followUint = strconv.FormatInt(tokenId, 10) + "_" + strconv.FormatInt(videoRsp.Author.Id, 10)
+		// 我是否关注了这个作者
+		videoRsp.Author.IsFollow = isFollowedRsp.IsFollowDict[followUint]
+		var favoriteUint = strconv.FormatInt(tokenId, 10) + "_" + strconv.FormatInt(videoRsp.Id, 10)
+		videoRsp.IsFavorite = isFavoriteVideoRsp.IsFavoriteDict[favoriteUint]
 	}
-	response.Success(ctx, "success", resp)
 
+	response.Success(ctx, "success", resp)
 }
 
 type DouyinFeedResponse struct {

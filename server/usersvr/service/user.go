@@ -30,6 +30,31 @@ type UserService struct {
 	pb.UnimplementedUserServiceServer
 }
 
+func (u UserService) GetUserInfoDict(ctx context.Context, req *pb.GetUserInfoDictRequest) (*pb.GetUserInfoDictResponse, error) {
+	userList, err := repository.GetUserList(req.UserIdList)
+	if err != nil {
+		log.Errorf("GetUserInfoDict err", req.UserIdList)
+		return nil, err
+	}
+	resp := &pb.GetUserInfoDictResponse{UserInfoDict: make(map[int64]*pb.UserInfo)}
+
+	for _, user := range userList {
+		resp.UserInfoDict[user.Id] = &pb.UserInfo{
+			Id:              user.Id,
+			Name:            user.Name,
+			Avatar:          user.Avatar,
+			FollowCount:     user.Follow,
+			FollowerCount:   user.Follower,
+			BackgroundImage: user.BackgroundImage,
+			Signature:       user.Signature,
+			TotalFavorited:  user.TotalFav,
+			FavoriteCount:   user.FavCount,
+		}
+	}
+
+	return resp, nil
+}
+
 func (u UserService) CacheChangeUserCount(ctx context.Context, req *pb.CacheChangeUserCountReq) (*pb.CacheChangeUserCountRsp, error) {
 	uid := strconv.FormatInt(req.UserId, 10)
 	mutex := lock.GetLock("user_" + uid)
