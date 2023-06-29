@@ -4,25 +4,28 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"strconv"
 	"usersvr/middleware/cache"
 	"usersvr/middleware/db"
+
+	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
-// 检查该用户名是否已经存在
-func UserNameIsExist(userName string) error {
+// 检查该用户名是否已经存在, 存在返回错误
+func UserNameIsExist(userName string) (bool, error) {
 	db := db.GetDB()
 	user := User{}
-	err := db.Where("user_name = ?", userName).Find(&user).Error
-	if err == nil {
-		return errors.New("username exist")
-	} else if err != gorm.ErrRecordNotFound {
-		return err
+	err := db.Where("user_name = ?", userName).First(&user).Error
+	if err != nil {
+		if err.Error() != gorm.ErrRecordNotFound.Error() {
+			return false, err
+		}
+		return false, nil // 数据库错误
 	}
-	return nil
+
+	return true, nil
 }
 
 // 创建用户

@@ -30,15 +30,15 @@ consul:
   host: "43.139.192.217"
   port: 8500
   tags:
-    - "usersvr"
+    - "videosvr"
 
 minio:
   host: "43.139.192.217"
   port: "9000"
-  accessKeyID: "admin"
-  secretAccessKey: "admin"
-  videobuckets: video
-  picbuckets: pic
-  videopath: "/root/tiktok/store/video"
-  picpath: "/root/tiktok/store/pic"
+  access_key_id: "xTqFWI3gfobE66smemuR"
+  secret_access_key: "zL64rIU04CrS0KqDBrTtmgW3WZYZaxQpYSNSNEzs"
+  video_buckets: video
+  pic_buckets: pic
+  video_path: "/root/tiktok/store/video"
+  pic_path: "/root/tiktok/store/pic"
 

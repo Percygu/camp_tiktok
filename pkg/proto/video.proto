@@ -10,6 +10,15 @@ service VideoService {
   rpc PublishVideo(PublishVideoRequest) returns (PublishVideoResponse);
   rpc GetFeedList(GetFeedListRequest) returns (GetFeedListResponse);
   rpc GetVideoInfoList(GetVideoInfoListReq) returns (GetVideoInfoListRsp);
+  rpc GetFavoriteVideoList(GetFavoriteVideoListReq) returns (GetFavoriteVideoListRsp);
+}
+
+message GetFavoriteVideoListReq {
+  int64 user_id = 1;
+}
+
+message GetFavoriteVideoListRsp {
+  repeated VideoInfo video_list = 1; // 用户收藏的视频列表​
 }
 
 

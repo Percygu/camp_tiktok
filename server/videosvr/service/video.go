@@ -10,13 +10,14 @@ import (
 	"strings"
 	"time"
 	"videosvr/config"
+	"videosvr/log"
 	"videosvr/middleware/minioStore"
 	"videosvr/repository"
 	"videosvr/utils"
 )
 
 type VideoService struct {
-	pb.UnimplementedCommentServiceServer
+	pb.UnimplementedVideoServiceServer
 }
 
 func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublishVideoListRequest) (*pb.GetPublishVideoListResponse, error) {
@@ -33,17 +34,19 @@ func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublis
 func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequest) (*pb.PublishVideoResponse, error) {
 	client := minioStore.GetMinio()
 	videoUrl, err := client.UploadFile("video", req.SaveFile, strconv.FormatInt(req.UserId, 10))
+	log.Infof("save file: %v", req.SaveFile)
 	if err != nil {
 		return nil, err
 	}
 
+	// 生成视频封面（截取第一桢）
 	imageFile, err := GetImageFile(req.SaveFile)
 
 	if err != nil {
 		return nil, err
 	}
 
-	zap.L().Error("imageFile", zap.String("imageFile", imageFile))
+	log.Infof("imageFile", zap.String("imageFile", imageFile))
 
 	picUrl, err := client.UploadFile("pic", imageFile, strconv.FormatInt(req.UserId, 10))
 	if err != nil {
@@ -169,8 +172,8 @@ func GetImageFile(videoPath string) (string, error) {
 	cmd := exec.Command("ffmpeg", "-i", videoPath, "-ss", "1", "-f", "image2", "-t", "0.01", "-y", picName)
 	err := cmd.Run()
 	if err != nil {
+		log.Errorf("cmd.Run() failed with %s\n", err)
 		return "", err
 	}
-	zap.L().Info("picName", zap.String("picName", picName))
 	return picName, nil
 }

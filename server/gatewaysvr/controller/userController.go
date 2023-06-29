@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"gatewaysvr/config"
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -19,8 +19,7 @@ func UserLogin(ctx *gin.Context) {
 		response.Fail(ctx, "username or password invalid", nil)
 		return
 	}
-
-	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).CheckPassWord(ctx, &pb.CheckPassWordRequest{
+	resp, err := utils.GetUserSvrClient().CheckPassWord(ctx, &pb.CheckPassWordRequest{
 		Username: userName,
 		Password: password,
 	})
@@ -40,13 +39,14 @@ func UserRegister(ctx *gin.Context) {
 		response.Fail(ctx, "username or password invalid", nil)
 		return
 	}
-
-	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).Register(ctx, &pb.RegisterRequest{
+	log.Info(userName, password)
+	resp, err := utils.GetUserSvrClient().Register(ctx, &pb.RegisterRequest{
 		Username: userName,
 		Password: password,
 	})
+
 	if err != nil {
-		zap.L().Error("register error", zap.Error(err))
+		log.Error("register error", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
@@ -72,7 +72,7 @@ func GetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	userInfo, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).GetUserInfo(ctx, &pb.GetUserInfoRequest{
+	userInfo, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
 		Id: uid,
 	})
 	if err != nil {

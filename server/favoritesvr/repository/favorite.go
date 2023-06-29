@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"favoritesvr/config"
 	db "favoritesvr/middleware/db"
 	"favoritesvr/utils"
 	"fmt"
@@ -64,7 +63,7 @@ func GetFavoriteList(uid int64) ([]*pb.VideoInfo, error) {
 	for _, favorite := range favoriteList {
 		videoIDList = append(videoIDList, favorite.VideoId)
 	}
-	videoSvrClient := utils.NewVideoSvrClient(config.GetGlobalConfig().VideoSvrName)
+	videoSvrClient := utils.GetVideoSvrClient()
 	if videoSvrClient == nil {
 		return nil, fmt.Errorf("videoSvrClient is nil")
 	}

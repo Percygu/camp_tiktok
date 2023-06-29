@@ -40,7 +40,7 @@ func Run() error {
 	// 端口监听启动成功，启动grpc server
 	server := grpc.NewServer()
 	// 注册grpc server
-	pb.RegisterCommentServiceServer(server, &service.VideoService{}) // 注册服务
+	pb.RegisterVideoServiceServer(server, &service.VideoService{}) // 注册服务
 	// 注册服务健康检查
 	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 
@@ -48,7 +48,7 @@ func Run() error {
 	consulClient := consul.NewRegistryClient(config.GetGlobalConfig().ConsulConfig.Host, config.GetGlobalConfig().ConsulConfig.Port)
 	serviceID := fmt.Sprintf("%s", uuid.NewV4())
 	if err := consulClient.Register(config.GetGlobalConfig().SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port,
-		config.GetGlobalConfig().Name, config.GetGlobalConfig().ConsulConfig.Tags, serviceID); err != nil {
+		config.GetGlobalConfig().SvrConfig.Name, config.GetGlobalConfig().ConsulConfig.Tags, serviceID); err != nil {
 		log.Fatal("consul.Register error: ", zap.Error(err))
 		return fmt.Errorf("consul.Register error: %v", zap.Error(err))
 	}

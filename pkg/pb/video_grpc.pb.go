@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	VideoService_GetPublishVideoList_FullMethodName = "/VideoService/GetPublishVideoList"
-	VideoService_PublishVideo_FullMethodName        = "/VideoService/PublishVideo"
-	VideoService_GetFeedList_FullMethodName         = "/VideoService/GetFeedList"
-	VideoService_GetVideoInfoList_FullMethodName    = "/VideoService/GetVideoInfoList"
+	VideoService_GetPublishVideoList_FullMethodName  = "/VideoService/GetPublishVideoList"
+	VideoService_PublishVideo_FullMethodName         = "/VideoService/PublishVideo"
+	VideoService_GetFeedList_FullMethodName          = "/VideoService/GetFeedList"
+	VideoService_GetVideoInfoList_FullMethodName     = "/VideoService/GetVideoInfoList"
+	VideoService_GetFavoriteVideoList_FullMethodName = "/VideoService/GetFavoriteVideoList"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -34,6 +35,7 @@ type VideoServiceClient interface {
 	PublishVideo(ctx context.Context, in *PublishVideoRequest, opts ...grpc.CallOption) (*PublishVideoResponse, error)
 	GetFeedList(ctx context.Context, in *GetFeedListRequest, opts ...grpc.CallOption) (*GetFeedListResponse, error)
 	GetVideoInfoList(ctx context.Context, in *GetVideoInfoListReq, opts ...grpc.CallOption) (*GetVideoInfoListRsp, error)
+	GetFavoriteVideoList(ctx context.Context, in *GetFavoriteVideoListReq, opts ...grpc.CallOption) (*GetFavoriteVideoListRsp, error)
 }
 
 type videoServiceClient struct {
@@ -80,6 +82,15 @@ func (c *videoServiceClient) GetVideoInfoList(ctx context.Context, in *GetVideoI
 	return out, nil
 }
 
+func (c *videoServiceClient) GetFavoriteVideoList(ctx context.Context, in *GetFavoriteVideoListReq, opts ...grpc.CallOption) (*GetFavoriteVideoListRsp, error) {
+	out := new(GetFavoriteVideoListRsp)
+	err := c.cc.Invoke(ctx, VideoService_GetFavoriteVideoList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations should embed UnimplementedVideoServiceServer
 // for forward compatibility
@@ -89,6 +100,7 @@ type VideoServiceServer interface {
 	PublishVideo(context.Context, *PublishVideoRequest) (*PublishVideoResponse, error)
 	GetFeedList(context.Context, *GetFeedListRequest) (*GetFeedListResponse, error)
 	GetVideoInfoList(context.Context, *GetVideoInfoListReq) (*GetVideoInfoListRsp, error)
+	GetFavoriteVideoList(context.Context, *GetFavoriteVideoListReq) (*GetFavoriteVideoListRsp, error)
 }
 
 // UnimplementedVideoServiceServer should be embedded to have forward compatible implementations.
@@ -106,6 +118,9 @@ func (UnimplementedVideoServiceServer) GetFeedList(context.Context, *GetFeedList
 }
 func (UnimplementedVideoServiceServer) GetVideoInfoList(context.Context, *GetVideoInfoListReq) (*GetVideoInfoListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVideoInfoList not implemented")
+}
+func (UnimplementedVideoServiceServer) GetFavoriteVideoList(context.Context, *GetFavoriteVideoListReq) (*GetFavoriteVideoListRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFavoriteVideoList not implemented")
 }
 
 // UnsafeVideoServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -191,6 +206,24 @@ func _VideoService_GetVideoInfoList_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_GetFavoriteVideoList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFavoriteVideoListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).GetFavoriteVideoList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_GetFavoriteVideoList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).GetFavoriteVideoList(ctx, req.(*GetFavoriteVideoListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetVideoInfoList",
 			Handler:    _VideoService_GetVideoInfoList_Handler,
+		},
+		{
+			MethodName: "GetFavoriteVideoList",
+			Handler:    _VideoService_GetFavoriteVideoList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

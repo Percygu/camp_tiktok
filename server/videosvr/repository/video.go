@@ -3,6 +3,7 @@ package repository
 import (
 	"gorm.io/gorm"
 	"time"
+	"videosvr/log"
 	"videosvr/middleware/db"
 )
 
@@ -56,11 +57,12 @@ func InsertVideo(authorId int64, playUrl, coverUrl, title string) error {
 func GetVideoListByFeed(currentTime int64) ([]Video, error) {
 	var videos []Video
 	db := db.GetDB()
-	err := db.Where("publish_time < ?", currentTime).Limit(20).Order("video_id DESC").Find(&videos).Error
+	err := db.Where("publish_time < ?", currentTime).Limit(20).Order("id DESC").Find(&videos).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return videos, err
 	}
 
+	log.Info("GetVideoListByFeed", videos)
 	// for i, v := range videos {
 	// 	author, err := utils.NewUserSvrClient(config.GetGlobalConfig().UserSvrName).GetUserInfo(context.Background(), &pb.GetUserInfoRequest{Id: v.AuthorId})
 	// 	err = CacheSetAuthor(v.Id, v.AuthorId)

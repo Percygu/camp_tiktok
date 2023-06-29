@@ -7,6 +7,7 @@ import (
 	"favoritesvr/middleware/consul"
 	"favoritesvr/middleware/db"
 	"favoritesvr/service"
+	"favoritesvr/utils"
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	uuid "github.com/satori/go.uuid"
@@ -27,6 +28,8 @@ func Init() {
 	}
 	log.InitLog()
 	log.Info("log init success...")
+	utils.InitSvrConn()
+	log.Info("InitSvrConn success...")
 }
 
 func Run() error {
@@ -53,7 +56,7 @@ func Run() error {
 	log.Info("Init Consul Register success")
 
 	// 启动
-	log.Infof("TikTokLite.comment_svr listening on %s:%d", config.GetGlobalConfig().
+	log.Infof("TikTokLite.favorite_svr listening on %s:%d", config.GetGlobalConfig().
 		SvrConfig.Host, config.GetGlobalConfig().SvrConfig.Port)
 	go func() {
 		err = server.Serve(listen)

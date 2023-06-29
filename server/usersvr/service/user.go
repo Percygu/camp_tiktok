@@ -4,13 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Percygu/camp_tiktok/pkg/pb"
-	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/crypto/bcrypt"
+	"fmt"
 	"strconv"
 	"usersvr/log"
 	"usersvr/middleware/lock"
 	"usersvr/repository"
+
+	"github.com/Percygu/camp_tiktok/pkg/pb"
+	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -25,7 +27,7 @@ type JWTClaims struct {
 }
 
 type UserService struct {
-	pb.UnimplementedCommentServiceServer
+	pb.UnimplementedUserServiceServer
 }
 
 func (u UserService) CacheChangeUserCount(ctx context.Context, req *pb.CacheChangeUserCountReq) (*pb.CacheChangeUserCountRsp, error) {
@@ -116,9 +118,13 @@ func (u UserService) CheckPassWord(ctx context.Context, req *pb.CheckPassWordReq
 }
 
 func (u UserService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	err := repository.UserNameIsExist(req.Username)
+	sign, err := repository.UserNameIsExist(req.Username)
 	if err != nil {
+		log.Error("UserNameIsExist err ", err)
 		return nil, err
+	}
+	if sign {
+		return nil, fmt.Errorf("user %s exists", req.Username)
 	}
 	info, err := repository.InsertUser(req.Username, req.Password)
 	if err != nil {

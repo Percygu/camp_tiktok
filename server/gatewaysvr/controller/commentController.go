@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"gatewaysvr/config"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -40,7 +39,7 @@ func CommentAction(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().SvrConfig.CommentSvrName).CommentAction(ctx, &pb.CommentActionReq{
+	resp, err := utils.GetCommentSvrClient().CommentAction(ctx, &pb.CommentActionReq{
 		UserId:      tokenUid,
 		VideoId:     videoId,
 		CommentId:   commentId,
@@ -74,7 +73,7 @@ func GetCommentList(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewCommentSvrClient(config.GetGlobalConfig().SvrConfig.CommentSvrName).GetCommentList(ctx, &pb.GetCommentListReq{
+	resp, err := utils.GetCommentSvrClient().GetCommentList(ctx, &pb.GetCommentListReq{
 		VideoId: videoId,
 	})
 

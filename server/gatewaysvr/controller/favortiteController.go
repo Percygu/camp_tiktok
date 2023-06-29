@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"gatewaysvr/config"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -38,7 +37,7 @@ func FavoriteAction(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName).FavoriteAction(ctx, &pb.FavoriteActionReq{
+	resp, err := utils.GetFavoriteSvrClient().FavoriteAction(ctx, &pb.FavoriteActionReq{
 		UserId:     tokenUid,
 		VideoId:    favInfo.VideoId,
 		ActionType: int64(favInfo.ActionType),
@@ -56,9 +55,10 @@ func GetFavoriteList(ctx *gin.Context) {
 
 	tokenUidStr, _ := ctx.Get("UserId")
 	tokenUid := tokenUidStr.(int64)
-	resp, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName).GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
+	resp, err := utils.GetFavoriteSvrClient().GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
 		UserId: tokenUid,
 	})
+
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return

@@ -7,6 +7,7 @@ import (
 	"commentsvr/middleware/consul"
 	"commentsvr/middleware/db"
 	"commentsvr/service"
+	"commentsvr/utils"
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 
@@ -29,6 +30,8 @@ func Init() {
 	}
 	log.InitLog()
 	log.Info("log init success...")
+	utils.InitSvrConn()
+	log.Info("InitSvrConn success...")
 }
 
 func Run() error {

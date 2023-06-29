@@ -48,11 +48,11 @@ type MinioConfig struct {
 	Port            string `mapstructure:"port"`
 	AccessKeyID     string `mapstructure:"access_key_id"`
 	SecretAccessKey string `mapstructure:"secret_access_key"`
-	VideoBuckets    string `mapstructure:"videobuckets"`
-	PicBuckets      string `mapstructure:"picbuckets"`
-	VideoPath       string `mapstructure:"videopath"`
+	VideoBuckets    string `mapstructure:"video_buckets"`
+	PicBuckets      string `mapstructure:"pic_buckets"`
+	VideoPath       string `mapstructure:"video_path"`
 	// LogFile   string `mapstructure:"logfile"`
-	PicPath string `mapstructure:"picpath"`
+	PicPath string `mapstructure:"pic_path"`
 }
 
 type RedisConfig struct {

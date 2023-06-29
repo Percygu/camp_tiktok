@@ -20,7 +20,7 @@ func openDB() {
 	dbConfig := config.GetGlobalConfig().DbConfig
 	connArgs := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", dbConfig.Username,
 		dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Database)
-	log.Info("mdb addr:" + connArgs)
+	// log.Info("mdb addr:" + connArgs)
 
 	var err error
 	db, err = gorm.Open(mysql.Open(connArgs), &gorm.Config{})

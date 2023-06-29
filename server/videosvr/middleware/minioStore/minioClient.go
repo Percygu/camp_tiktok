@@ -76,6 +76,8 @@ func creatBucket(m *minio.Client, bucket string) {
 	if err != nil {
 		log.Errorf("SetBucketPolicy %s  err:%s", bucket, err.Error())
 	}
+
+	log.Infof("create bucket %s success", bucket)
 }
 
 func (m *Minio) UploadFile(filetype, file, userID string) (string, error) {
