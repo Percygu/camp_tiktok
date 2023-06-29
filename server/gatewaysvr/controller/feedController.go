@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -28,38 +30,60 @@ func Feed(ctx *gin.Context) {
 	// }
 
 	// 这里还需要知道用户是否关注这个视频 作者 以及是否点赞
-	resp, err := utils.GetVideoSvrClient().GetFeedList(ctx, &pb.GetFeedListRequest{
+	feedListResponse, err := utils.GetVideoSvrClient().GetFeedList(ctx, &pb.GetFeedListRequest{
 		CurrentTime: currentTime,
 		TokenUserId: tokenId,
 	})
 
-	// 填充是否关注
-	for i, video := range resp.VideoList {
-		vi
-		utils.GetRelationSvrClient().GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
-			UserId: tokenId,
+	var resp = &DouyinFeedResponse{VideoList: make([]*Video, 0), NextTime: feedListResponse.NextTime}
+
+	for _, video := range feedListResponse.VideoList {
+		videoRsp := &Video{
+			Id:            video.Id,
+			PlayUrl:       video.PlayUrl,
+			CoverUrl:      video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			IsFavorite:    video.IsFavorite,
+			Title:         video.Title,
+		}
+		// 调用远程方法获取视频作者信息
+		GetUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
+			Id: video.AuthorId,
 		})
-	}
-
-	// m := make(map[int64]struct{})
-	// list, err := repository.GetFollowList(userId, "follow")
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// for _, u := range list {
-	// 	m[u.Id] = struct{}{}
-	// }
-
-	// log.Info("resp:", resp.VideoList, err)
-
-	if err != nil {
 		if err != nil {
-			response.Fail(ctx, err.Error(), nil)
+			log.Errorf("GetUserSvrClient GetUserInfo err %v", err.Error())
+			response.Fail(ctx, fmt.Sprintf("GetUserSvrClient GetUserInfo err %v", err.Error()), nil)
+			return
+		}
+		// 调用远程方法获取 我是否关注了这个视频的作者
+		isFollowedRsp, err := utils.GetRelationSvrClient().IsFollowed(ctx, &pb.IsFollowedReq{
+			SelfUserId: tokenId,
+			ToUserId:   video.AuthorId,
+		})
+		if err != nil {
+			log.Errorf("GetRelationSvrClient IsFollowed err %v", err.Error())
+			response.Fail(ctx, fmt.Sprintf("GetRelationSvrClient IsFollowed err %v", err.Error()), nil)
+			return
+		}
+		// 调用远程方法获取 我是否点赞了这个视频
+		IsFavoriteVideoRsp, err := utils.GetFavoriteSvrClient().IsFavoriteVideo(ctx, &pb.IsFavoriteVideoReq{
+			UserId:  tokenId,
+			VideoId: video.Id,
+		})
+		if err != nil {
+			log.Errorf("GetFavoriteSvrClient IsFavoriteVideo err %v", err.Error())
+			response.Fail(ctx, fmt.Sprintf("GetFavoriteSvrClient IsFavoriteVideo err %v", err.Error()), nil)
 			return
 		}
 
-		response.Success(ctx, "success", resp.VideoList)
+		videoRsp.Author = GetUserInfoRsp.UserInfo
+		videoRsp.Author.IsFollow = isFollowedRsp.IsFollowed
+		videoRsp.IsFavorite = IsFavoriteVideoRsp.IsFavorite
+
 	}
+	response.Success(ctx, "success", resp)
+
 }
 
 type DouyinFeedResponse struct {

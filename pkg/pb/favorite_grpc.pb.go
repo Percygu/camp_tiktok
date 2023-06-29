@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	FavoriteService_FavoriteAction_FullMethodName         = "/FavoriteService/FavoriteAction"
 	FavoriteService_GetFavoriteVideoIdList_FullMethodName = "/FavoriteService/GetFavoriteVideoIdList"
-	FavoriteService_IsFavoriteVideo_FullMethodName        = "/FavoriteService/IsFavoriteVideo"
+	FavoriteService_IsFavoriteVideoDict_FullMethodName    = "/FavoriteService/IsFavoriteVideoDict"
 )
 
 // FavoriteServiceClient is the client API for FavoriteService service.
@@ -30,7 +30,7 @@ const (
 type FavoriteServiceClient interface {
 	FavoriteAction(ctx context.Context, in *FavoriteActionReq, opts ...grpc.CallOption) (*FavoriteActionRsp, error)
 	GetFavoriteVideoIdList(ctx context.Context, in *GetFavoriteVideoIdListReq, opts ...grpc.CallOption) (*GetFavoriteVideoIdListRsp, error)
-	IsFavoriteVideo(ctx context.Context, in *IsFavoriteVideoReq, opts ...grpc.CallOption) (*IsFavoriteVideoRsp, error)
+	IsFavoriteVideoDict(ctx context.Context, in *IsFavoriteVideoDictReq, opts ...grpc.CallOption) (*IsFavoriteVideoDictRsp, error)
 }
 
 type favoriteServiceClient struct {
@@ -59,9 +59,9 @@ func (c *favoriteServiceClient) GetFavoriteVideoIdList(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *favoriteServiceClient) IsFavoriteVideo(ctx context.Context, in *IsFavoriteVideoReq, opts ...grpc.CallOption) (*IsFavoriteVideoRsp, error) {
-	out := new(IsFavoriteVideoRsp)
-	err := c.cc.Invoke(ctx, FavoriteService_IsFavoriteVideo_FullMethodName, in, out, opts...)
+func (c *favoriteServiceClient) IsFavoriteVideoDict(ctx context.Context, in *IsFavoriteVideoDictReq, opts ...grpc.CallOption) (*IsFavoriteVideoDictRsp, error) {
+	out := new(IsFavoriteVideoDictRsp)
+	err := c.cc.Invoke(ctx, FavoriteService_IsFavoriteVideoDict_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *favoriteServiceClient) IsFavoriteVideo(ctx context.Context, in *IsFavor
 type FavoriteServiceServer interface {
 	FavoriteAction(context.Context, *FavoriteActionReq) (*FavoriteActionRsp, error)
 	GetFavoriteVideoIdList(context.Context, *GetFavoriteVideoIdListReq) (*GetFavoriteVideoIdListRsp, error)
-	IsFavoriteVideo(context.Context, *IsFavoriteVideoReq) (*IsFavoriteVideoRsp, error)
+	IsFavoriteVideoDict(context.Context, *IsFavoriteVideoDictReq) (*IsFavoriteVideoDictRsp, error)
 }
 
 // UnimplementedFavoriteServiceServer should be embedded to have forward compatible implementations.
@@ -87,8 +87,8 @@ func (UnimplementedFavoriteServiceServer) FavoriteAction(context.Context, *Favor
 func (UnimplementedFavoriteServiceServer) GetFavoriteVideoIdList(context.Context, *GetFavoriteVideoIdListReq) (*GetFavoriteVideoIdListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFavoriteVideoIdList not implemented")
 }
-func (UnimplementedFavoriteServiceServer) IsFavoriteVideo(context.Context, *IsFavoriteVideoReq) (*IsFavoriteVideoRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsFavoriteVideo not implemented")
+func (UnimplementedFavoriteServiceServer) IsFavoriteVideoDict(context.Context, *IsFavoriteVideoDictReq) (*IsFavoriteVideoDictRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsFavoriteVideoDict not implemented")
 }
 
 // UnsafeFavoriteServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -138,20 +138,20 @@ func _FavoriteService_GetFavoriteVideoIdList_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _FavoriteService_IsFavoriteVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IsFavoriteVideoReq)
+func _FavoriteService_IsFavoriteVideoDict_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsFavoriteVideoDictReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FavoriteServiceServer).IsFavoriteVideo(ctx, in)
+		return srv.(FavoriteServiceServer).IsFavoriteVideoDict(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: FavoriteService_IsFavoriteVideo_FullMethodName,
+		FullMethod: FavoriteService_IsFavoriteVideoDict_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FavoriteServiceServer).IsFavoriteVideo(ctx, req.(*IsFavoriteVideoReq))
+		return srv.(FavoriteServiceServer).IsFavoriteVideoDict(ctx, req.(*IsFavoriteVideoDictReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -172,8 +172,8 @@ var FavoriteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _FavoriteService_GetFavoriteVideoIdList_Handler,
 		},
 		{
-			MethodName: "IsFavoriteVideo",
-			Handler:    _FavoriteService_IsFavoriteVideo_Handler,
+			MethodName: "IsFavoriteVideoDict",
+			Handler:    _FavoriteService_IsFavoriteVideoDict_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
