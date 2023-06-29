@@ -25,19 +25,26 @@ message GetFavoriteVideoIdListRsp {
   repeated int64 video_id_list = 1; // 关注z者用户信息列表
 }
 
-message IsFavoriteVideoReq {
+
+// IsFavoriteVideoDict
+message FavoriteUnit {
   int64 user_id = 1;
   int64 video_id = 2;
 }
 
-message IsFavoriteVideoRsp {
-  bool is_favorite = 1;
+message IsFavoriteVideoDictReq {
+  repeated FavoriteUnit favorite_unit_list = 1;
 }
+
+message IsFavoriteVideoDictRsp {
+  map<string, bool> is_favorite_dict = 1;
+}
+// **********************
 
 service FavoriteService {
   rpc FavoriteAction(FavoriteActionReq) returns (FavoriteActionRsp); // 关联关系方法
   rpc GetFavoriteVideoIdList(GetFavoriteVideoIdListReq) returns (GetFavoriteVideoIdListRsp); // 获取喜欢的视频列表
-  rpc IsFavoriteVideo(IsFavoriteVideoReq) returns (IsFavoriteVideoRsp); // 判断是否喜欢
+  rpc IsFavoriteVideoDict(IsFavoriteVideoDictReq) returns (IsFavoriteVideoDictRsp); // 判断是否喜欢
 }
 
 

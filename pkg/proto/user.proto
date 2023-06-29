@@ -8,12 +8,20 @@ import "common.proto";
 
 service UserService {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse); // 获取用户信息
-
+  rpc GetUserInfoDict(GetUserInfoDictRequest) returns (GetUserInfoDictResponse); // 获取用户信息字典
   rpc CheckPassWord(CheckPassWordRequest) returns (CheckPassWordResponse); //检查密码
   rpc Register(RegisterRequest) returns (RegisterResponse); // 注册
   rpc GetUserInfoList(GetUserInfoListRequest) returns (GetUserInfoListResponse); // 获取用户列表信息
   rpc CacheChangeUserCount(CacheChangeUserCountReq) returns (CacheChangeUserCountRsp);
   rpc CacheGetAuthor (CacheGetAuthorReq) returns (CacheGetAuthorRsp);
+}
+
+message GetUserInfoDictRequest {
+  repeated int64 user_id_list = 1;
+}
+
+message GetUserInfoDictResponse {
+  map<int64, UserInfo> user_info_dict = 1;
 }
 
 // 用户信息

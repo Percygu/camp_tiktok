@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	UserService_GetUserInfo_FullMethodName          = "/UserService/GetUserInfo"
+	UserService_GetUserInfoDict_FullMethodName      = "/UserService/GetUserInfoDict"
 	UserService_CheckPassWord_FullMethodName        = "/UserService/CheckPassWord"
 	UserService_Register_FullMethodName             = "/UserService/Register"
 	UserService_GetUserInfoList_FullMethodName      = "/UserService/GetUserInfoList"
@@ -32,6 +33,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+	GetUserInfoDict(ctx context.Context, in *GetUserInfoDictRequest, opts ...grpc.CallOption) (*GetUserInfoDictResponse, error)
 	CheckPassWord(ctx context.Context, in *CheckPassWordRequest, opts ...grpc.CallOption) (*CheckPassWordResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	GetUserInfoList(ctx context.Context, in *GetUserInfoListRequest, opts ...grpc.CallOption) (*GetUserInfoListResponse, error)
@@ -50,6 +52,15 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 func (c *userServiceClient) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
 	out := new(GetUserInfoResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUserInfo_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUserInfoDict(ctx context.Context, in *GetUserInfoDictRequest, opts ...grpc.CallOption) (*GetUserInfoDictResponse, error) {
+	out := new(GetUserInfoDictResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUserInfoDict_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +117,7 @@ func (c *userServiceClient) CacheGetAuthor(ctx context.Context, in *CacheGetAuth
 // for forward compatibility
 type UserServiceServer interface {
 	GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error)
+	GetUserInfoDict(context.Context, *GetUserInfoDictRequest) (*GetUserInfoDictResponse, error)
 	CheckPassWord(context.Context, *CheckPassWordRequest) (*CheckPassWordResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	GetUserInfoList(context.Context, *GetUserInfoListRequest) (*GetUserInfoListResponse, error)
@@ -119,6 +131,9 @@ type UnimplementedUserServiceServer struct {
 
 func (UnimplementedUserServiceServer) GetUserInfo(context.Context, *GetUserInfoRequest) (*GetUserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserInfoDict(context.Context, *GetUserInfoDictRequest) (*GetUserInfoDictResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoDict not implemented")
 }
 func (UnimplementedUserServiceServer) CheckPassWord(context.Context, *CheckPassWordRequest) (*CheckPassWordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPassWord not implemented")
@@ -161,6 +176,24 @@ func _UserService_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUserInfo(ctx, req.(*GetUserInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUserInfoDict_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserInfoDictRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserInfoDict(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUserInfoDict_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserInfoDict(ctx, req.(*GetUserInfoDictRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -265,6 +298,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserInfo",
 			Handler:    _UserService_GetUserInfo_Handler,
+		},
+		{
+			MethodName: "GetUserInfoDict",
+			Handler:    _UserService_GetUserInfoDict_Handler,
 		},
 		{
 			MethodName: "CheckPassWord",
