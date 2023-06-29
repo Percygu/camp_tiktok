@@ -38,18 +38,18 @@ func PublishAction(ctx *gin.Context) {
 		return
 	}
 
-	publish, err := utils.NewVideoSvrClient(config.GetGlobalConfig().SvrConfig.VideoSvrName).PublishVideo(ctx, &pb.PublishVideoRequest{
+	publish, err := utils.GetVideoSvrClient().PublishVideo(ctx, &pb.PublishVideoRequest{
 		UserId:   userId.(int64),
 		Title:    title,
 		SaveFile: saveFile,
 	})
 
 	if err != nil {
+		log.Errorf("utils.GetVideoSvrClient().PublishVideo err:%v", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 
-	log.Infof("publish:%v", err)
 	response.Success(ctx, "success", publish)
 
 }
@@ -63,7 +63,7 @@ func GetPublishList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 	}
 
-	resp, err := utils.NewVideoSvrClient(config.GetGlobalConfig().SvrConfig.VideoSvrName).GetPublishVideoList(ctx, &pb.GetPublishVideoListRequest{
+	resp, err := utils.GetVideoSvrClient().GetPublishVideoList(ctx, &pb.GetPublishVideoListRequest{
 		TokenUserId: tokenUserId.(int64),
 		UserID:      userId,
 	})

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"commentsvr/config"
 	"commentsvr/constant"
 	"commentsvr/log"
 	"commentsvr/repository"
@@ -55,7 +54,7 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 		userIDList = append(userIDList, comment.UserId)
 	}
 
-	userSvrClient := utils.NewUserSvrClient(config.GetGlobalConfig().UserSvrName)
+	userSvrClient := utils.GetUserSvrClient()
 	if userSvrClient == nil {
 		return nil, fmt.Errorf("userSvrClient is nil")
 	}

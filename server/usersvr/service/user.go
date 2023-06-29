@@ -27,7 +27,7 @@ type JWTClaims struct {
 }
 
 type UserService struct {
-	pb.UnimplementedCommentServiceServer
+	pb.UnimplementedUserServiceServer
 }
 
 func (u UserService) CacheChangeUserCount(ctx context.Context, req *pb.CacheChangeUserCountReq) (*pb.CacheChangeUserCountRsp, error) {

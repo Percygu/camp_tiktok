@@ -3,12 +3,16 @@ package utils
 import (
 	"commentsvr/config"
 	"commentsvr/log"
-	"commentsvr/utils/otgrpc"
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
-	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
+	// 必须要导入这个包，否则grpc会报错
+	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"google.golang.org/grpc/credentials/insecure"
+)
+
+var (
+	UserSvrClient pb.UserServiceClient
 )
 
 func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
@@ -17,7 +21,7 @@ func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
 		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, svrName),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
+		// grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
 	)
 	if err != nil {
 		log.Errorf("NewSvrConn with svrname %s err:%v", svrName, err)
@@ -32,4 +36,12 @@ func NewUserSvrClient(svrName string) pb.UserServiceClient {
 		return nil
 	}
 	return pb.NewUserServiceClient(conn)
+}
+
+func InitSvrConn() {
+	UserSvrClient = NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName)
+}
+
+func GetUserSvrClient() pb.UserServiceClient {
+	return UserSvrClient
 }

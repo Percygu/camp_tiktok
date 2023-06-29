@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"gatewaysvr/config"
 	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
@@ -20,7 +19,7 @@ func UserLogin(ctx *gin.Context) {
 		response.Fail(ctx, "username or password invalid", nil)
 		return
 	}
-	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).CheckPassWord(ctx, &pb.CheckPassWordRequest{
+	resp, err := utils.GetUserSvrClient().CheckPassWord(ctx, &pb.CheckPassWordRequest{
 		Username: userName,
 		Password: password,
 	})
@@ -41,7 +40,7 @@ func UserRegister(ctx *gin.Context) {
 		return
 	}
 	log.Info(userName, password)
-	resp, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).Register(ctx, &pb.RegisterRequest{
+	resp, err := utils.GetUserSvrClient().Register(ctx, &pb.RegisterRequest{
 		Username: userName,
 		Password: password,
 	})
@@ -73,7 +72,7 @@ func GetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	userInfo, err := utils.NewUserSvrClient(config.GetGlobalConfig().SvrConfig.UserSvrName).GetUserInfo(ctx, &pb.GetUserInfoRequest{
+	userInfo, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
 		Id: uid,
 	})
 	if err != nil {

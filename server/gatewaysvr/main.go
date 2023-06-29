@@ -5,6 +5,7 @@ import (
 	"gatewaysvr/config"
 	"gatewaysvr/log"
 	"gatewaysvr/routes"
+	"gatewaysvr/utils"
 	"go.uber.org/zap"
 )
 
@@ -14,6 +15,8 @@ func Init() {
 	}
 	log.InitLog()
 	log.Info("log init success...")
+	utils.InitSvrConn()
+	log.Info("Init Grpc Server conn success")
 }
 
 func main() {

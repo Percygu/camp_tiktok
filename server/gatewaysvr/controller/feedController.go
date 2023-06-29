@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"gatewaysvr/config"
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -22,15 +22,19 @@ func Feed(ctx *gin.Context) {
 	userId, _ := ctx.Get("UserId")
 	tokenId = userId.(int64)
 
-	if err != nil {
-		response.Fail(ctx, err.Error(), nil)
-		return
-	}
+	// log.Info("currentTime:", currentTime, "tokenId:", tokenId)
+	// if err != nil {
+	// 	response.Fail(ctx, err.Error(), nil)
+	// 	return
+	// }
 
-	resp, err := utils.NewVideoSvrClient(config.GetGlobalConfig().SvrConfig.VideoSvrName).GetFeedList(ctx, &pb.GetFeedListRequest{
+	resp, err := utils.GetVideoSvrClient().GetFeedList(ctx, &pb.GetFeedListRequest{
 		CurrentTime: currentTime,
 		TokenUserId: tokenId,
 	})
+
+	log.Info("resp:", resp.VideoList, err)
+
 	if err != nil {
 		if err != nil {
 			response.Fail(ctx, err.Error(), nil)

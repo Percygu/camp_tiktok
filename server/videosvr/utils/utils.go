@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
+	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
