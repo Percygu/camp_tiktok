@@ -9,8 +9,8 @@ CREATE DATABASE camps_tiktok;
 
 USE camps_tiktok;
 
-DROP TABLE IF EXISTS `comments`;
-CREATE TABLE `t_comments`
+DROP TABLE IF EXISTS `t_comment`;
+CREATE TABLE `t_comment`
 (
     `id`           bigint(20) NOT NULL AUTO_INCREMENT COMMENT '评论id，自增主键',
     `user_id`      bigint(20) NOT NULL COMMENT '评论发布用户id',
@@ -24,8 +24,8 @@ CREATE TABLE `t_comments`
 -- ----------------------------
 -- Table structure for follows
 -- ----------------------------
-DROP TABLE IF EXISTS `relations`;
-CREATE TABLE `t_relations`
+DROP TABLE IF EXISTS `t_relation`;
+CREATE TABLE `t_relation`
 (
     `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
     `follow_id`   bigint(20) NOT NULL COMMENT '用户id',
@@ -39,8 +39,8 @@ CREATE TABLE `t_relations`
 -- ----------------------------
 -- Table structure for likes
 -- ----------------------------
-DROP TABLE IF EXISTS `favorites`;
-CREATE TABLE `t_favorites`
+DROP TABLE IF EXISTS `t_favorite`;
+CREATE TABLE `t_favorite`
 (
     `id`       bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
     `user_id`  bigint(20) NOT NULL COMMENT '点赞用户id',
@@ -54,28 +54,35 @@ CREATE TABLE `t_favorites`
 -- ----------------------------
 -- Table structure for users
 -- ----------------------------
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `t_users`
+DROP TABLE IF EXISTS `t_user`;
+CREATE TABLE `t_user`
 (
     `id`               bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户id，自增主键',
-    `name`             varchar(255) NOT NULL COMMENT '用户名',
+    `user_name`             varchar(255) NOT NULL COMMENT '用户名',
     `password`         varchar(255) NOT NULL COMMENT '用户密码',
+    `follow_count`     bigint(20) NOT NULL DEFAULT 0 COMMENT '该用户关注其他用户个数',
+    `follower_count`   bigint(20) NOT NULL DEFAULT 0 COMMENT '该用户粉丝个数',
+    `total_favorited`  bigint(20) NOT NULL DEFAULT 0 COMMENT '该用户被喜欢的视频数量',
+    `favorite_count`   bigint(20) NOT NULL DEFAULT 0 COMMENT '该用户喜欢的视频数量',
+    `signature` varchar(1024) COMMENT '签名',
     `avatar`           varchar(1024) COMMENT '用户头像',
     `background_image` varchar(1024) COMMENT '主页背景',
     PRIMARY KEY (`id`),
-    KEY                `name_password_idx` (`name`,`password`) USING BTREE
+    KEY                `name_password_idx` (`user_name`,`password`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=20044 DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 -- ----------------------------
 -- Table structure for videos
 -- ----------------------------
-DROP TABLE IF EXISTS `videos`;
-CREATE TABLE `t_videos`
+DROP TABLE IF EXISTS `t_video`;
+CREATE TABLE `t_video`
 (
     `id`           bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键，视频唯一id',
     `author_id`    bigint(20) NOT NULL COMMENT '视频作者id',
     `play_url`     varchar(255) NOT NULL COMMENT '播放url',
     `cover_url`    varchar(255) NOT NULL COMMENT '封面url',
+    `favorite_count` bigint(20) NOT NULL DEFAULT 0 COMMENT '视频的点赞数量',
+    `comment_count` bigint(20) NOT NULL DEFAULT 0 COMMENT '视频的评论数量',
     `publish_time` datetime     NOT NULL COMMENT '发布时间戳',
     `title`        varchar(255) DEFAULT NULL COMMENT '视频名称',
     PRIMARY KEY (`id`),

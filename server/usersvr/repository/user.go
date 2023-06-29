@@ -44,7 +44,7 @@ func InsertUser(userName, password string) (*User, error) {
 		BackgroundImage: "https://tse2-mm.cn.bing.net/th/id/OIP-C.sDoybxmH4DIpvO33-wQEPgHaEq?pid=ImgDet&rs=1",
 		Signature:       "test sign",
 	}
-	result := db.Create(&user)
+	result := db.Model(&User{}).Create(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

@@ -1,1 +1,5 @@
-.idea/*
+.idea/
+server/usersvr/*.log
+*.log
+server/gatewaysvr/error_gateway.log
+
