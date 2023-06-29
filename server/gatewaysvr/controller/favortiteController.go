@@ -57,13 +57,74 @@ func GetFavoriteList(ctx *gin.Context) {
 	tokenUid := tokenUidStr.(int64)
 
 	// 拿videoID List
-	resp, err := utils.GetVideoSvrClient().GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
+	videoListResp, err := utils.GetVideoSvrClient().GetFavoriteVideoList(ctx, &pb.GetFavoriteVideoListReq{
 		UserId: tokenUid,
 	})
+
+	var userIdList []int64
+	for _, v := range videoListResp.VideoList {
+		userIdList = append(userIdList, v.AuthorId)
+	}
+
+	// 拿userInfo List
+	userInfoResp, err := utils.GetUserSvrClient().GetUserInfoList(ctx, &pb.GetUserInfoListRequest{
+		IdList: userIdList,
+	})
+
+	userMap := make(map[int64]*pb.UserInfo)
+	for _, v := range userInfoResp.UserInfoList {
+		userMap[v.Id] = v
+	}
+
+	videoList := make([]*Video, 0)
+
+	for _, v := range videoListResp.VideoList {
+		videoList = append(videoList, &Video{
+			Id:            v.Id,
+			PlayUrl:       v.PlayUrl,
+			CoverUrl:      v.CoverUrl,
+			FavoriteCount: v.FavoriteCount,
+			CommentCount:  v.CommentCount,
+			IsFavorite:    v.IsFavorite,
+			Title:         v.Title,
+			Author: &pb.UserInfo{
+				Id:              v.AuthorId,
+				Name:            userMap[v.AuthorId].Name,
+				Avatar:          userMap[v.AuthorId].Avatar,
+				FollowCount:     userMap[v.AuthorId].FollowCount,
+				FollowerCount:   userMap[v.AuthorId].FollowerCount,
+				IsFollow:        userMap[v.AuthorId].IsFollow,
+				BackgroundImage: userMap[v.AuthorId].BackgroundImage,
+				Signature:       userMap[v.AuthorId].Signature,
+				TotalFavorited:  userMap[v.AuthorId].TotalFavorited,
+				FavoriteCount:   userMap[v.AuthorId].FavoriteCount,
+			},
+		})
+	}
 
 	if err != nil {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp)
+
+	response.Success(ctx, "success", &DouyinFavoriteListResponse{
+		VideoList: videoList,
+	})
+}
+
+type Video struct {
+	Id            int64        `json:"id"`
+	Author        *pb.UserInfo `json:"author"`
+	PlayUrl       string       `json:"play_url"`
+	CoverUrl      string       `json:"cover_url"`
+	FavoriteCount int64        `json:"favorite_count"`
+	CommentCount  int64        `json:"comment_count"`
+	IsFavorite    bool         `json:"is_favorite"`
+	Title         string       `json:"title"`
+}
+
+type DouyinFavoriteListResponse struct {
+	StatusCode int32    `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code"`
+	StatusMsg  string   `protobuf:"bytes,2,opt,name=status_msg,json=statusMsg,proto3" json:"status_msg,omitempty"`
+	VideoList  []*Video `protobuf:"bytes,3,rep,name=video_list,json=videoList,proto3" json:"video_list,omitempty"`
 }
