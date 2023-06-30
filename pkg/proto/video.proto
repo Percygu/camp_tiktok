@@ -22,6 +22,7 @@ service VideoService {
 // ******************
 message UpdateFavoriteCountReq {
   int64 video_id = 1;
+  int64 action_type = 2;
 }
 
 message UpdateFavoriteCountRsp {

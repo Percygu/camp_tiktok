@@ -130,3 +130,68 @@ func CacheHGet(key, mKey string) ([]byte, error) {
 	}
 	return data, nil
 }
+
+func UpdateUserFavoritedNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 点赞 else： 取消点赞
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+
+	err := db.Model(&User{}).Where("id = ?", userID).Update("total_favorited", gorm.Expr("total_favorited + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateUserFavoriteNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 点赞 else： 取消点赞
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&User{}).Where("id = ?", userID).Update("favorite_count", gorm.Expr("favorite_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateUserFollowNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 关注 else： 取消关注
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&User{}).Where("id = ?", userID).Update("follow_count", gorm.Expr("follow_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateUserFollowerNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 关注 else： 取消关注
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&User{}).Where("id = ?", userID).Update("follower_count", gorm.Expr("follower_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

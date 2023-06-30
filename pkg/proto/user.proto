@@ -28,6 +28,7 @@ service UserService {
 // UpdateUserFollowCount
 message UpdateUserFollowCountReq {
   int64 user_id = 1;
+  int64 action_type = 2;
 }
 
 message UpdateUserFollowCountRsp {
@@ -38,6 +39,7 @@ message UpdateUserFollowCountRsp {
 // UpdateUserFollowerCount
 message UpdateUserFollowerCountReq {
   int64 user_id = 1;
+  int64 action_type = 2;
 }
 
 message UpdateUserFollowerCountRsp {
@@ -49,6 +51,7 @@ message UpdateUserFollowerCountRsp {
 // UpdateUserFavoritedCount
 message UpdateUserFavoritedCountReq {
   int64 user_id = 1;
+  int64 action_type = 2;
 }
 
 message UpdateUserFavoritedCountRsp {
@@ -59,6 +62,7 @@ message UpdateUserFavoritedCountRsp {
 // UpdateUserFavoriteCount
 message UpdateUserFavoriteCountReq {
   int64 user_id = 1;
+  int64 action_type = 2;
 }
 
 message UpdateUserFavoriteCountRsp {
