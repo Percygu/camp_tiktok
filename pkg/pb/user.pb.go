@@ -20,6 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ******
 type GetUserInfoDictRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -234,6 +235,7 @@ func (x *UserInfo) GetFavoriteCount() int64 {
 	return 0
 }
 
+// ******
 type GetUserInfoRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -328,6 +330,7 @@ func (x *GetUserInfoResponse) GetUserInfo() *UserInfo {
 	return nil
 }
 
+// ******
 type CheckPassWordRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -438,6 +441,7 @@ func (x *CheckPassWordResponse) GetToken() string {
 	return ""
 }
 
+// ******
 type RegisterRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -548,6 +552,7 @@ func (x *RegisterResponse) GetToken() string {
 	return ""
 }
 
+// ******
 type GetUserInfoListRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -642,6 +647,7 @@ func (x *GetUserInfoListResponse) GetUserInfoList() []*UserInfo {
 	return nil
 }
 
+// ******
 type CacheChangeUserCountReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -752,6 +758,7 @@ func (x *CacheChangeUserCountRsp) GetCommonRsp() *CommonResponse {
 	return nil
 }
 
+// ******
 type CacheGetAuthorReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

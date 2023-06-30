@@ -11,6 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// DouyinCommentActionResponse CommentAction返回的数据结构
+type DouyinCommentActionResponse struct {
+	StatusCode int32       `json:"status_code"`
+	StatusMsg  string      `json:"status_msg,omitempty"`
+	Comment    *pb.Comment `json:"comment"`
+}
+
+// DouyinCommentListResponse GetCommentList返回的数据结构
+type DouyinCommentListResponse struct {
+	StatusCode  int32      `json:"status_code"`
+	StatusMsg   string     `json:"status_msg,omitempty"`
+	CommentList []*pb.Comment `json:"comment_list,omitempty"`
+}
+
 // 发布评论
 func CommentAction(ctx *gin.Context) {
 	var err error
@@ -107,14 +121,3 @@ func GetCommentList(ctx *gin.Context) {
 	response.Success(ctx, "success", resp)
 }
 
-type DouyinCommentActionResponse struct {
-	StatusCode int32       `json:"status_code"`
-	StatusMsg  string      `json:"status_msg,omitempty"`
-	Comment    *pb.Comment `json:"comment"`
-}
-
-type DouyinCommentListResponse struct {
-	StatusCode  int32      `json:"status_code"`
-	StatusMsg   string     `json:"status_msg,omitempty"`
-	CommentList []*pb.Comment `json:"comment_list,omitempty"`
-}
