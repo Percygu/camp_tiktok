@@ -10,30 +10,13 @@ import (
 // 获取用户自己的视频列表
 func GetVideoListByAuthorId(AuthorId int64) ([]Video, error) {
 	var videos []Video
-	// userSvrClient := utils.NewUserSvrClient(config.GetGlobalConfig().UserSvrName)
-	// reply, err := userSvrClient.GetUserInfo(context.Background(), &pb.GetUserInfoRequest{Id: AuthorId})
-	// if err != nil {
-	// 	return videos, err
-	// }
+
 	db := db.GetDB()
 	err := db.Where("author_id = ?", AuthorId).Order("id DESC").Find(&videos).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return videos, err
 	}
-	// userInfo := reply.UserInfo
-	// for i := range videos {
-	// 	videos[i].Author = User{
-	// 		Id:              userInfo.Id,
-	// 		Name:            userInfo.Name,
-	// 		Follow:          userInfo.FollowCount,
-	// 		Follower:        userInfo.FollowerCount,
-	// 		Avatar:          userInfo.Avatar,
-	// 		BackgroundImage: userInfo.BackgroundImage,
-	// 		Signature:       userInfo.Signature,
-	// 		TotalFav:        userInfo.TotalFavorited,
-	// 		FavCount:        userInfo.FavoriteCount,
-	// 	}
-	// }
+
 	return videos, nil
 }
 

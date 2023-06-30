@@ -29,7 +29,8 @@ func RelationAction(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-
+	log.Infof("RelationAction tokenUserId:%d, toUid:%d, actionType:%d", tokenUserId, toUid, actionType)
+	// 1.关注 2.取消关注
 	_, err = utils.GetRelationSvrClient().RelationAction(ctx, &pb.RelationActionReq{
 		ToUserId:   toUid,
 		SelfUserId: tokenUserId,

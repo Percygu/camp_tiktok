@@ -11,13 +11,19 @@ import (
 func FollowAction(selfUserId, toUserId int64) error {
 	db := db.GetDB()
 	relation := Relation{
-		Follow:   selfUserId,
-		Follower: toUserId,
+		Follow:   toUserId,
+		Follower: selfUserId,
 	}
-	err := db.Where("follow_id = ? and follower_id = ?", toUserId, selfUserId).Find(&Relation{}).Error
-	if err != gorm.ErrRecordNotFound {
+	err := db.Where("follow_id = ? and follower_id = ?", toUserId, selfUserId).First(&Relation{}).Error
+	// 沒有err，说明有这条记录，说明已经关注过了
+	if err == nil {
 		return fmt.Errorf("you have followed this user")
 	}
+	// 有err，但不是gorm.ErrRecordNotFound，说明有其他错误，返回
+	if err != nil && err.Error() != gorm.ErrRecordNotFound.Error() {
+		return err
+	}
+	// 沒有這條記錄，則插入
 	err = db.Create(&relation).Error
 	if err != nil {
 		return err
@@ -67,11 +73,16 @@ func GetFollowerList(userId int64) ([]*Relation, error) {
 }
 
 func IsFollow(selfUserId, toUserId int64) (bool, error) {
+	if selfUserId == toUserId {
+		return true, nil
+	}
+
 	db := db.GetDB()
-	err := db.Where("follow_id = ? and follower_id = ?", toUserId, selfUserId).Find(&Relation{}).Error
-	if err == gorm.ErrRecordNotFound {
-		return false, nil
-	} else if err != nil {
+	err := db.Where("follow_id = ? and follower_id = ?", toUserId, selfUserId).First(&Relation{}).Error
+	if err != nil {
+		if err.Error() == gorm.ErrRecordNotFound.Error() {
+			return false, nil
+		}
 		return false, err
 	}
 	return true, nil

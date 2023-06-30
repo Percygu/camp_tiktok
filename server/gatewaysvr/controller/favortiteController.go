@@ -50,6 +50,7 @@ func FavoriteAction(ctx *gin.Context) {
 	}
 	tokenUidStr, _ := ctx.Get("UserId")
 	tokenUid := tokenUidStr.(int64)
+
 	// 这里只是插入了一条favorite记录，没有更新video表的favorite_count，还有对应视频作者的favorite_count
 	_, err = utils.GetFavoriteSvrClient().FavoriteAction(ctx, &pb.FavoriteActionReq{
 		UserId:     tokenUid,
@@ -57,16 +58,56 @@ func FavoriteAction(ctx *gin.Context) {
 		ActionType: int64(favInfo.ActionType),
 	})
 
+	if err != nil {
+		log.Errorf("FavoriteAction failed, err:%v", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
 	// 更新video表的favorite_count（更新视频获赞数）
 	_, err = utils.GetVideoSvrClient().UpdateFavoriteCount(ctx, &pb.UpdateFavoriteCountReq{
 		VideoId:    favInfo.VideoId,
 		ActionType: int64(favInfo.ActionType),
 	})
-
 	if err != nil {
+		log.Errorf("UpdateFavoriteCount failed, err:%v", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
+
+	// 查询video表的author_id
+	videoInfoResp, err := utils.GetVideoSvrClient().GetVideoInfoList(ctx, &pb.GetVideoInfoListReq{
+		VideoId: []int64{favInfo.VideoId},
+	})
+	if err != nil {
+		log.Errorf("GetVideoInfoList failed, err:%v", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	var authorId = videoInfoResp.VideoInfoList[0].AuthorId
+	// 更新user表的 total_favorited_count（更新视频作者获赞数）
+	_, err = utils.GetUserSvrClient().UpdateUserFavoritedCount(ctx, &pb.UpdateUserFavoritedCountReq{
+		UserId:     authorId,
+		ActionType: int64(favInfo.ActionType),
+	})
+	if err != nil {
+		log.Errorf("UpdateUserFavoritedCount failed, err:%v", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	// 更新user表的 favorite_count更新我喜欢的视频数）
+	_, err = utils.GetUserSvrClient().UpdateUserFavoriteCount(ctx, &pb.UpdateUserFavoriteCountReq{
+		UserId:     tokenUid,
+		ActionType: int64(favInfo.ActionType),
+	})
+	if err != nil {
+		log.Errorf("UpdateUserFavoriteCount failed, err:%v", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
 	response.Success(ctx, "success", nil)
 }
 
@@ -97,7 +138,7 @@ func GetFavoriteList(ctx *gin.Context) {
 		return
 	}
 
-	log.Info(userInfoResp)
+	// log.Info(userInfoResp)
 
 	userMap := make(map[int64]*pb.UserInfo)
 	for _, v := range userInfoResp.UserInfoList {

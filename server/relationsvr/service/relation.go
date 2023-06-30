@@ -36,6 +36,7 @@ func (c RelationService) RelationAction(ctx context.Context, req *pb.RelationAct
 	if req.SelfUserId == req.ToUserId {
 		return nil, fmt.Errorf("you can't follow yourself")
 	}
+
 	if req.ActionType == 1 {
 		log.Infof("follow action id:%v,toid:%v", req.SelfUserId, req.ToUserId)
 		err := repository.FollowAction(req.SelfUserId, req.ToUserId)

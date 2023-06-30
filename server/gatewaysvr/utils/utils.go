@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"gatewaysvr/config"
 	"gatewaysvr/log"
@@ -24,7 +25,9 @@ var (
 
 func NewSvrConn(svrName string) (*grpc.ClientConn, error) {
 	consulInfo := config.GetGlobalConfig().ConsulConfig
-	conn, err := grpc.Dial(
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	conn, err := grpc.DialContext(
+		ctx,
 		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, svrName),
 		// grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithInsecure(),

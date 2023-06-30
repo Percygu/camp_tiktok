@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"favoritesvr/log"
 	db "favoritesvr/middleware/db"
 	"fmt"
 	"gorm.io/gorm"
@@ -14,23 +15,22 @@ func LikeAction(uid, vid int64) error {
 		VideoId: vid,
 	}
 	// 这个video 是否有被当前userid 点赞过
-	err := db.Where("user_id = ? and video_id = ?", uid, vid).Find(&Favorite{}).Error
-	if err != gorm.ErrRecordNotFound {
-		return fmt.Errorf("you have liked this video")
+	err := db.Where("user_id = ? and video_id = ?", uid, vid).First(&Favorite{}).Error
+	// 沒有err，说明有这条记录，说明已经点赞过了
+	if err == nil {
+		return fmt.Errorf("you have Like this video")
 	}
+	// 有err，但不是gorm.ErrRecordNotFound，说明有其他错误，返回
+	if err != nil && err.Error() != gorm.ErrRecordNotFound.Error() {
+		return err
+	}
+	// 沒有這條記錄，則插入
 	err = db.Create(&favorite).Error
 
 	if err != nil {
 		return err
 	}
 
-	// TODO: update user TotalFav
-	// 得这个video的作者id
-
-	// authorid, _ := CacheGetAuthor(vid) // todo videosvr
-	// todo usercountcache change usersvr
-	// go CacheChangeUserCount(uid, add, "like")
-	// go CacheChangeUserCount(authorid, add, "liked")
 	return nil
 }
 
@@ -72,11 +72,16 @@ func GetFavoriteIdList(uid int64) ([]int64, error) {
 // IsFavoriteVideo 判断是否点赞这个视频
 func IsFavoriteVideo(uid, vid int64) (bool, error) {
 	db := db.GetDB()
-	err := db.Where("user_id = ? and video_id = ?", uid, vid).Find(&Favorite{}).Error
-	if err == gorm.ErrRecordNotFound {
-		return false, nil
-	} else if err != nil {
+	err := db.Where("user_id = ? and video_id = ?", uid, vid).First(&Favorite{}).Error
+	if err != nil {
+		if err.Error() == gorm.ErrRecordNotFound.Error() {
+			log.Info("111")
+			return false, nil
+		}
+		log.Info("222")
 		return false, err
 	}
+
+	log.Infof("is favorite video", uid, vid)
 	return true, nil
 }

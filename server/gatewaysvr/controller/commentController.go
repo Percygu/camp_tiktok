@@ -67,8 +67,20 @@ func CommentAction(ctx *gin.Context) {
 		return
 	}
 
-	// 获取用户详细信息
-	getUserInfoRsp, err := utils.UserSvrClient.GetUserInfo(ctx, &pb.GetUserInfoRequest{
+	// 视频评论数+1
+	_, err = utils.GetVideoSvrClient().UpdateCommentCount(ctx, &pb.UpdateCommentCountReq{
+		VideoId:    videoId,
+		ActionType: actionType,
+	})
+
+	if err != nil {
+		log.Errorf("UpdateCommentCount error : %s", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	// 获取用户详细信息（填充）
+	getUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
 		Id: tokenUid,
 	})
 	if err != nil {
@@ -78,7 +90,7 @@ func CommentAction(ctx *gin.Context) {
 	}
 	// 填充
 	commentActionRsp.Comment.UserInfo = getUserInfoRsp.UserInfo
-
+	log.Infof("commentActionRsp.Comment : %+v", commentActionRsp.Comment)
 	response.Success(ctx, "success", &DouyinCommentActionResponse{
 		Comment: commentActionRsp.Comment,
 	})

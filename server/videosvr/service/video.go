@@ -39,13 +39,26 @@ func (v VideoService) UpdateCommentCount(ctx context.Context, req *pb.UpdateComm
 func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublishVideoListRequest) (*pb.GetPublishVideoListResponse, error) {
 	videos, err := repository.GetVideoListByAuthorId(req.UserID)
 	if err != nil {
+		log.Errorf("GetVideoListByAuthorId err", zap.Error(err))
 		return nil, err
 	}
-	list := &pb.GetPublishVideoListResponse{
-		VideoList: VideoInfo(videos, req.TokenUserId),
+	// 结构体转换
+	videoList := make([]*pb.VideoInfo, 0)
+	for _, video := range videos {
+		videoList = append(videoList, &pb.VideoInfo{
+			Id:            video.Id,
+			AuthorId:      video.AuthorId,
+			PlayUrl:       video.PlayUrl,
+			CoverUrl:      video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			Title:         video.Title,
+		})
 	}
 
-	return list, nil
+	return &pb.GetPublishVideoListResponse{
+		VideoList: videoList,
+	}, nil
 }
 func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequest) (*pb.PublishVideoResponse, error) {
 	client := minioStore.GetMinio()
@@ -83,11 +96,6 @@ func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListReques
 		log.Errorf("GetFeedList|GetVideoListByFeed err:%v", err)
 		return nil, err
 	}
-	//
-	// feed := &pb.GetFeedListResponse{
-	// 	VideoList: VideoInfo(videoList, req.TokenUserId),
-	// }
-
 	nextTime := time.Now().UnixNano() / 1e6
 	if len(videoList) == 20 {
 		nextTime = videoList[len(videoList)-1].PublishTime
@@ -106,10 +114,13 @@ func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListReques
 			Title:         video.Title,
 		})
 	}
+
 	resp := &pb.GetFeedListResponse{
 		NextTime:  nextTime,
 		VideoList: VideoInfoList,
 	}
+
+	log.Infof("GetFeedList|resp:%+v", resp)
 	return resp, nil
 }
 

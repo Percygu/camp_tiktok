@@ -72,14 +72,23 @@ func GetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	userInfo, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
+	getUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
 		Id: uid,
 	})
 	if err != nil {
-		zap.L().Error("get userinfo error", zap.Error(err))
+		log.Errorf("GetUserInfo err %v", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", userInfo)
 
+	log.Infof("GetUserInfo %+v", getUserInfoRsp)
+	response.Success(ctx, "success", &DouyinUserResponse{
+		User: getUserInfoRsp.UserInfo,
+	})
+}
+
+type DouyinUserResponse struct {
+	StatusCode int32        `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code"`
+	StatusMsg  string       `protobuf:"bytes,2,opt,name=status_msg,json=statusMsg,proto3" json:"status_msg,omitempty"`
+	User       *pb.UserInfo `protobuf:"bytes,3,opt,name=user,proto3" json:"user"`
 }
