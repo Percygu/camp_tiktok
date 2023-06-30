@@ -40,6 +40,7 @@ func (u UserService) UpdateUserFavoritedCount(ctx context.Context, req *pb.Updat
 	return &pb.UpdateUserFavoritedCountRsp{}, nil
 }
 
+// UpdateUserFollowCount 更新用户 喜爱的视频数，ActionType 1：表示+1 2：-1
 func (u UserService) UpdateUserFavoriteCount(ctx context.Context, req *pb.UpdateUserFavoriteCountReq) (*pb.UpdateUserFavoriteCountRsp, error) {
 	err := repository.UpdateUserFavoriteNum(req.UserId, req.ActionType)
 	if err != nil {
@@ -49,6 +50,7 @@ func (u UserService) UpdateUserFavoriteCount(ctx context.Context, req *pb.Update
 	return &pb.UpdateUserFavoriteCountRsp{}, nil
 }
 
+// UpdateUserFollowCount 更新用户 关注数，ActionType 1：表示+1 2：-1
 func (u UserService) UpdateUserFollowCount(ctx context.Context, req *pb.UpdateUserFollowCountReq) (*pb.UpdateUserFollowCountRsp, error) {
 	err := repository.UpdateUserFollowNum(req.UserId, req.ActionType)
 	if err != nil {
@@ -58,6 +60,7 @@ func (u UserService) UpdateUserFollowCount(ctx context.Context, req *pb.UpdateUs
 	return &pb.UpdateUserFollowCountRsp{}, nil
 }
 
+// UpdateUserFollowerCount 更新用户 粉丝数，ActionType 1：表示+1 2：-1
 func (u UserService) UpdateUserFollowerCount(ctx context.Context, req *pb.UpdateUserFollowerCountReq) (*pb.UpdateUserFollowerCountRsp, error) {
 	err := repository.UpdateUserFollowerNum(req.UserId, req.ActionType)
 	if err != nil {

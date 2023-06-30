@@ -16,6 +16,26 @@ type VideoService struct {
 	pb.UnimplementedVideoServiceServer
 }
 
+// UpdateFavoriteCount 更新点赞数
+func (v VideoService) UpdateFavoriteCount(ctx context.Context, req *pb.UpdateFavoriteCountReq) (*pb.UpdateFavoriteCountRsp, error) {
+	err := repository.UpdateFavoriteNum(req.VideoId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateFavoriteCount err", zap.Error(err))
+		return nil, err
+	}
+	return &pb.UpdateFavoriteCountRsp{}, nil
+}
+
+// UpdateCommentCount 更新评论数
+func (v VideoService) UpdateCommentCount(ctx context.Context, req *pb.UpdateCommentCountReq) (*pb.UpdateCommentCountRsp, error) {
+	err := repository.UpdateCommentNum(req.VideoId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateCommentCount err", zap.Error(err))
+		return nil, err
+	}
+	return &pb.UpdateCommentCountRsp{}, nil
+}
+
 func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublishVideoListRequest) (*pb.GetPublishVideoListResponse, error) {
 	videos, err := repository.GetVideoListByAuthorId(req.UserID)
 	if err != nil {

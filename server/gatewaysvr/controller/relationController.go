@@ -2,6 +2,7 @@ package controller
 
 import (
 	"gatewaysvr/config"
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -29,17 +30,40 @@ func RelationAction(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.GetRelationSvrClient().RelationAction(ctx, &pb.RelationActionReq{
+	_, err = utils.GetRelationSvrClient().RelationAction(ctx, &pb.RelationActionReq{
 		ToUserId:   toUid,
 		SelfUserId: tokenUserId,
 		ActionType: actionType,
 	})
-
 	if err != nil {
+		log.Errorf("RelationAction error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp.CommonRsp)
+
+	// 我关注的人++
+	_, err = utils.GetUserSvrClient().UpdateUserFollowCount(ctx, &pb.UpdateUserFollowCountReq{
+		UserId:     tokenUserId,
+		ActionType: actionType,
+	})
+	if err != nil {
+		log.Errorf("RelationAction error : %s", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	// 被我关注的人的粉丝++
+	_, err = utils.GetUserSvrClient().UpdateUserFollowerCount(ctx, &pb.UpdateUserFollowerCountReq{
+		UserId:     toUid,
+		ActionType: actionType,
+	})
+	if err != nil {
+		log.Errorf("RelationAction error : %s", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	response.Success(ctx, "success", nil)
 }
 
 // 获取关注列表

@@ -96,3 +96,34 @@ func GetVideoListByVideoIdList(videoIdList []int64) ([]Video, error) {
 	}
 	return videos, nil
 }
+
+// 视频点赞数+1 或者 -1
+func UpdateFavoriteNum(videoId, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&Video{}).Where("id = ?", videoId).Update("favorite_count", gorm.Expr("favorite_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateCommentNum(videoId, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&Video{}).Where("id = ?", videoId).Update("comment_count", gorm.Expr("comment_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

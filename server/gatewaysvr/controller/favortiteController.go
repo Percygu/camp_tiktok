@@ -39,7 +39,7 @@ type Video struct {
 
 // *******************************************
 
-// 点赞视频
+// 点赞或取消点赞 一个视频
 func FavoriteAction(ctx *gin.Context) {
 	var favInfo FavActionParams
 	err := ctx.ShouldBindQuery(&favInfo)
@@ -53,6 +53,12 @@ func FavoriteAction(ctx *gin.Context) {
 	// 这里只是插入了一条favorite记录，没有更新video表的favorite_count，还有对应视频作者的favorite_count
 	_, err = utils.GetFavoriteSvrClient().FavoriteAction(ctx, &pb.FavoriteActionReq{
 		UserId:     tokenUid,
+		VideoId:    favInfo.VideoId,
+		ActionType: int64(favInfo.ActionType),
+	})
+
+	// 更新video表的favorite_count（更新视频获赞数）
+	_, err = utils.GetVideoSvrClient().UpdateFavoriteCount(ctx, &pb.UpdateFavoriteCountReq{
 		VideoId:    favInfo.VideoId,
 		ActionType: int64(favInfo.ActionType),
 	})
