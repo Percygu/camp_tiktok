@@ -60,15 +60,3 @@ func (f *FavoriteService) GetFavoriteVideoIdList(ctx context.Context, req *pb.Ge
 		VideoIdList: videoIdList,
 	}, nil
 }
-
-// func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
-// 	m := make(map[int64]struct{})
-// 	list, err := repository.GetFavoriteList(tokenUserId)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	for _, v := range list {
-// 		m[v.Id] = struct{}{}
-// 	}
-// 	return m, nil
-// }

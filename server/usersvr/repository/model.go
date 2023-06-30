@@ -10,8 +10,8 @@ type User struct {
 	Avatar          string `gorm:"column:avatar"`
 	BackgroundImage string `gorm:"column:background_image"`
 	Signature       string `gorm:"column:signature"`
-	TotalFav        int64  `gorm:"column:total_favorited"`
-	FavCount        int64  `gorm:"column:favorite_count"`
+	TotalFav        int64  `gorm:"column:total_favorited"` // 我 获赞的总数
+	FavCount        int64  `gorm:"column:favorite_count"`  // 我 点赞的视频总数
 }
 
 func (r *User) TableName() string {

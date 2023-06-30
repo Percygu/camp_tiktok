@@ -6,7 +6,6 @@ import (
 	"commentsvr/repository"
 	"commentsvr/utils"
 	"context"
-	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 )
 
@@ -18,26 +17,26 @@ func (c CommentService) CommentAction(ctx context.Context, req *pb.CommentAction
 	// 增加评论
 	if req.ActionType == 1 {
 		// commentInfo, err := repository.CommentAdd(userId, videoId, comment_text)
-		_, err := repository.CommentAdd(req.UserId, req.VideoId, req.CommentText)
+		comment, err := repository.CommentAdd(req.UserId, req.VideoId, req.CommentText)
 		if err != nil {
+			log.Errorf("CommentAction|CommentAdd err:%v", err)
 			return nil, err
 		}
-		return &pb.CommentActionRsp{
-			CommonRsp: &pb.CommonResponse{
-				Code: constant.SuccessCode,
-				Msg:  constant.SuccessMsg,
-			},
-		}, nil
-	} else { // 删除评论
+		return &pb.CommentActionRsp{Comment: &pb.Comment{
+			Id:         comment.Id,
+			UserInfo:   nil,
+			Content:    comment.CommentText,
+			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
+		}}, nil
+
+	} else {
+		// 删除评论
 		err := repository.CommentDelete(req.VideoId, req.CommentId)
 		if err != nil {
 			return nil, err
 		}
 		return &pb.CommentActionRsp{
-			CommonRsp: &pb.CommonResponse{
-				Code: constant.SuccessCode,
-				Msg:  constant.SuccessMsg,
-			},
+			Comment: nil,
 		}, nil
 	}
 }
@@ -54,14 +53,9 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 		userIDList = append(userIDList, comment.UserId)
 	}
 
-	userSvrClient := utils.GetUserSvrClient()
-	if userSvrClient == nil {
-		return nil, fmt.Errorf("userSvrClient is nil")
-	}
-	userInfoListReq := &pb.GetUserInfoListRequest{
+	userInfoListRsp, err := utils.GetUserSvrClient().GetUserInfoList(context.Background(), &pb.GetUserInfoListRequest{
 		IdList: userIDList,
-	}
-	userInfoListRsp, err := userSvrClient.GetUserInfoList(context.Background(), userInfoListReq)
+	})
 	if err != nil {
 		log.Errorf("GetCommentList|GetUserInfoList err:%v", err)
 		return nil, err
@@ -82,7 +76,7 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 			Id:         comment.Id,
 			UserInfo:   userInfo,
 			Content:    comment.CommentText,
-			CreateDate: comment.CreateTime,
+			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
 		}
 		list.CommentList[i] = v
 	}

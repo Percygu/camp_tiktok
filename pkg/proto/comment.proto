@@ -2,7 +2,6 @@ syntax = "proto3";
 
 option go_package = "../pb;pb";
 import "user.proto";
-import "common.proto";
 // 这里有多个--proto_path是因为当前proto文件中有import别的proto文件，在构建的时候这些proto文件要从--proto_path指定的多个路径去找，
 // 一个没找到就回去从另一个招
 // protoc --proto_path=../../../user/proto/ --proto_path=. --go_out=. ./*.proto
@@ -17,7 +16,7 @@ message CommentActionReq {
 }
 
 message CommentActionRsp {
-  CommonResponse common_rsp = 1;
+    Comment comment = 1;
 }
 
 message Comment {

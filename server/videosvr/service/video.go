@@ -2,15 +2,10 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
-	"os/exec"
-	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
-	"videosvr/config"
 	"videosvr/log"
 	"videosvr/middleware/minioStore"
 	"videosvr/repository"
@@ -21,16 +16,49 @@ type VideoService struct {
 	pb.UnimplementedVideoServiceServer
 }
 
+// UpdateFavoriteCount 更新点赞数
+func (v VideoService) UpdateFavoriteCount(ctx context.Context, req *pb.UpdateFavoriteCountReq) (*pb.UpdateFavoriteCountRsp, error) {
+	err := repository.UpdateFavoriteNum(req.VideoId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateFavoriteCount err", zap.Error(err))
+		return nil, err
+	}
+	return &pb.UpdateFavoriteCountRsp{}, nil
+}
+
+// UpdateCommentCount 更新评论数
+func (v VideoService) UpdateCommentCount(ctx context.Context, req *pb.UpdateCommentCountReq) (*pb.UpdateCommentCountRsp, error) {
+	err := repository.UpdateCommentNum(req.VideoId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateCommentCount err", zap.Error(err))
+		return nil, err
+	}
+	return &pb.UpdateCommentCountRsp{}, nil
+}
+
 func (v VideoService) GetPublishVideoList(ctx context.Context, req *pb.GetPublishVideoListRequest) (*pb.GetPublishVideoListResponse, error) {
 	videos, err := repository.GetVideoListByAuthorId(req.UserID)
 	if err != nil {
+		log.Errorf("GetVideoListByAuthorId err", zap.Error(err))
 		return nil, err
 	}
-	list := &pb.GetPublishVideoListResponse{
-		VideoList: VideoInfo(videos, req.TokenUserId),
+	// 结构体转换
+	videoList := make([]*pb.VideoInfo, 0)
+	for _, video := range videos {
+		videoList = append(videoList, &pb.VideoInfo{
+			Id:            video.Id,
+			AuthorId:      video.AuthorId,
+			PlayUrl:       video.PlayUrl,
+			CoverUrl:      video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			Title:         video.Title,
+		})
 	}
 
-	return list, nil
+	return &pb.GetPublishVideoListResponse{
+		VideoList: videoList,
+	}, nil
 }
 func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequest) (*pb.PublishVideoResponse, error) {
 	client := minioStore.GetMinio()
@@ -41,7 +69,7 @@ func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequ
 	}
 
 	// 生成视频封面（截取第一桢）
-	imageFile, err := GetImageFile(req.SaveFile)
+	imageFile, err := utils.GetImageFile(req.SaveFile)
 
 	if err != nil {
 		return nil, err
@@ -65,13 +93,9 @@ func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListReques
 	// 拿出一批视频
 	videoList, err := repository.GetVideoListByFeed(req.CurrentTime)
 	if err != nil {
+		log.Errorf("GetFeedList|GetVideoListByFeed err:%v", err)
 		return nil, err
 	}
-	//
-	// feed := &pb.GetFeedListResponse{
-	// 	VideoList: VideoInfo(videoList, req.TokenUserId),
-	// }
-
 	nextTime := time.Now().UnixNano() / 1e6
 	if len(videoList) == 20 {
 		nextTime = videoList[len(videoList)-1].PublishTime
@@ -90,19 +114,24 @@ func (v VideoService) GetFeedList(ctx context.Context, req *pb.GetFeedListReques
 			Title:         video.Title,
 		})
 	}
+
 	resp := &pb.GetFeedListResponse{
 		NextTime:  nextTime,
 		VideoList: VideoInfoList,
 	}
+
+	log.Infof("GetFeedList|resp:%+v", resp)
 	return resp, nil
 }
 
+// GetFavoriteVideoList 获取用户喜欢的视频列表
 func (v VideoService) GetFavoriteVideoList(ctx context.Context, req *pb.GetFavoriteVideoListReq) (*pb.GetFavoriteVideoListRsp, error) {
+	// 获取用户喜欢的视频id列表（这个得调用favorite服务处理）
 	resp, err := utils.GetFavoriteSvrClient().GetFavoriteVideoIdList(ctx, &pb.GetFavoriteVideoIdListReq{
 		UserId: req.UserId,
 	})
 	if err != nil {
-		log.Errorf("GetFavoriteVideoIdList err: %v", err)
+		log.Errorf("GetFavoriteVideoList | GetFavoriteVideoIdList err: %v", err)
 		return nil, err
 	}
 
@@ -110,19 +139,21 @@ func (v VideoService) GetFavoriteVideoList(ctx context.Context, req *pb.GetFavor
 		VideoId: resp.VideoIdList,
 	})
 	if err != nil {
-		log.Errorf("GetVideoInfoList err: %v", err)
+		log.Errorf("GetFavoriteVideoList | GetVideoInfoList err: %v", err)
 		return nil, err
 	}
 
 	if videoInfoListRsp == nil {
-		return nil, fmt.Errorf("videoInfoList is nil")
+		return nil, nil
 	}
 
+	// 返回
 	return &pb.GetFavoriteVideoListRsp{
 		VideoList: videoInfoListRsp.VideoInfoList,
 	}, nil
 }
 
+// GetVideoInfoList 通过video_id列表 获取 对应的视频信息
 func (v VideoService) GetVideoInfoList(ctx context.Context, req *pb.GetVideoInfoListReq) (*pb.GetVideoInfoListRsp, error) {
 	videoList, err := repository.GetVideoListByVideoIdList(req.VideoId)
 	if err != nil {
@@ -148,43 +179,44 @@ func (v VideoService) GetVideoInfoList(ctx context.Context, req *pb.GetVideoInfo
 }
 
 func VideoInfo(videoList []repository.Video, userId int64) []*pb.VideoInfo {
-	var err error
-	FollowList := make(map[int64]struct{})
-	favList := make(map[int64]struct{})
-	if userId != int64(0) {
-		FollowList, err = tokenFollowList(userId)
-		if err != nil {
-			return nil
-		}
-		favList, err = tokenFavList(userId)
-		if err != nil {
-			return nil
-		}
-	}
-
-	lists := make([]*pb.VideoInfo, len(videoList))
-	for i, video := range videoList {
-		v := &pb.VideoInfo{
-			Id:            video.Id,
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
-			FavoriteCount: video.FavoriteCount,
-			CommentCount:  video.CommentCount,
-			IsFavorite:    false,
-			// Author:        messageUserInfo(video.Author),
-			Title: video.Title,
-		}
-
-		if _, ok := FollowList[video.AuthorId]; ok {
-			v.Author.IsFollow = true
-		}
-		if _, ok := favList[video.Id]; ok {
-			v.IsFavorite = true
-		}
-
-		lists[i] = v
-	}
-	return lists
+	// var err error
+	// FollowList := make(map[int64]struct{})
+	// favList := make(map[int64]struct{})
+	// if userId != int64(0) {
+	// 	FollowList, err = tokenFollowList(userId)
+	// 	if err != nil {
+	// 		return nil
+	// 	}
+	// 	favList, err = tokenFavList(userId)
+	// 	if err != nil {
+	// 		return nil
+	// 	}
+	// }
+	//
+	// lists := make([]*pb.VideoInfo, len(videoList))
+	// for i, video := range videoList {
+	// 	v := &pb.VideoInfo{
+	// 		Id:            video.Id,
+	// 		PlayUrl:       video.PlayUrl,
+	// 		CoverUrl:      video.CoverUrl,
+	// 		FavoriteCount: video.FavoriteCount,
+	// 		CommentCount:  video.CommentCount,
+	// 		IsFavorite:    false,
+	// 		// Author:        messageUserInfo(video.Author),
+	// 		Title: video.Title,
+	// 	}
+	//
+	// 	if _, ok := FollowList[video.AuthorId]; ok {
+	// 		v.Author.IsFollow = true
+	// 	}
+	// 	if _, ok := favList[video.Id]; ok {
+	// 		v.IsFavorite = true
+	// 	}
+	//
+	// 	lists[i] = v
+	// }
+	// return lists
+	return nil
 }
 
 func tokenFollowList(userId int64) (map[int64]struct{}, error) {
@@ -202,22 +234,22 @@ func tokenFollowList(userId int64) (map[int64]struct{}, error) {
 	return m, nil
 }
 
-func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
-	m := make(map[int64]struct{})
-
-	reply, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName).GetFavoriteVideoList(context.Background(), &pb.GetFavoriteVideoListReq{
-		UserId: tokenUserId,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	list := reply.VideoInfoList
-	for _, v := range list {
-		m[v.Id] = struct{}{}
-	}
-	return m, nil
-}
+// func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
+// 	m := make(map[int64]struct{})
+//
+// 	reply, err := utils.NewFavoriteSvrClient(config.GetGlobalConfig().SvrConfig.FavoriteSvrName).GetFavoriteVideoList(context.Background(), &pb.GetFavoriteVideoListReq{
+// 		UserId: tokenUserId,
+// 	})
+// 	if err != nil {
+// 		return nil, err
+// 	}
+//
+// 	list := reply.VideoInfoList
+// 	for _, v := range list {
+// 		m[v.Id] = struct{}{}
+// 	}
+// 	return m, nil
+// }
 
 // func messageUserInfo(info repository.User) *pb.UserInfo {
 // 	return &pb.UserInfo{
@@ -233,19 +265,3 @@ func tokenFavList(tokenUserId int64) (map[int64]struct{}, error) {
 // 		FavoriteCount:   info.FavCount,
 // 	}
 // }
-
-func GetImageFile(videoPath string) (string, error) {
-	temp := strings.Split(videoPath, "/")
-	videoName := temp[len(temp)-1]
-	b := []byte(videoName)
-	videoName = string(b[:len(b)-3]) + "jpg"
-	picPath := config.GetGlobalConfig().MinioConfig.PicPath
-	picName := filepath.Join(picPath, videoName)
-	cmd := exec.Command("ffmpeg", "-i", videoPath, "-ss", "1", "-f", "image2", "-t", "0.01", "-y", picName)
-	err := cmd.Run()
-	if err != nil {
-		log.Errorf("cmd.Run() failed with %s\n", err)
-		return "", err
-	}
-	return picName, nil
-}

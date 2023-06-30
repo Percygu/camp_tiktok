@@ -30,6 +30,46 @@ type UserService struct {
 	pb.UnimplementedUserServiceServer
 }
 
+// UpdateUserFavoritedCount 更新用户 获赞数，ActionType 1：表示+1 2：-1
+func (u UserService) UpdateUserFavoritedCount(ctx context.Context, req *pb.UpdateUserFavoritedCountReq) (*pb.UpdateUserFavoritedCountRsp, error) {
+	err := repository.UpdateUserFavoritedNum(req.UserId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateUserFavoritedCount err", req.UserId)
+		return nil, err
+	}
+	return &pb.UpdateUserFavoritedCountRsp{}, nil
+}
+
+// UpdateUserFollowCount 更新用户 喜爱的视频数，ActionType 1：表示+1 2：-1
+func (u UserService) UpdateUserFavoriteCount(ctx context.Context, req *pb.UpdateUserFavoriteCountReq) (*pb.UpdateUserFavoriteCountRsp, error) {
+	err := repository.UpdateUserFavoriteNum(req.UserId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateUserFavoriteCount err", req.UserId)
+		return nil, err
+	}
+	return &pb.UpdateUserFavoriteCountRsp{}, nil
+}
+
+// UpdateUserFollowCount 更新用户 关注数，ActionType 1：表示+1 2：-1
+func (u UserService) UpdateUserFollowCount(ctx context.Context, req *pb.UpdateUserFollowCountReq) (*pb.UpdateUserFollowCountRsp, error) {
+	err := repository.UpdateUserFollowNum(req.UserId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateUserFollowCount err", req.UserId)
+		return nil, err
+	}
+	return &pb.UpdateUserFollowCountRsp{}, nil
+}
+
+// UpdateUserFollowerCount 更新用户 粉丝数，ActionType 1：表示+1 2：-1
+func (u UserService) UpdateUserFollowerCount(ctx context.Context, req *pb.UpdateUserFollowerCountReq) (*pb.UpdateUserFollowerCountRsp, error) {
+	err := repository.UpdateUserFollowerNum(req.UserId, req.ActionType)
+	if err != nil {
+		log.Errorf("UpdateUserFollowerCount err", req.UserId)
+		return nil, err
+	}
+	return &pb.UpdateUserFollowerCountRsp{}, nil
+}
+
 func (u UserService) GetUserInfoDict(ctx context.Context, req *pb.GetUserInfoDictRequest) (*pb.GetUserInfoDictResponse, error) {
 	userList, err := repository.GetUserList(req.UserIdList)
 	if err != nil {
@@ -98,9 +138,11 @@ func (u UserService) CacheGetAuthor(ctx context.Context, req *pb.CacheGetAuthorR
 }
 
 func (u UserService) GetUserInfoList(ctx context.Context, request *pb.GetUserInfoListRequest) (response *pb.GetUserInfoListResponse, err error) {
+	response = new(pb.GetUserInfoListResponse)
 	for _, user := range request.IdList {
 		info, err := repository.GetUserInfo(user)
 		if err != nil {
+			log.Errorf("GetUserInfoList err", user)
 			return nil, err
 		}
 		response.UserInfoList = append(response.UserInfoList, UserToUserInfo(info))

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -9,6 +10,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+// DouyinCommentActionResponse CommentAction返回的数据结构
+type DouyinCommentActionResponse struct {
+	StatusCode int32       `json:"status_code"`
+	StatusMsg  string      `json:"status_msg,omitempty"`
+	Comment    *pb.Comment `json:"comment"`
+}
+
+// DouyinCommentListResponse GetCommentList返回的数据结构
+type DouyinCommentListResponse struct {
+	StatusCode  int32         `json:"status_code"`
+	StatusMsg   string        `json:"status_msg,omitempty"`
+	CommentList []*pb.Comment `json:"comment_list,omitempty"`
+}
 
 // 发布评论
 func CommentAction(ctx *gin.Context) {
@@ -34,25 +49,51 @@ func CommentAction(ctx *gin.Context) {
 	videoId, err := strconv.ParseInt(video_id, 10, 64)
 	actionType, err := strconv.ParseInt(actionTypeStr, 10, 64)
 	if err != nil {
-		zap.L().Error("videoId error", zap.Error(err))
+		log.Errorf("actionType error", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-
-	resp, err := utils.GetCommentSvrClient().CommentAction(ctx, &pb.CommentActionReq{
+	// 发布评论
+	commentActionRsp, err := utils.GetCommentSvrClient().CommentAction(ctx, &pb.CommentActionReq{
 		UserId:      tokenUid,
 		VideoId:     videoId,
 		CommentId:   commentId,
 		CommentText: comment_text,
 		ActionType:  actionType,
 	})
-
 	if err != nil {
-		zap.L().Error("comment error", zap.Error(err))
+		log.Errorf("CommentAction error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp)
+
+	// 视频评论数+1
+	_, err = utils.GetVideoSvrClient().UpdateCommentCount(ctx, &pb.UpdateCommentCountReq{
+		VideoId:    videoId,
+		ActionType: actionType,
+	})
+
+	if err != nil {
+		log.Errorf("UpdateCommentCount error : %s", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	// 获取用户详细信息（填充）
+	getUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
+		Id: tokenUid,
+	})
+	if err != nil {
+		log.Errorf("GetUserInfo error : %s", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+	// 填充
+	commentActionRsp.Comment.UserInfo = getUserInfoRsp.UserInfo
+	log.Infof("commentActionRsp.Comment : %+v", commentActionRsp.Comment)
+	response.Success(ctx, "success", &DouyinCommentActionResponse{
+		Comment: commentActionRsp.Comment,
+	})
 }
 
 // 获取评论列表
@@ -72,15 +113,17 @@ func GetCommentList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-
-	resp, err := utils.GetCommentSvrClient().GetCommentList(ctx, &pb.GetCommentListReq{
+	// 获取评论列表（GetCommentList 调用了下游UserSvr 获取了用户信息）
+	getCommentListRsp, err := utils.GetCommentSvrClient().GetCommentList(ctx, &pb.GetCommentListReq{
 		VideoId: videoId,
 	})
-
 	if err != nil {
-		zap.L().Error("commentList error", zap.Error(err))
+		zap.L().Error("GetCommentList error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp)
+
+	response.Success(ctx, "success", &DouyinCommentListResponse{
+		CommentList: getCommentListRsp.CommentList,
+	})
 }

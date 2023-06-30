@@ -10,19 +10,18 @@ import (
 func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
 	db := db.GetDB()
 
-	nowtime := time.Now().Format("01-02")
+	nowTime := time.Now()
 	comment := Comment{
 		UserId:      userId,
 		VideoId:     videoId,
 		CommentText: comment_text,
-		CreateTime:  nowtime,
+		CreateTime:  nowTime,
 	}
 	result := db.Create(&comment)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	log.Infof("commentsvr:%+v", comment)
 	// 评论缓存起来
 	if err := SetCommentCacheInfo(&comment); err != nil {
 		log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
@@ -33,15 +32,15 @@ func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
 
 func CommentDelete(videoId, commentID int64) error {
 	db := db.GetDB()
-	commentTemp := Comment{}
+	comment := Comment{}
 
-	err := db.Model(&Comment{}).Where("comment_id = ?", commentID).Take(&commentTemp).Error
+	err := db.Model(&Comment{}).Where("id = ?", commentID).Take(&comment).Error
 	if err != nil {
 		return err
 	}
 	commentIDStr := strconv.FormatInt(commentID, 10)
 	DelCommentCacheInfo([]string{commentIDStr}, videoId)
-	db.Delete(&commentTemp)
+	db.Delete(&comment)
 	return nil
 }
 
@@ -56,11 +55,12 @@ func CommentList(videoId int64) ([]*Comment, error) {
 		return comments, nil
 	}
 
-	err = db.Where("video_id = ?", videoId).Order("comment_id DESC").Find(&comments).Error
+	err = db.Where("video_id = ?", videoId).Order("id DESC").Find(&comments).Error
 	if err != nil {
 		log.Errorf("get video with %d comment list err:%v", videoId, err)
 		return nil, err
 	}
+
 	for _, comment := range comments {
 		if err := SetCommentCacheInfo(comment); err != nil {
 			log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)

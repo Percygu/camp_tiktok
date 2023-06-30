@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "../pb;pb";
 
+import "common.proto";
+
 // protoc -I . video.proto  --go_out=plugins=grpc:.
 
 service VideoService {
@@ -11,7 +13,33 @@ service VideoService {
   rpc GetFeedList(GetFeedListRequest) returns (GetFeedListResponse);
   rpc GetVideoInfoList(GetVideoInfoListReq) returns (GetVideoInfoListRsp);
   rpc GetFavoriteVideoList(GetFavoriteVideoListReq) returns (GetFavoriteVideoListRsp);
+  // 更新这个视频的获赞数
+  rpc UpdateFavoriteCount(UpdateFavoriteCountReq) returns (UpdateFavoriteCountRsp);
+  // 更新这个视频的评论数
+  rpc UpdateCommentCount(UpdateCommentCountReq) returns (UpdateCommentCountRsp);
 }
+
+// ******************
+message UpdateFavoriteCountReq {
+  int64 video_id = 1;
+  int64 action_type = 2;
+}
+
+message UpdateFavoriteCountRsp {
+  CommonResponse common_rsp = 1;
+}
+// *******************
+
+// 更新这个视频的评论数
+message UpdateCommentCountReq {
+  int64 video_id = 1;
+  int64 action_type = 2;
+}
+
+message UpdateCommentCountRsp {
+  CommonResponse common_rsp = 1;
+}
+// *******************
 
 message GetFavoriteVideoListReq {
   int64 user_id = 1;

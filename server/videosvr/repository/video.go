@@ -7,35 +7,20 @@ import (
 	"videosvr/middleware/db"
 )
 
+// 获取用户自己的视频列表
 func GetVideoListByAuthorId(AuthorId int64) ([]Video, error) {
 	var videos []Video
-	// userSvrClient := utils.NewUserSvrClient(config.GetGlobalConfig().UserSvrName)
-	// reply, err := userSvrClient.GetUserInfo(context.Background(), &pb.GetUserInfoRequest{Id: AuthorId})
-	// if err != nil {
-	// 	return videos, err
-	// }
+
 	db := db.GetDB()
-	err := db.Where("author_id = ?", AuthorId).Order("video_id DESC").Find(&videos).Error
+	err := db.Where("author_id = ?", AuthorId).Order("id DESC").Find(&videos).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return videos, err
 	}
-	// userInfo := reply.UserInfo
-	// for i := range videos {
-	// 	videos[i].Author = User{
-	// 		Id:              userInfo.Id,
-	// 		Name:            userInfo.Name,
-	// 		Follow:          userInfo.FollowCount,
-	// 		Follower:        userInfo.FollowerCount,
-	// 		Avatar:          userInfo.Avatar,
-	// 		BackgroundImage: userInfo.BackgroundImage,
-	// 		Signature:       userInfo.Signature,
-	// 		TotalFav:        userInfo.TotalFavorited,
-	// 		FavCount:        userInfo.FavoriteCount,
-	// 	}
-	// }
+
 	return videos, nil
 }
 
+// 插入视频记录
 func InsertVideo(authorId int64, playUrl, coverUrl, title string) error {
 	video := Video{
 		AuthorId:      authorId,
@@ -54,6 +39,7 @@ func InsertVideo(authorId int64, playUrl, coverUrl, title string) error {
 	return nil
 }
 
+// 获取视频（比如我tiktok 下拉，获取视频）
 func GetVideoListByFeed(currentTime int64) ([]Video, error) {
 	var videos []Video
 	db := db.GetDB()
@@ -92,4 +78,35 @@ func GetVideoListByVideoIdList(videoIdList []int64) ([]Video, error) {
 		return videos, err
 	}
 	return videos, nil
+}
+
+// 视频点赞数+1 或者 -1
+func UpdateFavoriteNum(videoId, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&Video{}).Where("id = ?", videoId).Update("favorite_count", gorm.Expr("favorite_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateCommentNum(videoId, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&Video{}).Where("id = ?", videoId).Update("comment_count", gorm.Expr("comment_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

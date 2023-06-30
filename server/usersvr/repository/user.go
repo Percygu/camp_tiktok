@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
+	"usersvr/log"
 	"usersvr/middleware/cache"
 	"usersvr/middleware/db"
 
@@ -58,7 +59,7 @@ func InsertUser(userName, password string) (*User, error) {
 func GetUserList(userIdList []int64) ([]*User, error) {
 	db := db.GetDB()
 	var users []*User
-	err := db.Where("user_id in ?", userIdList).Find(&users).Error
+	err := db.Where("id in ?", userIdList).Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
@@ -72,14 +73,14 @@ func GetUserInfo(u interface{}) (User, error) {
 	var err error
 	switch u := u.(type) {
 	case int64:
-		user, err = CacheGetUser(u)
-		if err == nil {
-			return user, nil
-		}
-		err = db.Where("user_id = ?", u).Find(&user).Error
+		// user, err = CacheGetUser(u)
+		// if err == nil {
+		// 	return user, nil
+		// }
+		err = db.Where("id = ?", u).First(&user).Error
 
 	case string:
-		err = db.Where("user_name = ?", u).Find(&user).Error
+		err = db.Where("user_name = ?", u).First(&user).Error
 	default:
 		err = errors.New("")
 	}
@@ -87,8 +88,8 @@ func GetUserInfo(u interface{}) (User, error) {
 		return user, errors.New("user error")
 	}
 
-	go CacheSetUser(user)
-	zap.L().Info("get user info", zap.Any("user", user))
+	// go CacheSetUser(user)
+	// log.Infof("get user info", zap.Any("user", user))
 	return user, nil
 }
 
@@ -129,4 +130,70 @@ func CacheHGet(key, mKey string) ([]byte, error) {
 		return []byte{}, errors.New("data is empty")
 	}
 	return data, nil
+}
+
+func UpdateUserFavoritedNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 点赞 else： 取消点赞
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	log.Infof("update user favorited num", zap.Any("userID", userID), zap.Any("num", num))
+	err := db.Model(&User{}).Where("id = ?", userID).Update("total_favorited", gorm.Expr("total_favorited + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateUserFavoriteNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 点赞 else： 取消点赞
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&User{}).Where("id = ?", userID).Update("favorite_count", gorm.Expr("favorite_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateUserFollowNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 关注 else： 取消关注
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	err := db.Model(&User{}).Where("id = ?", userID).Update("follow_count", gorm.Expr("follow_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateUserFollowerNum(userID, updateType int64) error {
+	db := db.GetDB()
+	var num int64
+	// updateType 1: 关注 else： 取消关注
+	if updateType == 1 {
+		num = 1
+	} else {
+		num = -1
+	}
+	log.Infof("update user follower num", zap.Any("userID", userID), zap.Any("updateType", updateType))
+	err := db.Model(&User{}).Where("id = ?", userID).Update("follower_count", gorm.Expr("follower_count + ?", num)).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
