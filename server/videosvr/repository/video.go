@@ -7,6 +7,7 @@ import (
 	"videosvr/middleware/db"
 )
 
+// 获取用户自己的视频列表
 func GetVideoListByAuthorId(AuthorId int64) ([]Video, error) {
 	var videos []Video
 	// userSvrClient := utils.NewUserSvrClient(config.GetGlobalConfig().UserSvrName)
@@ -15,7 +16,7 @@ func GetVideoListByAuthorId(AuthorId int64) ([]Video, error) {
 	// 	return videos, err
 	// }
 	db := db.GetDB()
-	err := db.Where("author_id = ?", AuthorId).Order("video_id DESC").Find(&videos).Error
+	err := db.Where("author_id = ?", AuthorId).Order("id DESC").Find(&videos).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return videos, err
 	}
@@ -36,6 +37,7 @@ func GetVideoListByAuthorId(AuthorId int64) ([]Video, error) {
 	return videos, nil
 }
 
+// 插入视频记录
 func InsertVideo(authorId int64, playUrl, coverUrl, title string) error {
 	video := Video{
 		AuthorId:      authorId,
@@ -54,6 +56,7 @@ func InsertVideo(authorId int64, playUrl, coverUrl, title string) error {
 	return nil
 }
 
+// 获取视频（比如我tiktok 下拉，获取视频）
 func GetVideoListByFeed(currentTime int64) ([]Video, error) {
 	var videos []Video
 	db := db.GetDB()

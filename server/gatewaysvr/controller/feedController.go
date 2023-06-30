@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"gatewaysvr/log"
 	"gatewaysvr/response"
@@ -91,7 +92,18 @@ func Feed(ctx *gin.Context) {
 		videoRsp.Author.IsFollow = isFollowedRsp.IsFollowDict[followUint]
 		var favoriteUint = strconv.FormatInt(tokenId, 10) + "_" + strconv.FormatInt(videoRsp.Id, 10)
 		videoRsp.IsFavorite = isFavoriteVideoRsp.IsFavoriteDict[favoriteUint]
+		resp.VideoList = append(resp.VideoList, videoRsp)
 	}
+
+	bytes, err := json.Marshal(resp)
+	if err != nil {
+		log.Errorf("json.Marshal err %v", err.Error())
+		response.Fail(ctx, fmt.Sprintf("json.Marshal err %v", err.Error()), nil)
+		return
+	}
+
+	log.Info("Feed resp VideoList %v", resp.VideoList)
+	log.Infof("Feed resp json %v", string(bytes))
 
 	response.Success(ctx, "success", resp)
 }

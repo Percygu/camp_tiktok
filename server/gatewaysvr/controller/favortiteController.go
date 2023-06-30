@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -70,6 +71,14 @@ func GetFavoriteList(ctx *gin.Context) {
 	userInfoResp, err := utils.GetUserSvrClient().GetUserInfoList(ctx, &pb.GetUserInfoListRequest{
 		IdList: userIdList,
 	})
+
+	if err != nil {
+		log.Errorf("GetUserInfoList failed, err:%v", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	log.Info(userInfoResp)
 
 	userMap := make(map[int64]*pb.UserInfo)
 	for _, v := range userInfoResp.UserInfoList {

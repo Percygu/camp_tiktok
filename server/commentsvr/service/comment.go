@@ -82,7 +82,7 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 			Id:         comment.Id,
 			UserInfo:   userInfo,
 			Content:    comment.CommentText,
-			CreateDate: comment.CreateTime,
+			CreateDate: fmt.Sprint(comment.CreateTime),
 		}
 		list.CommentList[i] = v
 	}

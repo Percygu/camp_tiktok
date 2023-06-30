@@ -10,12 +10,12 @@ import (
 func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
 	db := db.GetDB()
 
-	nowtime := time.Now().Format("01-02")
+	nowTime := time.Now()
 	comment := Comment{
 		UserId:      userId,
 		VideoId:     videoId,
 		CommentText: comment_text,
-		CreateTime:  nowtime,
+		CreateTime:  nowTime,
 	}
 	result := db.Create(&comment)
 
@@ -35,7 +35,7 @@ func CommentDelete(videoId, commentID int64) error {
 	db := db.GetDB()
 	commentTemp := Comment{}
 
-	err := db.Model(&Comment{}).Where("comment_id = ?", commentID).Take(&commentTemp).Error
+	err := db.Model(&Comment{}).Where("id = ?", commentID).Take(&commentTemp).Error
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func CommentList(videoId int64) ([]*Comment, error) {
 		return comments, nil
 	}
 
-	err = db.Where("video_id = ?", videoId).Order("comment_id DESC").Find(&comments).Error
+	err = db.Where("video_id = ?", videoId).Order("id DESC").Find(&comments).Error
 	if err != nil {
 		log.Errorf("get video with %d comment list err:%v", videoId, err)
 		return nil, err

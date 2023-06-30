@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
@@ -34,12 +35,12 @@ func CommentAction(ctx *gin.Context) {
 	videoId, err := strconv.ParseInt(video_id, 10, 64)
 	actionType, err := strconv.ParseInt(actionTypeStr, 10, 64)
 	if err != nil {
-		zap.L().Error("videoId error", zap.Error(err))
+		log.Errorf("actionType error", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-
-	resp, err := utils.GetCommentSvrClient().CommentAction(ctx, &pb.CommentActionReq{
+	// 发布评论
+	commentActionRsp, err := utils.GetCommentSvrClient().CommentAction(ctx, &pb.CommentActionReq{
 		UserId:      tokenUid,
 		VideoId:     videoId,
 		CommentId:   commentId,
@@ -47,11 +48,30 @@ func CommentAction(ctx *gin.Context) {
 		ActionType:  actionType,
 	})
 
+	// 获取用户详细信息
+
+
 	if err != nil {
-		zap.L().Error("comment error", zap.Error(err))
+		log.Errorf("comment error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
+
+	// 获取用户消息
+	getUserInfoRsp, err := utils.UserSvrClient.GetUserInfo(ctx, &pb.GetUserInfoRequest{
+		Id: tokenUid,
+	})
+	if err != nil {
+		log.Errorf("CommentAction | GetUserInfo error : %s", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	// commentActionRsp.Comment.User = getUserInfoRsp.User
+	// var resp = &DouyinCommentActionResponse{
+	// 	Comment: pb.Comment{}
+	}
+
 	response.Success(ctx, "success", resp)
 }
 
@@ -77,10 +97,24 @@ func GetCommentList(ctx *gin.Context) {
 		VideoId: videoId,
 	})
 
+
+
 	if err != nil {
 		zap.L().Error("commentList error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 	response.Success(ctx, "success", resp)
+}
+
+type DouyinCommentActionResponse struct {
+	StatusCode int32       `json:"status_code"`
+	StatusMsg  string      `json:"status_msg,omitempty"`
+	Comment    *pb.Comment `json:"comment"`
+}
+
+type DouyinCommentListResponse struct {
+	StatusCode  int32      `json:"status_code"`
+	StatusMsg   string     `json:"status_msg,omitempty"`
+	CommentList []*pb.Comment `json:"comment_list,omitempty"`
 }

@@ -58,7 +58,7 @@ func InsertUser(userName, password string) (*User, error) {
 func GetUserList(userIdList []int64) ([]*User, error) {
 	db := db.GetDB()
 	var users []*User
-	err := db.Where("user_id in ?", userIdList).Find(&users).Error
+	err := db.Where("id in ?", userIdList).Find(&users).Error
 	if err != nil {
 		return nil, err
 	}

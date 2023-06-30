@@ -17,7 +17,7 @@ message CommentActionReq {
 }
 
 message CommentActionRsp {
-  CommonResponse common_rsp = 1;
+    Comment comment = 1;
 }
 
 message Comment {

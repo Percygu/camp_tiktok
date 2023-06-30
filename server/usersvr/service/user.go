@@ -98,9 +98,11 @@ func (u UserService) CacheGetAuthor(ctx context.Context, req *pb.CacheGetAuthorR
 }
 
 func (u UserService) GetUserInfoList(ctx context.Context, request *pb.GetUserInfoListRequest) (response *pb.GetUserInfoListResponse, err error) {
+	response = new(pb.GetUserInfoListResponse)
 	for _, user := range request.IdList {
 		info, err := repository.GetUserInfo(user)
 		if err != nil {
+			log.Errorf("GetUserInfoList err", user)
 			return nil, err
 		}
 		response.UserInfoList = append(response.UserInfoList, UserToUserInfo(info))
