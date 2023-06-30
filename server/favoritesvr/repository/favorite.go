@@ -67,16 +67,6 @@ func GetFavoriteIdList(uid int64) ([]int64, error) {
 	}
 
 	return videoIDList, nil
-	// videoSvrClient := utils.GetVideoSvrClient()
-	// if videoSvrClient == nil {
-	// 	return nil, fmt.Errorf("videoSvrClient is nil")
-	// }
-	// getVideoInfoListReq := &pb.GetVideoInfoListReq{VideoId: videoIDList}
-	// videoInfoListRsp, err := videoSvrClient.GetVideoInfoList(context.Background(), getVideoInfoListReq)
-	// if videoInfoListRsp == nil {
-	// 	return nil, fmt.Errorf("videoInfoList is nil")
-	// }
-	// return videoInfoListRsp.VideoInfoList, nil
 }
 
 // IsFavoriteVideo 判断是否点赞这个视频

@@ -20,8 +20,8 @@ type DouyinCommentActionResponse struct {
 
 // DouyinCommentListResponse GetCommentList返回的数据结构
 type DouyinCommentListResponse struct {
-	StatusCode  int32      `json:"status_code"`
-	StatusMsg   string     `json:"status_msg,omitempty"`
+	StatusCode  int32         `json:"status_code"`
+	StatusMsg   string        `json:"status_msg,omitempty"`
 	CommentList []*pb.Comment `json:"comment_list,omitempty"`
 }
 
@@ -61,32 +61,27 @@ func CommentAction(ctx *gin.Context) {
 		CommentText: comment_text,
 		ActionType:  actionType,
 	})
-
-	// 获取用户详细信息
-
-
 	if err != nil {
-		log.Errorf("comment error : %s", err)
+		log.Errorf("CommentAction error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 
-	// 获取用户消息
+	// 获取用户详细信息
 	getUserInfoRsp, err := utils.UserSvrClient.GetUserInfo(ctx, &pb.GetUserInfoRequest{
 		Id: tokenUid,
 	})
 	if err != nil {
-		log.Errorf("CommentAction | GetUserInfo error : %s", err)
+		log.Errorf("GetUserInfo error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
+	// 填充
+	commentActionRsp.Comment.UserInfo = getUserInfoRsp.UserInfo
 
-	// commentActionRsp.Comment.User = getUserInfoRsp.User
-	// var resp = &DouyinCommentActionResponse{
-	// 	Comment: pb.Comment{}
-	}
-
-	response.Success(ctx, "success", resp)
+	response.Success(ctx, "success", &DouyinCommentActionResponse{
+		Comment: commentActionRsp.Comment,
+	})
 }
 
 // 获取评论列表
@@ -106,18 +101,17 @@ func GetCommentList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-
-	resp, err := utils.GetCommentSvrClient().GetCommentList(ctx, &pb.GetCommentListReq{
+	// 获取评论列表（GetCommentList 调用了下游UserSvr 获取了用户信息）
+	getCommentListRsp, err := utils.GetCommentSvrClient().GetCommentList(ctx, &pb.GetCommentListReq{
 		VideoId: videoId,
 	})
-
-
-
 	if err != nil {
-		zap.L().Error("commentList error", zap.Error(err))
+		zap.L().Error("GetCommentList error", zap.Error(err))
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp)
-}
 
+	response.Success(ctx, "success", &DouyinCommentListResponse{
+		CommentList: getCommentListRsp.CommentList,
+	})
+}

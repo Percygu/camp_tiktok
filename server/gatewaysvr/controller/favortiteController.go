@@ -6,7 +6,6 @@ import (
 	"gatewaysvr/utils"
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type FavActionParams struct {
@@ -21,24 +20,38 @@ type FavListParams struct {
 	UserId int64  `form:"user_id" binding:"required"`
 }
 
+// DouyinFavoriteListResponse  GetFavoriteList返回的结构体
+type DouyinFavoriteListResponse struct {
+	StatusCode int32    `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code"`
+	StatusMsg  string   `protobuf:"bytes,2,opt,name=status_msg,json=statusMsg,proto3" json:"status_msg,omitempty"`
+	VideoList  []*Video `protobuf:"bytes,3,rep,name=video_list,json=videoList,proto3" json:"video_list,omitempty"`
+}
+type Video struct {
+	Id            int64        `json:"id"`
+	Author        *pb.UserInfo `json:"author"`
+	PlayUrl       string       `json:"play_url"`
+	CoverUrl      string       `json:"cover_url"`
+	FavoriteCount int64        `json:"favorite_count"`
+	CommentCount  int64        `json:"comment_count"`
+	IsFavorite    bool         `json:"is_favorite"`
+	Title         string       `json:"title"`
+}
+
+// *******************************************
+
 // 点赞视频
 func FavoriteAction(ctx *gin.Context) {
 	var favInfo FavActionParams
 	err := ctx.ShouldBindQuery(&favInfo)
 	if err != nil {
+		log.Errorf("ShouldBindQuery failed, err:%v", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 	tokenUidStr, _ := ctx.Get("UserId")
 	tokenUid := tokenUidStr.(int64)
-
-	if err != nil {
-		zap.L().Error("token error", zap.Error(err))
-		response.Fail(ctx, err.Error(), nil)
-		return
-	}
-
-	resp, err := utils.GetFavoriteSvrClient().FavoriteAction(ctx, &pb.FavoriteActionReq{
+	// 这里只是插入了一条favorite记录，没有更新video表的favorite_count，还有对应视频作者的favorite_count
+	_, err = utils.GetFavoriteSvrClient().FavoriteAction(ctx, &pb.FavoriteActionReq{
 		UserId:     tokenUid,
 		VideoId:    favInfo.VideoId,
 		ActionType: int64(favInfo.ActionType),
@@ -48,7 +61,7 @@ func FavoriteAction(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp)
+	response.Success(ctx, "success", nil)
 }
 
 // 获取点赞列表
@@ -119,21 +132,4 @@ func GetFavoriteList(ctx *gin.Context) {
 	response.Success(ctx, "success", &DouyinFavoriteListResponse{
 		VideoList: videoList,
 	})
-}
-
-type Video struct {
-	Id            int64        `json:"id"`
-	Author        *pb.UserInfo `json:"author"`
-	PlayUrl       string       `json:"play_url"`
-	CoverUrl      string       `json:"cover_url"`
-	FavoriteCount int64        `json:"favorite_count"`
-	CommentCount  int64        `json:"comment_count"`
-	IsFavorite    bool         `json:"is_favorite"`
-	Title         string       `json:"title"`
-}
-
-type DouyinFavoriteListResponse struct {
-	StatusCode int32    `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code"`
-	StatusMsg  string   `protobuf:"bytes,2,opt,name=status_msg,json=statusMsg,proto3" json:"status_msg,omitempty"`
-	VideoList  []*Video `protobuf:"bytes,3,rep,name=video_list,json=videoList,proto3" json:"video_list,omitempty"`
 }
