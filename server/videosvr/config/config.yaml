@@ -1,7 +1,7 @@
 svr_config:
     name: "videosvr"
     host: "43.139.192.217"
-    port: 8001
+    port: 8004
     relation_svr_name: "relationsvr"
     favorite_svr_name: "favoritesvr"
 
@@ -39,6 +39,6 @@ minio:
   secret_access_key: "zL64rIU04CrS0KqDBrTtmgW3WZYZaxQpYSNSNEzs"
   video_buckets: video
   pic_buckets: pic
-  video_path: "/root/tiktok/store/video"
-  pic_path: "/root/tiktok/store/pic"
+  video_path: "/root/tiktok/video"
+  pic_path: "/root/tiktok/pic"
 

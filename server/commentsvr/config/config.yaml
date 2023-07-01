@@ -1,7 +1,7 @@
 svr_config:
   name: "commentsvr"
   host: "43.139.192.217"
-  port: "8005"
+  port: "8002"
   user_svr_name: "usersvr"
 
 
