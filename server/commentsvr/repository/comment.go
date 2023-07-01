@@ -48,7 +48,7 @@ func CommentList(videoId int64) ([]*Comment, error) {
 	var comments []*Comment
 	db := db.GetDB()
 	var err error
-	comments, err = GetCommentCacheList(videoId)
+	// comments, err = GetCommentCacheList(videoId)
 	log.Infof("comments-------------------------:%+v\n", comments)
 
 	if len(comments) != 0 {
@@ -60,15 +60,15 @@ func CommentList(videoId int64) ([]*Comment, error) {
 		log.Errorf("get video with %d comment list err:%v", videoId, err)
 		return nil, err
 	}
-
-	for _, comment := range comments {
-		if err := SetCommentCacheInfo(comment); err != nil {
-			log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
-			DelCacheCommentAll(videoId)
-			return comments, nil
-		}
-	}
-	log.Infof("comments:%+v", comments)
+	//
+	// for _, comment := range comments {
+	// 	if err := SetCommentCacheInfo(comment); err != nil {
+	// 		log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
+	// 		DelCacheCommentAll(videoId)
+	// 		return comments, nil
+	// 	}
+	// }
+	// log.Infof("comments:%+v", comments)
 
 	return comments, nil
 }

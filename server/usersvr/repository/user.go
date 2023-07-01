@@ -78,14 +78,14 @@ func GetUserInfo(u interface{}) (User, error) {
 		// 	return user, nil
 		// }
 		err = db.Where("id = ?", u).First(&user).Error
-
 	case string:
 		err = db.Where("user_name = ?", u).First(&user).Error
 	default:
 		err = errors.New("")
 	}
+
 	if err != nil {
-		return user, errors.New("user error")
+		return user, err
 	}
 
 	// go CacheSetUser(user)

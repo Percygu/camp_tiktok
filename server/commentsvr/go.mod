@@ -3,7 +3,7 @@ module commentsvr
 go 1.19
 
 require (
-	github.com/Percygu/camp_tiktok v1.0.30
+	github.com/Percygu/camp_tiktok v1.0.31
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/hashicorp/consul/api v1.22.0
 	github.com/mbobakov/grpc-consul-resolver v1.5.2

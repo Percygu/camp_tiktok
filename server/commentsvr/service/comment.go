@@ -24,7 +24,7 @@ func (c CommentService) CommentAction(ctx context.Context, req *pb.CommentAction
 		}
 		return &pb.CommentActionRsp{Comment: &pb.Comment{
 			Id:         comment.Id,
-			UserInfo:   nil,
+			User:       nil,
 			Content:    comment.CommentText,
 			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
 		}}, nil
@@ -44,13 +44,13 @@ func (c CommentService) CommentAction(ctx context.Context, req *pb.CommentAction
 func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentListReq) (*pb.GetCommentListRsp, error) {
 	comments, err := repository.CommentList(req.VideoId)
 	if err != nil {
+		log.Errorf("GetCommentList|CommentList err:%v", err)
 		return nil, err
 	}
-	log.Infof("comments:%v\n", comments)
 
 	userIDList := make([]int64, len(comments))
-	for _, comment := range comments {
-		userIDList = append(userIDList, comment.UserId)
+	for i, comment := range comments {
+		userIDList[i] = comment.UserId
 	}
 
 	userInfoListRsp, err := utils.GetUserSvrClient().GetUserInfoList(context.Background(), &pb.GetUserInfoListRequest{
@@ -74,7 +74,7 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 		userInfo := uerMap[comment.UserId]
 		v := &pb.Comment{
 			Id:         comment.Id,
-			UserInfo:   userInfo,
+			User:       userInfo,
 			Content:    comment.CommentText,
 			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
 		}

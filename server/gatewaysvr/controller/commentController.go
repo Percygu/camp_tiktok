@@ -89,8 +89,8 @@ func CommentAction(ctx *gin.Context) {
 		return
 	}
 	// 填充
-	commentActionRsp.Comment.UserInfo = getUserInfoRsp.UserInfo
-	log.Infof("commentActionRsp.Comment : %+v", commentActionRsp.Comment)
+	commentActionRsp.Comment.User = getUserInfoRsp.UserInfo
+	// log.Infof("commentActionRsp.Comment : %+v", commentActionRsp.Comment)
 	response.Success(ctx, "success", &DouyinCommentActionResponse{
 		Comment: commentActionRsp.Comment,
 	})
