@@ -1,3 +1,4 @@
+FROM zhugeqing/golang:1.19  AS builder
 WORKDIR /app
 MAINTAINER 诸葛青
 COPY . .
