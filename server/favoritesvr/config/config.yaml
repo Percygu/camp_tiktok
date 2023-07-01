@@ -1,7 +1,7 @@
 svr_config:
   name: "favoritesvr"
   host: "43.139.192.217"
-  port: "8004"
+  port: 8003
   user_svr_name: "usersvr"
   video_svr_name: "videosvr"
 
