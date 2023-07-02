@@ -6,6 +6,7 @@ import (
 	"commentsvr/repository"
 	"commentsvr/utils"
 	"context"
+
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 )
 
@@ -16,18 +17,25 @@ type CommentService struct {
 func (c CommentService) CommentAction(ctx context.Context, req *pb.CommentActionReq) (*pb.CommentActionRsp, error) {
 	// 增加评论
 	if req.ActionType == 1 {
-		// commentInfo, err := repository.CommentAdd(userId, videoId, comment_text)
 		comment, err := repository.CommentAdd(req.UserId, req.VideoId, req.CommentText)
 		if err != nil {
 			log.Errorf("CommentAction|CommentAdd err:%v", err)
 			return nil, err
 		}
-		return &pb.CommentActionRsp{Comment: &pb.Comment{
+		getUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
+			Id: req.UserId,
+		})
+		if err != nil {
+			log.Errorf("CommentAction|GetUserInfo err %v", err)
+			return nil, err
+		}
+		result := &pb.CommentActionRsp{Comment: &pb.Comment{
 			Id:         comment.Id,
-			User:       nil,
+			User:       getUserInfoRsp.UserInfo,
 			Content:    comment.CommentText,
 			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
-		}}, nil
+		}}
+		return result, nil
 
 	} else {
 		// 删除评论
@@ -79,6 +87,7 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
 		}
 		list.CommentList[i] = v
+		log.Infof("commentsvr|comment====%+v", v)
 	}
 	return list, nil
 }

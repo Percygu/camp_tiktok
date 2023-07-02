@@ -23,9 +23,9 @@ func CommentAdd(userId, videoId int64, comment_text string) (*Comment, error) {
 		return nil, result.Error
 	}
 	// 评论缓存起来
-	if err := SetCommentCacheInfo(&comment); err != nil {
-		log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
-	}
+	// if err := SetCommentCacheInfo(&comment); err != nil {
+	// 	log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
+	// }
 
 	return &comment, nil
 }
@@ -60,7 +60,7 @@ func CommentList(videoId int64) ([]*Comment, error) {
 		log.Errorf("get video with %d comment list err:%v", videoId, err)
 		return nil, err
 	}
-	//
+
 	// for _, comment := range comments {
 	// 	if err := SetCommentCacheInfo(comment); err != nil {
 	// 		log.Errorf("CommentAdd|SetCommentCacheInfo err:%v", err)
@@ -68,7 +68,10 @@ func CommentList(videoId int64) ([]*Comment, error) {
 	// 		return comments, nil
 	// 	}
 	// }
-	// log.Infof("comments:%+v", comments)
+	for _, comment := range comments {
+		log.Infof("comment == %+v", comment)
+	}
+	log.Infof("comments:%+v", comments)
 
 	return comments, nil
 }

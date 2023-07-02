@@ -4,9 +4,10 @@ import (
 	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
+	"strconv"
+
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -123,7 +124,9 @@ func GetCommentList(ctx *gin.Context) {
 		return
 	}
 
-	response.Success(ctx, "success", &DouyinCommentListResponse{
+	result := &DouyinCommentListResponse{
 		CommentList: getCommentListRsp.CommentList,
-	})
+	}
+
+	response.Success(ctx, "success", result)
 }

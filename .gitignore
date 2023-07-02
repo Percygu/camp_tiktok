@@ -2,4 +2,6 @@
 server/usersvr/*.log
 *.log
 server/gatewaysvr/error_gateway.log
+server/*/bin/*
+
 

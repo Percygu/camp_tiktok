@@ -21,7 +21,8 @@ mysql:
 
 log:
   level: "debug"
-  filename: "video.log"
+  file_name: "video.log"
+  log_path: "../../log/videosvr/"
   max_size: 200
   max_age: 30
   max_backups: 7
