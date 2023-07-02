@@ -3,5 +3,7 @@ server/usersvr/*.log
 *.log
 server/gatewaysvr/error_gateway.log
 server/*/bin/*
+server/*/script/*.pid
+server/favoritesvr/script/favoritesvr.pid
 
 
