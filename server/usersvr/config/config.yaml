@@ -40,7 +40,7 @@ mysql:
 
 log:
   level: "debug"
-  filen_name: "usersvr.log"
+  file_name: "usersvr.log"
   log_path: "../../log/usersvr/"
   max_size: 200
   max_age: 30

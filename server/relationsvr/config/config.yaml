@@ -22,7 +22,7 @@ mysql:
 log:
   level: "debug"
   file_name: "relationsvr.log"
-  log_path: "../../log/grelationsvr/"
+  log_path: "../../log/relationsvr/"
   max_size: 200
   max_age: 30
   max_backups: 7
