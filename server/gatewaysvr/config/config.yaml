@@ -12,7 +12,8 @@ svr_config:
 
 log:
   level: "debug"
-  file_name: "gateway.log"
+  file_name: "gatewaysvr.log"
+  log_path: "../../log/gatewaysvr/"
   max_size: 200
   max_age: 30
   max_backups: 7
