@@ -6,6 +6,7 @@ import (
 	"commentsvr/repository"
 	"commentsvr/utils"
 	"context"
+
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 )
 
@@ -16,18 +17,25 @@ type CommentService struct {
 func (c CommentService) CommentAction(ctx context.Context, req *pb.CommentActionReq) (*pb.CommentActionRsp, error) {
 	// 增加评论
 	if req.ActionType == 1 {
-		// commentInfo, err := repository.CommentAdd(userId, videoId, comment_text)
 		comment, err := repository.CommentAdd(req.UserId, req.VideoId, req.CommentText)
 		if err != nil {
 			log.Errorf("CommentAction|CommentAdd err:%v", err)
 			return nil, err
 		}
-		return &pb.CommentActionRsp{Comment: &pb.Comment{
+		getUserInfoRsp, err := utils.GetUserSvrClient().GetUserInfo(ctx, &pb.GetUserInfoRequest{
+			Id: req.UserId,
+		})
+		if err != nil {
+			log.Errorf("CommentAction|GetUserInfo err %v", err)
+			return nil, err
+		}
+		result := &pb.CommentActionRsp{Comment: &pb.Comment{
 			Id:         comment.Id,
-			UserInfo:   nil,
+			User:       getUserInfoRsp.UserInfo,
 			Content:    comment.CommentText,
 			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
-		}}, nil
+		}}
+		return result, nil
 
 	} else {
 		// 删除评论
@@ -44,13 +52,13 @@ func (c CommentService) CommentAction(ctx context.Context, req *pb.CommentAction
 func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentListReq) (*pb.GetCommentListRsp, error) {
 	comments, err := repository.CommentList(req.VideoId)
 	if err != nil {
+		log.Errorf("GetCommentList|CommentList err:%v", err)
 		return nil, err
 	}
-	log.Infof("comments:%v\n", comments)
 
 	userIDList := make([]int64, len(comments))
-	for _, comment := range comments {
-		userIDList = append(userIDList, comment.UserId)
+	for i, comment := range comments {
+		userIDList[i] = comment.UserId
 	}
 
 	userInfoListRsp, err := utils.GetUserSvrClient().GetUserInfoList(context.Background(), &pb.GetUserInfoListRequest{
@@ -74,11 +82,12 @@ func (c CommentService) GetCommentList(ctx context.Context, req *pb.GetCommentLi
 		userInfo := uerMap[comment.UserId]
 		v := &pb.Comment{
 			Id:         comment.Id,
-			UserInfo:   userInfo,
+			User:       userInfo,
 			Content:    comment.CommentText,
 			CreateDate: comment.CreateTime.Format(constant.DefaultTime),
 		}
 		list.CommentList[i] = v
+		log.Infof("commentsvr|comment====%+v", v)
 	}
 	return list, nil
 }

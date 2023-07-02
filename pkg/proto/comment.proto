@@ -21,7 +21,7 @@ message CommentActionRsp {
 
 message Comment {
   int64 id = 1; // 视频评论id​
-  UserInfo user_info = 2; // 评论用户信息​
+  UserInfo user = 2; // 评论用户信息​
   string content = 3; // 评论内容
   string create_date = 4; // 评论发布日期，格式 mm-dd​
 }

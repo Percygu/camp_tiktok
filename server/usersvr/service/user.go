@@ -137,12 +137,13 @@ func (u UserService) CacheGetAuthor(ctx context.Context, req *pb.CacheGetAuthorR
 	return &pb.CacheGetAuthorRsp{UserId: uid}, nil
 }
 
-func (u UserService) GetUserInfoList(ctx context.Context, request *pb.GetUserInfoListRequest) (response *pb.GetUserInfoListResponse, err error) {
-	response = new(pb.GetUserInfoListResponse)
-	for _, user := range request.IdList {
-		info, err := repository.GetUserInfo(user)
+func (u UserService) GetUserInfoList(ctx context.Context, req *pb.GetUserInfoListRequest) (*pb.GetUserInfoListResponse, error) {
+	response := new(pb.GetUserInfoListResponse)
+	log.Infof("GetUserInfoList req", req.IdList)
+	for _, userId := range req.IdList {
+		info, err := repository.GetUserInfo(userId)
 		if err != nil {
-			log.Errorf("GetUserInfoList err", user)
+			log.Errorf("GetUserInfoList err", userId, err)
 			return nil, err
 		}
 		response.UserInfoList = append(response.UserInfoList, UserToUserInfo(info))

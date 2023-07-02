@@ -4,9 +4,10 @@ import (
 	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
+	"strconv"
+
 	"github.com/Percygu/camp_tiktok/pkg/pb"
 	"go.uber.org/zap"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -89,8 +90,8 @@ func CommentAction(ctx *gin.Context) {
 		return
 	}
 	// 填充
-	commentActionRsp.Comment.UserInfo = getUserInfoRsp.UserInfo
-	log.Infof("commentActionRsp.Comment : %+v", commentActionRsp.Comment)
+	commentActionRsp.Comment.User = getUserInfoRsp.UserInfo
+	// log.Infof("commentActionRsp.Comment : %+v", commentActionRsp.Comment)
 	response.Success(ctx, "success", &DouyinCommentActionResponse{
 		Comment: commentActionRsp.Comment,
 	})
@@ -123,7 +124,9 @@ func GetCommentList(ctx *gin.Context) {
 		return
 	}
 
-	response.Success(ctx, "success", &DouyinCommentListResponse{
+	result := &DouyinCommentListResponse{
 		CommentList: getCommentListRsp.CommentList,
-	})
+	}
+
+	response.Success(ctx, "success", result)
 }
