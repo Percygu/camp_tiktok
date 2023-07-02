@@ -21,7 +21,8 @@ mysql:
 
 log:
   level: "debug"
-  filename: "comment.log"
+  file_name: "commentsvr.log"
+  log_path: "../../log/commentsvr/"
   max_size: 200
   max_age: 30
   max_backups: 7
