@@ -23,6 +23,7 @@ mysql:
 log:
   level: "debug"
   log_path: "../../log/favoritesvr/"
+  file_name: "favoritesvr.log"
   max_size: 200
   max_age: 30
   max_backups: 7

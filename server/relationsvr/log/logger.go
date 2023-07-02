@@ -3,7 +3,6 @@ package log
 import (
 	"os"
 	"relationsvr/config"
-	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -34,25 +33,23 @@ func InitLog() {
 			return lev < zap.ErrorLevel && lev >= zap.InfoLevel
 		}
 	})
-	currentTime := time.Now()
-	now := currentTime.Format("200601021504")
 	// info文件writeSyncer
 	logConfig := config.GetGlobalConfig().LogConfig
 	infoFileWriteSyncer := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   logConfig.LogPath + "info_" + now + "_" + logConfig.Filename, // 日志文件存放目录，
-		MaxSize:    logConfig.MaxSize,                                            // 文件大小限制,单位MB
-		MaxBackups: logConfig.MaxBackups,                                         // 最大保留日志文件数量
-		MaxAge:     logConfig.MaxAge,                                             // 日志文件保留天数
-		Compress:   false,                                                        // 是否压缩处理
+		Filename:   logConfig.LogPath + "info_" + "_" + logConfig.FileName, // 日志文件存放目录，
+		MaxSize:    logConfig.MaxSize,                                      // 文件大小限制,单位MB
+		MaxBackups: logConfig.MaxBackups,                                   // 最大保留日志文件数量
+		MaxAge:     logConfig.MaxAge,                                       // 日志文件保留天数
+		Compress:   false,                                                  // 是否压缩处理
 	})
 	infoFileCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(infoFileWriteSyncer, zapcore.AddSync(os.Stdout)), lowPriority)
 	// error文件writeSyncer
 	errorFileWriteSyncer := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   logConfig.LogPath + "error_" + now + "_" + logConfig.Filename, // 日志文件存放目录
-		MaxSize:    logConfig.MaxSize,                                             // 文件大小限制,单位MB
-		MaxBackups: logConfig.MaxBackups,                                          // 最大保留日志文件数量
-		MaxAge:     logConfig.MaxAge,                                              // 日志文件保留天数
-		Compress:   false,                                                         // 是否压缩处理
+		Filename:   logConfig.LogPath + "error_" + "_" + logConfig.FileName, // 日志文件存放目录
+		MaxSize:    logConfig.MaxSize,                                       // 文件大小限制,单位MB
+		MaxBackups: logConfig.MaxBackups,                                    // 最大保留日志文件数量
+		MaxAge:     logConfig.MaxAge,                                        // 日志文件保留天数
+		Compress:   false,                                                   // 是否压缩处理
 	})
 	errorFileCore := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(errorFileWriteSyncer, zapcore.AddSync(os.Stdout)), highPriority)
 
