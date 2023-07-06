@@ -55,6 +55,7 @@ type RedisConfig struct {
 type LogConfig struct {
 	Level      string `mapstructure:"level"`
 	LogPath    string `mapstructure:"log_path"`
+	FileName   string `mapstructure:"file_name"`
 	MaxSize    int    `mapstructure:"max_size"`
 	MaxAge     int    `mapstructure:"max_age"`
 	MaxBackups int    `mapstructure:"max_backups"`
