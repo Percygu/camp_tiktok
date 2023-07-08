@@ -5,8 +5,6 @@ FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for comments
 -- ----------------------------
-CREATE DATABASE camps_tiktok;
-
 USE camps_tiktok;
 
 DROP TABLE IF EXISTS `t_comment`;
@@ -83,7 +81,7 @@ CREATE TABLE `t_video`
     `cover_url`    varchar(255) NOT NULL COMMENT '封面url',
     `favorite_count` bigint(20) NOT NULL DEFAULT 0 COMMENT '视频的点赞数量',
     `comment_count` bigint(20) NOT NULL DEFAULT 0 COMMENT '视频的评论数量',
-    `publish_time` datetime     NOT NULL COMMENT '发布时间戳',
+    `publish_time` bigint(20)     NOT NULL COMMENT '发布时间戳',
     `title`        varchar(255) DEFAULT NULL COMMENT '视频名称',
     PRIMARY KEY (`id`),
     KEY            `time` (`publish_time`) USING BTREE,

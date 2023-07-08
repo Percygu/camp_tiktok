@@ -65,6 +65,7 @@ func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequ
 	videoUrl, err := client.UploadFile("video", req.SaveFile, strconv.FormatInt(req.UserId, 10))
 	log.Infof("save file: %v", req.SaveFile)
 	if err != nil {
+		log.Errorf("UploadFile err", zap.Error(err))
 		return nil, err
 	}
 
@@ -72,18 +73,19 @@ func (v VideoService) PublishVideo(ctx context.Context, req *pb.PublishVideoRequ
 	imageFile, err := utils.GetImageFile(req.SaveFile)
 
 	if err != nil {
+		log.Errorf("GetImageFile err", zap.Error(err))
 		return nil, err
 	}
 
-	log.Infof("imageFile", zap.String("imageFile", imageFile))
-
 	picUrl, err := client.UploadFile("pic", imageFile, strconv.FormatInt(req.UserId, 10))
 	if err != nil {
+		log.Errorf("UploadFile err", zap.Error(err))
 		picUrl = "https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7909abe413ec4a1e82032d2beb810157~tplv-k3u1fbpfcp-zoom-in-crop-mark:1304:0:0:0.awebp?"
 	}
 
 	err = repository.InsertVideo(req.UserId, videoUrl, picUrl, req.Title)
 	if err != nil {
+		log.Errorf("InsertVideo err", zap.Error(err))
 		return nil, err
 	}
 	return &pb.PublishVideoResponse{}, nil
