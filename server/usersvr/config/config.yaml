@@ -32,7 +32,7 @@ redsync:
     PoolSize: 10
 
 mysql:
-  host: "121.43.102.177"
+  host: "43.139.192.217"
   port: "8086"
   database: "camps_tiktok"
   username: "root"

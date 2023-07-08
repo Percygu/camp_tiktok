@@ -7,13 +7,13 @@ svr_config:
 
 redis:
   host: "43.139.192.217"
-  password: "123456"
+  password: ""
   db: 0
   port: 6379
   PoolSize: 10
 
 mysql:
-  host: "121.43.102.177"
+  host: "43.139.192.217"
   port: "8086"
   database: "camps_tiktok"
   username: "root"
@@ -36,8 +36,8 @@ consul:
 minio:
   host: "43.139.192.217"
   port: "9000"
-  access_key_id: "xTqFWI3gfobE66smemuR"
-  secret_access_key: "zL64rIU04CrS0KqDBrTtmgW3WZYZaxQpYSNSNEzs"
+  access_key_id: "lsVmcz8Ahat4GoMP39y0"
+  secret_access_key: "PSThm9hSaHUNQ2xoItGji4IBIzD3JhJQfrt3kecG"
   video_buckets: video
   pic_buckets: pic
   video_path: "/root/tiktok/video"
