@@ -24,6 +24,8 @@ const (
 	VideoService_GetFeedList_FullMethodName          = "/VideoService/GetFeedList"
 	VideoService_GetVideoInfoList_FullMethodName     = "/VideoService/GetVideoInfoList"
 	VideoService_GetFavoriteVideoList_FullMethodName = "/VideoService/GetFavoriteVideoList"
+	VideoService_UpdateFavoriteCount_FullMethodName  = "/VideoService/UpdateFavoriteCount"
+	VideoService_UpdateCommentCount_FullMethodName   = "/VideoService/UpdateCommentCount"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -36,6 +38,10 @@ type VideoServiceClient interface {
 	GetFeedList(ctx context.Context, in *GetFeedListRequest, opts ...grpc.CallOption) (*GetFeedListResponse, error)
 	GetVideoInfoList(ctx context.Context, in *GetVideoInfoListReq, opts ...grpc.CallOption) (*GetVideoInfoListRsp, error)
 	GetFavoriteVideoList(ctx context.Context, in *GetFavoriteVideoListReq, opts ...grpc.CallOption) (*GetFavoriteVideoListRsp, error)
+	// 更新这个视频的获赞数
+	UpdateFavoriteCount(ctx context.Context, in *UpdateFavoriteCountReq, opts ...grpc.CallOption) (*UpdateFavoriteCountRsp, error)
+	// 更新这个视频的评论数
+	UpdateCommentCount(ctx context.Context, in *UpdateCommentCountReq, opts ...grpc.CallOption) (*UpdateCommentCountRsp, error)
 }
 
 type videoServiceClient struct {
@@ -91,6 +97,24 @@ func (c *videoServiceClient) GetFavoriteVideoList(ctx context.Context, in *GetFa
 	return out, nil
 }
 
+func (c *videoServiceClient) UpdateFavoriteCount(ctx context.Context, in *UpdateFavoriteCountReq, opts ...grpc.CallOption) (*UpdateFavoriteCountRsp, error) {
+	out := new(UpdateFavoriteCountRsp)
+	err := c.cc.Invoke(ctx, VideoService_UpdateFavoriteCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *videoServiceClient) UpdateCommentCount(ctx context.Context, in *UpdateCommentCountReq, opts ...grpc.CallOption) (*UpdateCommentCountRsp, error) {
+	out := new(UpdateCommentCountRsp)
+	err := c.cc.Invoke(ctx, VideoService_UpdateCommentCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations should embed UnimplementedVideoServiceServer
 // for forward compatibility
@@ -101,6 +125,10 @@ type VideoServiceServer interface {
 	GetFeedList(context.Context, *GetFeedListRequest) (*GetFeedListResponse, error)
 	GetVideoInfoList(context.Context, *GetVideoInfoListReq) (*GetVideoInfoListRsp, error)
 	GetFavoriteVideoList(context.Context, *GetFavoriteVideoListReq) (*GetFavoriteVideoListRsp, error)
+	// 更新这个视频的获赞数
+	UpdateFavoriteCount(context.Context, *UpdateFavoriteCountReq) (*UpdateFavoriteCountRsp, error)
+	// 更新这个视频的评论数
+	UpdateCommentCount(context.Context, *UpdateCommentCountReq) (*UpdateCommentCountRsp, error)
 }
 
 // UnimplementedVideoServiceServer should be embedded to have forward compatible implementations.
@@ -121,6 +149,12 @@ func (UnimplementedVideoServiceServer) GetVideoInfoList(context.Context, *GetVid
 }
 func (UnimplementedVideoServiceServer) GetFavoriteVideoList(context.Context, *GetFavoriteVideoListReq) (*GetFavoriteVideoListRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFavoriteVideoList not implemented")
+}
+func (UnimplementedVideoServiceServer) UpdateFavoriteCount(context.Context, *UpdateFavoriteCountReq) (*UpdateFavoriteCountRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFavoriteCount not implemented")
+}
+func (UnimplementedVideoServiceServer) UpdateCommentCount(context.Context, *UpdateCommentCountReq) (*UpdateCommentCountRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCommentCount not implemented")
 }
 
 // UnsafeVideoServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -224,6 +258,42 @@ func _VideoService_GetFavoriteVideoList_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_UpdateFavoriteCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFavoriteCountReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).UpdateFavoriteCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_UpdateFavoriteCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).UpdateFavoriteCount(ctx, req.(*UpdateFavoriteCountReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VideoService_UpdateCommentCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCommentCountReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).UpdateCommentCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_UpdateCommentCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).UpdateCommentCount(ctx, req.(*UpdateCommentCountReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +320,14 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFavoriteVideoList",
 			Handler:    _VideoService_GetFavoriteVideoList_Handler,
+		},
+		{
+			MethodName: "UpdateFavoriteCount",
+			Handler:    _VideoService_UpdateFavoriteCount_Handler,
+		},
+		{
+			MethodName: "UpdateCommentCount",
+			Handler:    _VideoService_UpdateCommentCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

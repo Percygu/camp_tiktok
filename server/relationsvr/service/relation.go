@@ -60,27 +60,28 @@ func (c RelationService) RelationAction(ctx context.Context, req *pb.RelationAct
 
 // GetRelationFollowList 获取被关注者列表
 func (c RelationService) GetRelationFollowList(ctx context.Context, req *pb.GetRelationFollowListReq) (*pb.GetRelationFollowListRsp, error) {
-	userInfoList, err := RelationFollowList(req.UserId, 1)
+	list, err := RelationFollowList(req.UserId, 1)
 	if err != nil {
+		log.Errorf("GetRelationFollowList err:%v", err)
 		return nil, err
 	}
 	return &pb.GetRelationFollowListRsp{
-		UserInfoList: userInfoList,
+		UserInfoList: list,
 	}, nil
 }
 
 // GetRelationFollowerList 获取关注者列表
 func (c RelationService) GetRelationFollowerList(ctx context.Context, req *pb.GetRelationFollowerListReq) (*pb.GetRelationFollowerListRsp, error) {
-	userInfoList, err := RelationFollowList(req.UserId, 2)
+	list, err := RelationFollowList(req.UserId, 2)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.GetRelationFollowerListRsp{
-		UserInfoList: userInfoList,
+		UserInfoList: list,
 	}, nil
 }
 
-func RelationFollowList(userID, relationType int64) ([]*pb.UserInfo, error) {
+func RelationFollowList(userID, relationType int64) ([]int64, error) {
 	var (
 		relationList []*repository.Relation
 		err          error
@@ -96,13 +97,19 @@ func RelationFollowList(userID, relationType int64) ([]*pb.UserInfo, error) {
 		return nil, err
 	}
 	if len(relationList) == 0 {
-		return []*pb.UserInfo{}, nil
+		return []int64{}, nil
 	}
 	log.Infof("user:%v, relationList:%+v", userID, relationList)
-	userIdList := make([]int64, 0)
+	resp := make([]int64, 0)
 	for _, relation := range relationList {
-		userIdList = append(userIdList, relation.Follow)
+		// 关注者
+		if relationType == 1 {
+			resp = append(resp, relation.Follow)
+		} else {
+			// 被关注者
+			resp = append(resp, relation.Follower)
+		}
 	}
 	// todo 获取用户列表
-	return []*pb.UserInfo{}, nil
+	return resp, nil
 }
