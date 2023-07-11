@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 option go_package = "../pb;pb";
+import "user.proto";
 import "common.proto";
 // 这里有多个--proto_path是因为当前proto文件中有import别的proto文件，在构建的时候这些proto文件要从--proto_path指定的多个路径去找，
 // 一个没找到就回去从另一个招
@@ -22,7 +23,7 @@ message GetRelationFollowListReq {
 }
 
 message GetRelationFollowListRsp {
-  repeated int64 follow_list = 1; // 关注我关注的人
+  repeated UserInfo user_info_list = 1; // 关注z者用户信息列表
 }
 
 message GetRelationFollowerListReq {
@@ -30,7 +31,7 @@ message GetRelationFollowerListReq {
 }
 
 message GetRelationFollowerListRsp {
-  repeated int64 follower_list = 1; // 喜欢我的人
+  repeated UserInfo user_info_list = 1; // 被关注者用户信息列表
 }
 
 

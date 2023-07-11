@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gatewaysvr/config"
 	"gatewaysvr/log"
 	"gatewaysvr/response"
 	"gatewaysvr/utils"
@@ -9,12 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-type DouyinRelationFollowerListResponse struct {
-	StatusCode int32          `json:"status_code"`
-	StatusMsg  string         `json:"status_msg,omitempty"`
-	UserList   []*pb.UserInfo `json:"user_list,omitempty"`
-}
 
 // 关注操作
 func RelationAction(ctx *gin.Context) {
@@ -95,7 +90,6 @@ func GetFollowList(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Errorf("GetFollowList error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
@@ -116,22 +110,17 @@ func GetFollowerList(ctx *gin.Context) {
 	UserId := ctx.Query("user_id")
 	uid, err := strconv.ParseInt(UserId, 10, 64)
 	if err != nil {
-		log.Errorf("GetFollowerList ParseInt error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
 
-	// 获取关注者列表
-	resp, err := utils.GetRelationSvrClient().GetRelationFollowerList(ctx, &pb.GetRelationFollowerListReq{
+	resp, err := utils.NewRelationSvrClient(config.GetGlobalConfig().SvrConfig.RelationSvrName).GetRelationFollowerList(ctx, &pb.GetRelationFollowerListReq{
 		UserId: uid,
 	})
 
 	if err != nil {
-		log.Errorf("GetFollowerList error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", &DouyinRelationFollowerListResponse{
-		UserList:
-	})
+	response.Success(ctx, "success", resp)
 }

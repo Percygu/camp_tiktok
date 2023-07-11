@@ -19,17 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserService_GetUserInfo_FullMethodName              = "/UserService/GetUserInfo"
-	UserService_GetUserInfoDict_FullMethodName          = "/UserService/GetUserInfoDict"
-	UserService_CheckPassWord_FullMethodName            = "/UserService/CheckPassWord"
-	UserService_Register_FullMethodName                 = "/UserService/Register"
-	UserService_GetUserInfoList_FullMethodName          = "/UserService/GetUserInfoList"
-	UserService_CacheChangeUserCount_FullMethodName     = "/UserService/CacheChangeUserCount"
-	UserService_CacheGetAuthor_FullMethodName           = "/UserService/CacheGetAuthor"
-	UserService_UpdateUserFavoritedCount_FullMethodName = "/UserService/UpdateUserFavoritedCount"
-	UserService_UpdateUserFavoriteCount_FullMethodName  = "/UserService/UpdateUserFavoriteCount"
-	UserService_UpdateUserFollowCount_FullMethodName    = "/UserService/UpdateUserFollowCount"
-	UserService_UpdateUserFollowerCount_FullMethodName  = "/UserService/UpdateUserFollowerCount"
+	UserService_GetUserInfo_FullMethodName          = "/UserService/GetUserInfo"
+	UserService_GetUserInfoDict_FullMethodName      = "/UserService/GetUserInfoDict"
+	UserService_CheckPassWord_FullMethodName        = "/UserService/CheckPassWord"
+	UserService_Register_FullMethodName             = "/UserService/Register"
+	UserService_GetUserInfoList_FullMethodName      = "/UserService/GetUserInfoList"
+	UserService_CacheChangeUserCount_FullMethodName = "/UserService/CacheChangeUserCount"
+	UserService_CacheGetAuthor_FullMethodName       = "/UserService/CacheGetAuthor"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -43,14 +39,6 @@ type UserServiceClient interface {
 	GetUserInfoList(ctx context.Context, in *GetUserInfoListRequest, opts ...grpc.CallOption) (*GetUserInfoListResponse, error)
 	CacheChangeUserCount(ctx context.Context, in *CacheChangeUserCountReq, opts ...grpc.CallOption) (*CacheChangeUserCountRsp, error)
 	CacheGetAuthor(ctx context.Context, in *CacheGetAuthorReq, opts ...grpc.CallOption) (*CacheGetAuthorRsp, error)
-	// 更新 我的获赞数
-	UpdateUserFavoritedCount(ctx context.Context, in *UpdateUserFavoritedCountReq, opts ...grpc.CallOption) (*UpdateUserFavoritedCountRsp, error)
-	// 更新我喜欢的视频总数
-	UpdateUserFavoriteCount(ctx context.Context, in *UpdateUserFavoriteCountReq, opts ...grpc.CallOption) (*UpdateUserFavoriteCountRsp, error)
-	// 更新我的关注数
-	UpdateUserFollowCount(ctx context.Context, in *UpdateUserFollowCountReq, opts ...grpc.CallOption) (*UpdateUserFollowCountRsp, error)
-	// 更新我的粉丝数
-	UpdateUserFollowerCount(ctx context.Context, in *UpdateUserFollowerCountReq, opts ...grpc.CallOption) (*UpdateUserFollowerCountRsp, error)
 }
 
 type userServiceClient struct {
@@ -124,42 +112,6 @@ func (c *userServiceClient) CacheGetAuthor(ctx context.Context, in *CacheGetAuth
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateUserFavoritedCount(ctx context.Context, in *UpdateUserFavoritedCountReq, opts ...grpc.CallOption) (*UpdateUserFavoritedCountRsp, error) {
-	out := new(UpdateUserFavoritedCountRsp)
-	err := c.cc.Invoke(ctx, UserService_UpdateUserFavoritedCount_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) UpdateUserFavoriteCount(ctx context.Context, in *UpdateUserFavoriteCountReq, opts ...grpc.CallOption) (*UpdateUserFavoriteCountRsp, error) {
-	out := new(UpdateUserFavoriteCountRsp)
-	err := c.cc.Invoke(ctx, UserService_UpdateUserFavoriteCount_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) UpdateUserFollowCount(ctx context.Context, in *UpdateUserFollowCountReq, opts ...grpc.CallOption) (*UpdateUserFollowCountRsp, error) {
-	out := new(UpdateUserFollowCountRsp)
-	err := c.cc.Invoke(ctx, UserService_UpdateUserFollowCount_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) UpdateUserFollowerCount(ctx context.Context, in *UpdateUserFollowerCountReq, opts ...grpc.CallOption) (*UpdateUserFollowerCountRsp, error) {
-	out := new(UpdateUserFollowerCountRsp)
-	err := c.cc.Invoke(ctx, UserService_UpdateUserFollowerCount_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // UserServiceServer is the server API for UserService service.
 // All implementations should embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -171,14 +123,6 @@ type UserServiceServer interface {
 	GetUserInfoList(context.Context, *GetUserInfoListRequest) (*GetUserInfoListResponse, error)
 	CacheChangeUserCount(context.Context, *CacheChangeUserCountReq) (*CacheChangeUserCountRsp, error)
 	CacheGetAuthor(context.Context, *CacheGetAuthorReq) (*CacheGetAuthorRsp, error)
-	// 更新 我的获赞数
-	UpdateUserFavoritedCount(context.Context, *UpdateUserFavoritedCountReq) (*UpdateUserFavoritedCountRsp, error)
-	// 更新我喜欢的视频总数
-	UpdateUserFavoriteCount(context.Context, *UpdateUserFavoriteCountReq) (*UpdateUserFavoriteCountRsp, error)
-	// 更新我的关注数
-	UpdateUserFollowCount(context.Context, *UpdateUserFollowCountReq) (*UpdateUserFollowCountRsp, error)
-	// 更新我的粉丝数
-	UpdateUserFollowerCount(context.Context, *UpdateUserFollowerCountReq) (*UpdateUserFollowerCountRsp, error)
 }
 
 // UnimplementedUserServiceServer should be embedded to have forward compatible implementations.
@@ -205,18 +149,6 @@ func (UnimplementedUserServiceServer) CacheChangeUserCount(context.Context, *Cac
 }
 func (UnimplementedUserServiceServer) CacheGetAuthor(context.Context, *CacheGetAuthorReq) (*CacheGetAuthorRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CacheGetAuthor not implemented")
-}
-func (UnimplementedUserServiceServer) UpdateUserFavoritedCount(context.Context, *UpdateUserFavoritedCountReq) (*UpdateUserFavoritedCountRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserFavoritedCount not implemented")
-}
-func (UnimplementedUserServiceServer) UpdateUserFavoriteCount(context.Context, *UpdateUserFavoriteCountReq) (*UpdateUserFavoriteCountRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserFavoriteCount not implemented")
-}
-func (UnimplementedUserServiceServer) UpdateUserFollowCount(context.Context, *UpdateUserFollowCountReq) (*UpdateUserFollowCountRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserFollowCount not implemented")
-}
-func (UnimplementedUserServiceServer) UpdateUserFollowerCount(context.Context, *UpdateUserFollowerCountReq) (*UpdateUserFollowerCountRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserFollowerCount not implemented")
 }
 
 // UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -356,78 +288,6 @@ func _UserService_CacheGetAuthor_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_UpdateUserFavoritedCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserFavoritedCountReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUserFavoritedCount(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_UpdateUserFavoritedCount_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUserFavoritedCount(ctx, req.(*UpdateUserFavoritedCountReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_UpdateUserFavoriteCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserFavoriteCountReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUserFavoriteCount(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_UpdateUserFavoriteCount_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUserFavoriteCount(ctx, req.(*UpdateUserFavoriteCountReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_UpdateUserFollowCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserFollowCountReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUserFollowCount(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_UpdateUserFollowCount_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUserFollowCount(ctx, req.(*UpdateUserFollowCountReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_UpdateUserFollowerCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserFollowerCountReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).UpdateUserFollowerCount(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_UpdateUserFollowerCount_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUserFollowerCount(ctx, req.(*UpdateUserFollowerCountReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -462,22 +322,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CacheGetAuthor",
 			Handler:    _UserService_CacheGetAuthor_Handler,
-		},
-		{
-			MethodName: "UpdateUserFavoritedCount",
-			Handler:    _UserService_UpdateUserFavoritedCount_Handler,
-		},
-		{
-			MethodName: "UpdateUserFavoriteCount",
-			Handler:    _UserService_UpdateUserFavoriteCount_Handler,
-		},
-		{
-			MethodName: "UpdateUserFollowCount",
-			Handler:    _UserService_UpdateUserFollowCount_Handler,
-		},
-		{
-			MethodName: "UpdateUserFollowerCount",
-			Handler:    _UserService_UpdateUserFollowerCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

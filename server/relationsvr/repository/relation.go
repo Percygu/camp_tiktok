@@ -50,7 +50,7 @@ func UnFollowAction(selfUserId, toUserId int64) error {
 func GetFollowList(userId int64) ([]*Relation, error) {
 	db := db.GetDB()
 	relationList := make([]*Relation, 0)
-	err := db.Where("follower_id = ?", userId).Find(&relationList).Error
+	err := db.Where("follower = ?", userId).Find(&relationList).Error
 	if err == gorm.ErrRecordNotFound {
 		return relationList, nil
 	} else if err != nil {
@@ -63,7 +63,7 @@ func GetFollowList(userId int64) ([]*Relation, error) {
 func GetFollowerList(userId int64) ([]*Relation, error) {
 	db := db.GetDB()
 	relationList := make([]*Relation, 0)
-	err := db.Where("follow_id = ?", userId).Find(&relationList).Error
+	err := db.Where("follow = ?", userId).Find(&relationList).Error
 	if err == gorm.ErrRecordNotFound {
 		return relationList, nil
 	} else if err != nil {
