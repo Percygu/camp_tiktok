@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type DouyinRelationFollowerListResponse struct {
+type DouyinRelationListResponse struct {
 	StatusCode int32          `json:"status_code"`
 	StatusMsg  string         `json:"status_msg,omitempty"`
 	UserList   []*pb.UserInfo `json:"user_list,omitempty"`
@@ -90,7 +90,8 @@ func GetFollowList(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := utils.GetRelationSvrClient().GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
+	// 获取关注列表
+	getRelationFollowListRsp, err := utils.GetRelationSvrClient().GetRelationFollowList(ctx, &pb.GetRelationFollowListReq{
 		UserId: uid,
 	})
 
@@ -99,7 +100,20 @@ func GetFollowList(ctx *gin.Context) {
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", resp)
+
+	// 去用户服务获取用户信息
+	resp, err := utils.GetUserSvrClient().GetUserInfoList(ctx, &pb.GetUserInfoListRequest{
+		IdList: getRelationFollowListRsp.FollowList,
+	})
+	if err != nil {
+		log.Errorf("GetFollowList error : %s", err)
+		response.Fail(ctx, err.Error(), nil)
+		return
+	}
+
+	response.Success(ctx, "success", &DouyinRelationListResponse{
+		UserList: resp.UserInfoList,
+	})
 }
 
 // 获取关注者列表
@@ -122,16 +136,21 @@ func GetFollowerList(ctx *gin.Context) {
 	}
 
 	// 获取关注者列表
-	resp, err := utils.GetRelationSvrClient().GetRelationFollowerList(ctx, &pb.GetRelationFollowerListReq{
+	getRelationFollowerListRsp, err := utils.GetRelationSvrClient().GetRelationFollowerList(ctx, &pb.GetRelationFollowerListReq{
 		UserId: uid,
 	})
-
 	if err != nil {
 		log.Errorf("GetFollowerList error : %s", err)
 		response.Fail(ctx, err.Error(), nil)
 		return
 	}
-	response.Success(ctx, "success", &DouyinRelationFollowerListResponse{
-		UserList:
+
+	// 去用户服务获取用户信息
+	resp, err := utils.GetUserSvrClient().GetUserInfoList(ctx, &pb.GetUserInfoListRequest{
+		IdList: getRelationFollowerListRsp.FollowerList,
+	})
+
+	response.Success(ctx, "success", &DouyinRelationListResponse{
+		UserList: resp.UserInfoList,
 	})
 }

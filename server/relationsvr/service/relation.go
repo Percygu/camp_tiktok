@@ -66,7 +66,7 @@ func (c RelationService) GetRelationFollowList(ctx context.Context, req *pb.GetR
 		return nil, err
 	}
 	return &pb.GetRelationFollowListRsp{
-		UserInfoList: list,
+		FollowList: list,
 	}, nil
 }
 
@@ -77,7 +77,7 @@ func (c RelationService) GetRelationFollowerList(ctx context.Context, req *pb.Ge
 		return nil, err
 	}
 	return &pb.GetRelationFollowerListRsp{
-		UserInfoList: list,
+		FollowerList: list,
 	}, nil
 }
 
