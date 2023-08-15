@@ -25,6 +25,8 @@ type SvrConfig struct {
 	// UserSvrName     string `mapstructure:"user_svr_name"` // 用户服务name
 	RelationSvrName string `mapstructure:"relation_svr_name"`
 	FavoriteSvrName string `mapstructure:"favorite_svr_name"`
+	// 雪花算法 机器ID
+	MachineID int `mapstructure:"machine_id"`
 }
 
 type ConsulConfig struct {

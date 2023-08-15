@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"strconv"
 	"usersvr/log"
 	"usersvr/middleware/lock"
@@ -120,38 +120,41 @@ func (u UserService) CacheChangeUserCount(ctx context.Context, req *pb.CacheChan
 	return &pb.CacheChangeUserCountRsp{}, nil
 }
 
-func (u UserService) CacheGetAuthor(ctx context.Context, req *pb.CacheGetAuthorReq) (*pb.CacheGetAuthorRsp, error) {
-	key := strconv.FormatInt(req.VideoId, 10)
-	data, err := repository.CacheHGet("video", key)
-	if err != nil {
-		log.Errorf("CacheGetAuthor err", req.VideoId)
-		return nil, err
-	}
+// func (u UserService) CacheGetAuthor(ctx context.Context, req *pb.CacheGetAuthorReq) (*pb.CacheGetAuthorRsp, error) {
+// 	key := strconv.FormatInt(req.VideoId, 10)
+// 	data, err := repository.CacheHGet("video", key)
+// 	if err != nil {
+// 		log.Errorf("CacheGetAuthor err", req.VideoId)
+// 		return nil, err
+// 	}
+//
+// 	uid := int64(0)
+// 	err = json.Unmarshal(data, &uid)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+//
+// 	return &pb.CacheGetAuthorRsp{UserId: uid}, nil
+// }
 
-	uid := int64(0)
-	err = json.Unmarshal(data, &uid)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.CacheGetAuthorRsp{UserId: uid}, nil
-}
-
+// GetUserInfoList 获取用户信息列表
 func (u UserService) GetUserInfoList(ctx context.Context, req *pb.GetUserInfoListRequest) (*pb.GetUserInfoListResponse, error) {
 	response := new(pb.GetUserInfoListResponse)
-	log.Infof("GetUserInfoList req", req.IdList)
-	for _, userId := range req.IdList {
-		info, err := repository.GetUserInfo(userId)
-		if err != nil {
-			log.Errorf("GetUserInfoList err", userId, err)
-			return nil, err
-		}
-		response.UserInfoList = append(response.UserInfoList, UserToUserInfo(info))
+
+	userList, err := repository.GetUserList(req.IdList)
+	if err != nil {
+		zap.L().Error("GetUserList error", zap.Error(err))
+		return nil, err
+	}
+
+	for _, user := range userList {
+		response.UserInfoList = append(response.UserInfoList, UserToUserInfo(*user))
 	}
 
 	return response, nil
 }
 
+// GetUserInfo 获取用户信息
 func (u UserService) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*pb.GetUserInfoResponse, error) {
 	user, err := repository.GetUserInfo(req.Id)
 	if err != nil {
@@ -164,6 +167,7 @@ func (u UserService) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest
 	return response, nil
 }
 
+// CheckPassWord 登录验证
 func (u UserService) CheckPassWord(ctx context.Context, req *pb.CheckPassWordRequest) (*pb.CheckPassWordResponse, error) {
 	info, err := repository.GetUserInfo(req.Username)
 	if err != nil {
@@ -185,6 +189,7 @@ func (u UserService) CheckPassWord(ctx context.Context, req *pb.CheckPassWordReq
 	return response, nil
 }
 
+// Register 注册
 func (u UserService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
 	sign, err := repository.UserNameIsExist(req.Username)
 	if err != nil {

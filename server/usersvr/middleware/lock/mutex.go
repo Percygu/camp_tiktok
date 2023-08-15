@@ -19,11 +19,15 @@ var (
 	lockExpiry  = time.Second * 10
 	retryDelay  = time.Millisecond * 100
 	tries       = 3
-	option      = []redsync.Option{
+	// 设置锁的过期时间
+	// 设置重试次数
+	// 设置重试间隔
+	option = []redsync.Option{
 		redsync.WithExpiry(lockExpiry),
 		redsync.WithRetryDelay(retryDelay),
 		redsync.WithTries(tries),
 	}
+	lockPrefix = "tiktok:lock:"
 )
 
 // openDB 连接db
@@ -58,7 +62,7 @@ func CloseLock() {
 func GetLock(name string) *redsync.Mutex {
 	// 初始化一次
 	mutexOnce.Do(initLock)
-	return rs.NewMutex(name, option...)
+	return rs.NewMutex(lockPrefix+name, option...)
 }
 
 func UnLock(mutex *redsync.Mutex) {
