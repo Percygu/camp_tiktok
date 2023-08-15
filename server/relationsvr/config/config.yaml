@@ -17,6 +17,9 @@ mysql:
   database: "camps_tiktok"
   username: "root"
   password: "123456"
+  max_idle_conn: 10
+  max_open_conn: 100
+  max_idle_time: 30
 
 
 log:

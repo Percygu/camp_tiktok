@@ -14,8 +14,6 @@ const (
 )
 
 const (
-	ReqUuid           = "uuid"
-	SessionKeyPrefix  = "session_"
-	CommentInfoPrefix = "comment_info_"
-	VideoInfoPrefix   = "video_info_"
+	ReqUuid          = "uuid"
+	SessionKeyPrefix = "session_"
 )

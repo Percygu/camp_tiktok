@@ -1,5 +1,8 @@
 package repository
 
+// redis user key prefix
+var userKeyPrefix = "tiktok:user:"
+
 type User struct {
 	// gorm.Model
 	Id              int64  `gorm:"column:id; primary_key; auto_increment"`

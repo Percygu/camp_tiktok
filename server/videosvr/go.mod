@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/Percygu/camp_tiktok v1.0.29
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/gin-gonic/gin v1.8.0
 	github.com/golang/protobuf v1.5.3

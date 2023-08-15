@@ -2,12 +2,11 @@ package minioStore
 
 import (
 	"github.com/minio/minio-go/v6"
-	"strconv"
 	"strings"
 	"sync"
-	"time"
 	"videosvr/config"
 	"videosvr/log"
+	"videosvr/middleware/snowflake"
 )
 
 type Minio struct {
@@ -94,7 +93,10 @@ func (m *Minio) UploadFile(filetype, file, userID string) (string, error) {
 	}
 	fileName.WriteString(userID)
 	fileName.WriteString("_")
-	fileName.WriteString(strconv.FormatInt(time.Now().UnixNano()/1e6, 10))
+	// 生成雪花算法ID
+	snowflakeID := snowflake.GenID()
+	// 写入雪花算法ID
+	fileName.WriteString(snowflakeID)
 	fileName.WriteString(Suffix)
 	n, err := m.MinioClient.FPutObject(bucket, fileName.String(), file, minio.PutObjectOptions{
 		ContentType: contentType,
