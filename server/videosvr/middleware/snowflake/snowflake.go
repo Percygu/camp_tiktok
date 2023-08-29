@@ -32,7 +32,7 @@ func initSnowflake(startTime string, machineID int) {
 func GenID() string {
 	// 保证只执行一次
 	snowflakeOnce.Do(func() {
-		initSnowflake(time.Now().Format("2023-12-15 00:00:00"), config.GetGlobalConfig().SvrConfig.MachineID)
+		initSnowflake(time.Now().Format("2006-01-02 00:00:00"), config.GetGlobalConfig().SvrConfig.MachineID)
 	})
 	return strconv.FormatInt(node.Generate().Int64(), 10)
 }
