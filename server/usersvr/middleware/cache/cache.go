@@ -16,7 +16,7 @@ var (
 	ValueExpire = time.Hour * 24 * 7
 )
 
-// openDB 连接db
+// initRedis 连接Redis
 func initRedis() {
 	redisConfig := config.GetGlobalConfig().RedisConfig
 	log.Infof("redisConfig=======%+v", redisConfig)
@@ -30,7 +30,7 @@ func initRedis() {
 	if redisConn == nil {
 		panic("failed to call redis.NewClient")
 	}
-	res, err := redisConn.Set(context.Background(), "abc", 100, 1000).Result()
+	res, err := redisConn.Set(context.Background(), "abc", 100, 1 * time.Second).Result()
 	log.Infof("res=======%v,err======%v", res, err)
 	_, err = redisConn.Ping(context.Background()).Result()
 	if err != nil {

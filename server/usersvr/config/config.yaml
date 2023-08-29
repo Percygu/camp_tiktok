@@ -6,7 +6,7 @@ svr_config:
 
 redis:
   host: "43.139.192.217"
-  password: "123456"
+  password: "Golang12345"
   db: 0
   port: 6379
   PoolSize: 10
