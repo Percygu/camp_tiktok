@@ -22,7 +22,7 @@ func DbGetUserByUserName(userName string) (User, error) {
 	db := db.GetDB()
 	user := User{}
 	err := db.Where("user_name = ?", userName).First(&user).Error
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		zap.L().Error("DbGetUserByUserName error", zap.Error(err))
 		return User{}, err
 	}
